@@ -1,0 +1,458 @@
+<template id="scene-4-template">
+  <div data-composition-id="scene-4" data-width="1920" data-height="1080" data-start="0" data-duration="6.8">
+    <div class="scene-content">
+      <div class="meta-row">
+        <span class="scene-tag">// scene 04 — proof in motion</span>
+        <span class="timestamp" id="s4-ts">t+00:14</span>
+      </div>
+
+      <div class="layout">
+        <!-- LEFT: Agent status -->
+        <div class="sidebar">
+          <div class="agent-header">
+            <div class="agent-avatar">A</div>
+            <div class="agent-meta">
+              <div class="agent-name">agent.curator_v2</div>
+              <div class="agent-sub">session · <span class="sess-id">s_4f91a3</span></div>
+            </div>
+          </div>
+
+          <div class="stat">
+            <div class="stat-label">actions this run</div>
+            <div class="stat-value" id="s4-count">00</div>
+          </div>
+
+          <div class="stat">
+            <div class="stat-label">latency p50</div>
+            <div class="stat-value small">142<span class="unit">ms</span></div>
+          </div>
+
+          <div class="stat">
+            <div class="stat-label">channel</div>
+            <div class="stat-chip">transfermarkt</div>
+          </div>
+
+          <div class="live-row">
+            <span class="live-dot"></span>
+            <span class="live-label">tool calls streaming</span>
+          </div>
+        </div>
+
+        <!-- RIGHT: Feed -->
+        <div class="feed" id="s4-feed">
+          <div class="feed-title">agent.trace</div>
+
+          <!-- Card 1: ingest -->
+          <div class="tc-card" id="tc-1">
+            <div class="tc-head">
+              <span class="tc-step">01</span>
+              <span class="tc-fn">tchop.cards.ingest</span>
+              <span class="tc-status ok">200</span>
+            </div>
+            <div class="tc-body">
+              <div class="tc-row"><span class="tc-k">url</span><span class="tc-v">https://kicker.de/bvb-transfer-sabitzer</span></div>
+              <div class="tc-row"><span class="tc-k">→ card_id</span><span class="tc-v accent">c_9f3a27</span></div>
+            </div>
+          </div>
+
+          <!-- Card 2: tag -->
+          <div class="tc-card" id="tc-2">
+            <div class="tc-head">
+              <span class="tc-step">02</span>
+              <span class="tc-fn">tchop.cards.tag</span>
+              <span class="tc-status ok">200</span>
+            </div>
+            <div class="tc-body">
+              <div class="tc-row"><span class="tc-k">tags</span>
+                <span class="tc-chips">
+                  <span class="chip">bvb</span><span class="chip">transfer</span><span class="chip">bundesliga</span>
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 3: route -->
+          <div class="tc-card" id="tc-3">
+            <div class="tc-head">
+              <span class="tc-step">03</span>
+              <span class="tc-fn">tchop.channels.route</span>
+              <span class="tc-status ok">200</span>
+            </div>
+            <div class="tc-body">
+              <div class="tc-row"><span class="tc-k">channel</span><span class="tc-v accent">Transfermarkt</span></div>
+              <div class="tc-row"><span class="tc-k">confidence</span><span class="tc-v mono">0.94</span></div>
+            </div>
+          </div>
+
+          <!-- Card 4: schedule -->
+          <div class="tc-card" id="tc-4">
+            <div class="tc-head">
+              <span class="tc-step">04</span>
+              <span class="tc-fn">tchop.push.schedule</span>
+              <span class="tc-status ok">200</span>
+            </div>
+            <div class="tc-body">
+              <div class="tc-row"><span class="tc-k">deliver_at</span><span class="tc-v mono">2026-04-20 08:00 CET</span></div>
+              <div class="tc-row"><span class="tc-k">audience</span><span class="tc-v">active_readers (8,312)</span></div>
+            </div>
+          </div>
+
+          <!-- Card 5: status -->
+          <div class="tc-card" id="tc-5">
+            <div class="tc-head">
+              <span class="tc-step">05</span>
+              <span class="tc-fn">tchop.cards.status</span>
+              <span class="tc-status ok">200</span>
+            </div>
+            <div class="tc-body">
+              <div class="tc-row"><span class="tc-k">state</span>
+                <span class="tc-status-pill">published</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <style>
+      [data-composition-id="scene-4"] {
+        position: absolute;
+        inset: 0;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        color: #F1F1F3;
+        font-family: 'Basier Circle', 'Manrope', -apple-system, sans-serif;
+      }
+      [data-composition-id="scene-4"] .scene-content {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        height: 100%;
+        padding: 80px 120px;
+        gap: 28px;
+        box-sizing: border-box;
+        z-index: 10;
+      }
+      [data-composition-id="scene-4"] .meta-row {
+        display: flex;
+        justify-content: space-between;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 20px;
+        font-weight: 500;
+        color: #B8B8C7;
+        font-variant-numeric: tabular-nums;
+      }
+      [data-composition-id="scene-4"] .scene-tag { color: #FF8F72; }
+
+      [data-composition-id="scene-4"] .layout {
+        flex: 1;
+        display: grid;
+        grid-template-columns: 420px 1fr;
+        gap: 48px;
+        min-height: 0;
+      }
+
+      /* SIDEBAR */
+      [data-composition-id="scene-4"] .sidebar {
+        display: flex;
+        flex-direction: column;
+        gap: 28px;
+        padding: 32px;
+        background: rgba(67,68,91,0.55);
+        border: 1px solid rgba(241,241,243,0.08);
+        border-radius: 20px;
+      }
+      [data-composition-id="scene-4"] .agent-header {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid rgba(241,241,243,0.08);
+      }
+      [data-composition-id="scene-4"] .agent-avatar {
+        width: 54px;
+        height: 54px;
+        border-radius: 16px;
+        background: #2D2D46;
+        color: #FF8F72;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+        font-weight: 700;
+        border: 1px solid rgba(255,143,114,0.6);
+        box-shadow: 0 4px 14px rgba(246,112,77,0.35);
+      }
+      [data-composition-id="scene-4"] .agent-name {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 20px;
+        font-weight: 600;
+        color: #F1F1F3;
+      }
+      [data-composition-id="scene-4"] .agent-sub {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 15px;
+        color: #B8B8C7;
+        font-variant-numeric: tabular-nums;
+      }
+      [data-composition-id="scene-4"] .sess-id { color: #7BACE3; }
+
+      [data-composition-id="scene-4"] .stat {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      [data-composition-id="scene-4"] .stat-label {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 16px;
+        font-weight: 500;
+        color: #B8B8C7;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+      [data-composition-id="scene-4"] .stat-value {
+        font-family: 'Basier Circle', 'Manrope', sans-serif;
+        font-size: 72px;
+        font-weight: 700;
+        line-height: 1;
+        letter-spacing: -0.03em;
+        color: #F1F1F3;
+        font-variant-numeric: tabular-nums;
+      }
+      [data-composition-id="scene-4"] .stat-value.small { font-size: 48px; }
+      [data-composition-id="scene-4"] .unit {
+        font-size: 28px;
+        font-weight: 400;
+        color: #B8B8C7;
+        margin-left: 4px;
+      }
+      [data-composition-id="scene-4"] .stat-chip {
+        display: inline-flex;
+        align-self: flex-start;
+        padding: 6px 16px;
+        background: rgba(123,172,227,0.2);
+        color: #7BACE3;
+        border: 1px solid rgba(123,172,227,0.4);
+        border-radius: 100px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 18px;
+        font-weight: 600;
+      }
+      [data-composition-id="scene-4"] .live-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-top: auto;
+        padding-top: 16px;
+        border-top: 1px solid rgba(241,241,243,0.08);
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 17px;
+        font-weight: 700;
+        color: #4FD88A;
+      }
+      [data-composition-id="scene-4"] .live-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: #4FD88A;
+        box-shadow: 0 0 10px rgba(79,216,138,0.8);
+      }
+
+      /* FEED */
+      [data-composition-id="scene-4"] .feed {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        overflow: visible;
+      }
+      [data-composition-id="scene-4"] .feed-title {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 18px;
+        font-weight: 600;
+        color: #F6704D;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        margin-bottom: 6px;
+      }
+      [data-composition-id="scene-4"] .tc-card {
+        background: rgba(55,62,75,0.75);
+        border: 1px solid rgba(241,241,243,0.1);
+        border-radius: 14px;
+        padding: 16px 22px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+      }
+      [data-composition-id="scene-4"] .tc-head {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+      [data-composition-id="scene-4"] .tc-step {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 16px;
+        font-weight: 700;
+        color: #E8E8EE;
+        background: rgba(241,241,243,0.12);
+        padding: 4px 10px;
+        border-radius: 6px;
+        letter-spacing: 0.04em;
+      }
+      [data-composition-id="scene-4"] .tc-fn {
+        flex: 1;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 21px;
+        font-weight: 700;
+        color: #FFD138;
+      }
+      [data-composition-id="scene-4"] .tc-status {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 16px;
+        font-weight: 700;
+        padding: 4px 10px;
+        border-radius: 6px;
+      }
+      [data-composition-id="scene-4"] .tc-status.ok {
+        background: rgba(79,216,138,0.18);
+        color: #4FD88A;
+        border: 1px solid rgba(79,216,138,0.4);
+      }
+      [data-composition-id="scene-4"] .tc-body {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+      [data-composition-id="scene-4"] .tc-row {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 18px;
+      }
+      [data-composition-id="scene-4"] .tc-k {
+        color: #E8E8EE;
+        min-width: 110px;
+      }
+      [data-composition-id="scene-4"] .tc-v { color: #F1F1F3; }
+      [data-composition-id="scene-4"] .tc-v.accent { color: #FF8F72; font-weight: 700; }
+      [data-composition-id="scene-4"] .tc-v.mono { font-variant-numeric: tabular-nums; }
+      [data-composition-id="scene-4"] .tc-chips {
+        display: inline-flex;
+        gap: 6px;
+      }
+      [data-composition-id="scene-4"] .chip {
+        padding: 3px 10px;
+        background: rgba(123,172,227,0.22);
+        color: #7BACE3;
+        border: 1px solid rgba(123,172,227,0.45);
+        border-radius: 100px;
+        font-size: 16px;
+        font-weight: 700;
+      }
+      [data-composition-id="scene-4"] .tc-status-pill {
+        padding: 3px 12px;
+        background: rgba(79,216,138,0.2);
+        color: #4FD88A;
+        border: 1px solid rgba(79,216,138,0.45);
+        border-radius: 100px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 16px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+      }
+    </style>
+
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <script>
+      (function () {
+        window.__timelines = window.__timelines || {};
+        var tl = gsap.timeline({ paused: true });
+        var sel = function (s) { return '[data-composition-id="scene-4"] ' + s; };
+
+        // Meta row
+        tl.from(sel('.meta-row .scene-tag'),
+          { y: -20, opacity: 0, duration: 0.4, ease: "power3.out" }, 0.1);
+        tl.from(sel('.meta-row .timestamp'),
+          { y: -20, opacity: 0, duration: 0.4, ease: "power3.out" }, 0.2);
+
+        // Sidebar slides in
+        tl.from(sel('.sidebar'),
+          { x: -60, opacity: 0, duration: 0.55, ease: "power3.out" }, 0.25);
+
+        // Agent avatar scales in a hair later
+        tl.from(sel('.agent-avatar'),
+          { scale: 0.5, opacity: 0, duration: 0.45, ease: "expo.out" }, 0.55);
+
+        // Feed title
+        tl.from(sel('.feed-title'),
+          { x: 30, opacity: 0, duration: 0.45, ease: "power3.out" }, 0.45);
+
+        // Cards stagger in — synced to narration pacing within 6.8s scene
+        // Narration beats relative to scene start (scene starts at composition t=14.0):
+        //   "An agent reads a URL."    → 0.56-1.96s  → card 1 at 0.75
+        //   "Tags it."                 → 1.96-2.63   → card 2 at 2.10
+        //   "Slots into a channel."    → 2.63-3.80   → card 3 at 2.85
+        //   "Schedules the push."      → 3.84-5.26   → card 4 at 4.00
+        //   "Updates the status."      → 5.26-6.60   → card 5 at 5.35
+        var cards = ['#tc-1', '#tc-2', '#tc-3', '#tc-4', '#tc-5'];
+        var cardStarts = [0.75, 2.10, 2.85, 4.00, 5.35];
+        cards.forEach(function (id, i) {
+          var t = cardStarts[i];
+          tl.from(sel(id), {
+            x: 80,
+            opacity: 0,
+            scale: 0.96,
+            filter: "blur(6px)",
+            duration: 0.4,
+            ease: "power3.out"
+          }, t);
+          // Status badge pops separately
+          tl.fromTo(sel(id + ' .tc-status'),
+            { scale: 0.5, opacity: 0 },
+            { scale: 1, opacity: 1, duration: 0.3, ease: "expo.out" }, t + 0.22);
+        });
+
+        // Counter ticks up from 00 to 05 synced with card entrances
+        var countEl = document.querySelector(sel('#s4-count'));
+        var countState = { n: 0 };
+        cards.forEach(function (id, i) {
+          var t = cardStarts[i] + 0.1;
+          tl.to(countState, {
+            n: i + 1,
+            duration: 0.28,
+            ease: "power2.out",
+            onUpdate: function () {
+              if (countEl) countEl.textContent = String(Math.round(countState.n)).padStart(2, '0');
+            }
+          }, t);
+        });
+
+        // Live dot pulse — finite repeats
+        tl.to(sel('.live-dot'),
+          { scale: 1.5, opacity: 0.4, duration: 0.55, ease: "sine.inOut",
+            repeat: 5, yoyo: true }, 0.8);
+
+        // Timestamp ticks subtly — increment seconds across the scene
+        var tsEl = document.querySelector(sel('#s4-ts'));
+        var tsState = { s: 14 };
+        tl.to(tsState, {
+          s: 21,
+          duration: 6.5,
+          ease: "none",
+          onUpdate: function () {
+            if (tsEl) {
+              var n = Math.floor(tsState.s);
+              tsEl.textContent = 't+00:' + String(n).padStart(2, '0');
+            }
+          }
+        }, 0.3);
+
+        window.__timelines["scene-4"] = tl;
+      })();
+    </script>
+  </div>
+</template>

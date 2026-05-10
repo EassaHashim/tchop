@@ -1,0 +1,23 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "static-server",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "8080"],
+      "port": 8080
+    },
+    {
+      "name": "docs-server",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "8765", "--directory", "/Users/heiko_scherer/Documents"],
+      "port": 8765
+    },
+    {
+      "name": "status-tags-video",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["hyperframes", "preview", "tchop-status-tags-video", "--port", "3002"],
+      "port": 3002
+    }
+  ]
+}

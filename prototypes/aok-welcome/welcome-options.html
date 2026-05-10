@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Welcome Page — 3 Directions</title>
+<link rel="icon" href="https://mxz-assets.tchop.it/img/app-icons/aok/dialog_onlinefavicon.ico" />
+<style>
+  @font-face { font-family:'AOKBuenosAires'; src:url('https://mxz-assets.tchop.it/font/aok/AOKBuenosAiresText-Regular.woff2') format('woff2'); font-weight:400; font-display:swap; }
+  @font-face { font-family:'AOKBuenosAires'; src:url('https://mxz-assets.tchop.it/font/aok/AOKBuenosAiresText-SemiBold.woff2') format('woff2'); font-weight:600; font-display:swap; }
+  @font-face { font-family:'AOKBuenosAires'; src:url('https://mxz-assets.tchop.it/font/aok/AOKBuenosAiresText-Bold.woff2') format('woff2'); font-weight:700; font-display:swap; }
+
+  :root {
+    --primary:#005E3F; --secondary:#18AB42; --btn-bg:#91F54A; --btn-text:#004730;
+    --tint:#E8F4F2; --tint-deep:#D4ECE4;
+    --txt:#293033; --txt2:#6D767C; --txt3:#98A1A6;
+    --bg:#FFFFFF; --bg2:#F8F8F8; --border:#EBEBEB; --divider:#DFE3E6;
+    --overlay:rgba(35,35,46,0.5);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{font-size:16px;}
+  body{font-family:'AOKBuenosAires',sans-serif;color:var(--txt);font-size:1rem;line-height:1.5rem;-webkit-font-smoothing:antialiased;background:var(--bg2);}
+  a{color:var(--secondary);text-decoration:none;}
+  a:hover{color:var(--primary);}
+  button{font-family:inherit;cursor:pointer;border:none;background:none;padding:0;color:inherit;}
+  img{display:block;max-width:100%;}
+
+  /* ============================================================
+     Shared components
+     ============================================================ */
+  .btn{display:flex;align-items:center;justify-content:center;gap:0.5rem;font-size:1rem;font-weight:600;line-height:1.5rem;padding:0.625rem 1.5rem;border-radius:0.25rem;border:0.125rem solid;transition:0.2s;width:100%;}
+  .btn-primary{color:var(--btn-text);background:var(--btn-bg);border-color:var(--btn-bg);}
+  .btn-primary:hover{background:#fff;border-color:var(--btn-bg);}
+  .btn-secondary{color:var(--primary);background:#fff;border-color:#AFB6BC;}
+  .btn-secondary:hover{background:var(--divider);}
+  .btn svg{width:1.125rem;height:1.125rem;flex-shrink:0;}
+
+  .social-row{display:flex;gap:0.5rem;width:100%;}
+  .social-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:0.5rem;padding:0.5rem;border:0.0625rem solid var(--border);border-radius:0.25rem;font-size:0.875rem;font-weight:600;color:var(--txt);background:#fff;transition:0.2s;}
+  .social-btn:hover{border-color:var(--secondary);background:var(--tint);}
+  .social-btn svg{width:1.125rem;height:1.125rem;}
+
+  .divider{display:flex;align-items:center;gap:0.75rem;width:100%;margin:0.25rem 0;}
+  .divider::before,.divider::after{content:'';flex:1;height:0.0625rem;background:var(--divider);}
+  .divider span{font-size:0.8125rem;color:var(--txt3);white-space:nowrap;}
+
+  .free-link{display:block;text-align:center;font-size:0.875rem;color:var(--secondary);font-weight:600;padding:0.5rem;border-radius:0.25rem;transition:0.2s;}
+  .free-link:hover{background:var(--tint);color:var(--primary);}
+
+  .ext-links{display:flex;justify-content:center;gap:0.25rem;font-size:0.75rem;color:var(--txt3);}
+  .ext-links a{color:var(--txt2);font-weight:400;}
+  .ext-links a:hover{color:var(--primary);}
+
+  .qr-block{display:flex;align-items:center;gap:1rem;padding:1rem;background:var(--bg2);border-radius:0.25rem;border:0.0625rem solid var(--border);}
+  .qr-code{width:5rem;height:5rem;background:#fff;border:0.0625rem solid var(--border);border-radius:0.25rem;display:grid;place-items:center;flex-shrink:0;overflow:hidden;}
+  .qr-code svg{width:4rem;height:4rem;}
+  .qr-text{font-size:0.8125rem;color:var(--txt2);line-height:1.15rem;}
+  .qr-text strong{color:var(--txt);font-weight:600;display:block;margin-bottom:0.25rem;font-size:0.9375rem;}
+  .store-badges{display:flex;gap:0.5rem;margin-top:0.5rem;}
+  .store-badge{display:inline-flex;align-items:center;gap:0.375rem;padding:0.375rem 0.75rem;background:#000;color:#fff;font-size:0.6875rem;font-weight:600;border-radius:0.25rem;line-height:1;}
+  .store-badge svg{width:0.875rem;height:0.875rem;}
+  .store-badge small{font-weight:400;font-size:0.5625rem;display:block;opacity:0.8;}
+
+  .feature-cards{display:flex;gap:1rem;}
+  .feature-card{flex:1;padding:1.25rem 1rem;background:#fff;border:0.0625rem solid var(--border);border-radius:0.25rem;text-align:center;}
+  .feature-card-icon{width:2.5rem;height:2.5rem;margin:0 auto 0.75rem;background:var(--tint);border-radius:0.25rem;display:grid;place-items:center;color:var(--primary);}
+  .feature-card-icon svg{width:1.25rem;height:1.25rem;}
+  .feature-card h4{font-size:0.9375rem;font-weight:700;color:var(--txt);margin-bottom:0.25rem;}
+  .feature-card p{font-size:0.8125rem;color:var(--txt2);line-height:1.15rem;}
+
+  .activity-bar{display:flex;gap:1.5rem;padding:0.875rem 1rem;background:var(--tint);border-radius:0.25rem;}
+  .activity-item{text-align:center;flex:1;}
+  .activity-num{font-size:1.5rem;font-weight:700;color:var(--primary);}
+  .activity-label{font-size:0.6875rem;color:var(--txt2);text-transform:uppercase;letter-spacing:0.02em;font-weight:600;}
+
+  .preview-feed{position:relative;overflow:hidden;border-radius:0.25rem;border:0.0625rem solid var(--border);}
+  .preview-card{padding:0.875rem 1rem;border-bottom:0.0625rem solid var(--border);background:#fff;}
+  .preview-card:last-child{border-bottom:none;}
+  .preview-card-title{font-size:0.875rem;font-weight:600;color:var(--txt);margin-bottom:0.125rem;}
+  .preview-card-meta{font-size:0.75rem;color:var(--txt3);}
+  .preview-overlay{position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,0) 0%,rgba(255,255,255,0.95) 60%,#fff 100%);display:flex;align-items:flex-end;justify-content:center;padding:1.5rem;}
+  .preview-overlay span{font-size:0.875rem;font-weight:600;color:var(--primary);}
+
+  /* ============================================================
+     Switcher
+     ============================================================ */
+  .switcher{position:fixed;top:0;left:0;right:0;z-index:9000;background:#fff;border-bottom:0.0625rem solid var(--border);display:flex;align-items:center;padding:0.5rem 1.5rem;gap:0.75rem;box-shadow:0 0.25rem 0.75rem rgba(0,0,0,0.06);}
+  .switcher-label{font-size:0.75rem;font-weight:600;color:var(--txt3);text-transform:uppercase;letter-spacing:0.04em;}
+  .switcher button{font-size:0.875rem;font-weight:600;padding:0.375rem 1rem;border-radius:0.25rem;background:var(--bg2);color:var(--txt);}
+  .switcher button:hover{background:var(--tint);color:var(--primary);}
+  .switcher button.active{background:var(--primary);color:#fff;}
+  .switcher .toggles{margin-left:auto;display:flex;gap:0.75rem;align-items:center;font-size:0.75rem;color:var(--txt2);}
+  .switcher .toggles label{display:flex;align-items:center;gap:0.375rem;cursor:pointer;}
+  .switcher .toggles input{accent-color:var(--primary);}
+
+  .page{display:none;padding-top:3rem;}
+  .page.active{display:block;}
+
+  /* ============================================================
+     DIRECTION A: Magazine cover
+     ============================================================ */
+  .a-hero{display:flex;min-height:100vh;background:var(--bg);}
+  .a-hero-visual{flex:1;background:var(--tint);display:flex;align-items:center;justify-content:center;padding:3rem;position:relative;overflow:hidden;}
+  .a-hero-visual-img{max-width:20rem;opacity:0.9;}
+  .a-hero-visual::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(0,94,63,0.08) 0%,rgba(0,94,63,0.02) 100%);}
+  .a-hero-login{width:28rem;flex-shrink:0;display:flex;flex-direction:column;justify-content:center;padding:3rem 2.5rem;border-left:0.0625rem solid var(--border);}
+  .a-logo{margin-bottom:2rem;}
+  .a-logo img{height:2.5rem;}
+  .a-title{font-size:1.75rem;font-weight:700;color:var(--primary);margin-bottom:0.375rem;}
+  .a-subtitle{font-size:0.9375rem;color:var(--txt2);margin-bottom:2rem;line-height:1.375rem;}
+  .a-form{display:flex;flex-direction:column;gap:0.75rem;}
+
+  .a-sections{background:var(--bg2);}
+  .a-section{max-width:56rem;margin:0 auto;padding:4rem 2rem;}
+  .a-section-title{font-size:1.5rem;font-weight:700;color:var(--primary);text-align:center;margin-bottom:0.5rem;}
+  .a-section-sub{font-size:0.9375rem;color:var(--txt2);text-align:center;margin-bottom:2rem;}
+
+  .a-footer{background:var(--bg);border-top:0.0625rem solid var(--border);padding:1.5rem;text-align:center;}
+
+  /* ============================================================
+     DIRECTION B: Card with backdrop
+     ============================================================ */
+  .b-page{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem;background:var(--tint);position:relative;}
+  .b-page::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,var(--primary) 0%,#18AB42 100%);opacity:0.06;}
+  .b-card{position:relative;width:100%;max-width:26rem;background:#fff;border-radius:0.25rem;box-shadow:0 1rem 3rem rgba(0,0,0,0.12);padding:2rem;display:flex;flex-direction:column;gap:0.875rem;align-items:center;}
+  .b-logo img{height:3rem;margin-bottom:0.5rem;}
+  .b-title{font-size:1.5rem;font-weight:700;color:var(--primary);text-align:center;}
+  .b-subtitle{font-size:0.875rem;color:var(--txt2);text-align:center;line-height:1.25rem;margin-bottom:0.5rem;}
+  .b-form{display:flex;flex-direction:column;gap:0.75rem;width:100%;}
+
+  /* ============================================================
+     DIRECTION C: Sliding panels
+     ============================================================ */
+  .c-page{display:flex;min-height:100vh;background:var(--bg);}
+  .c-login{width:26rem;flex-shrink:0;display:flex;flex-direction:column;justify-content:center;padding:3rem 2.5rem;border-right:0.0625rem solid var(--border);background:#fff;}
+  .c-panel{flex:1;background:var(--bg2);padding:3rem 2.5rem;display:flex;flex-direction:column;justify-content:center;gap:1.5rem;overflow-y:auto;}
+  .c-panel-title{font-size:1.25rem;font-weight:700;color:var(--primary);margin-bottom:0.25rem;}
+  .c-panel-sub{font-size:0.875rem;color:var(--txt2);line-height:1.25rem;}
+  .c-panel-section{display:flex;flex-direction:column;gap:0.75rem;}
+  .c-panel-label{font-size:0.6875rem;font-weight:600;color:var(--txt3);text-transform:uppercase;letter-spacing:0.04em;}
+
+  /* ============================================================
+     QR code placeholder SVG (simulated pattern)
+     ============================================================ */
+</style>
+</head>
+<body>
+
+<!-- Switcher bar -->
+<div class="switcher">
+  <span class="switcher-label">Direction:</span>
+  <button class="active" onclick="show('a',this)">A — Magazine</button>
+  <button onclick="show('b',this)">B — Card</button>
+  <button onclick="show('c',this)">C — Panels</button>
+  <div class="toggles">
+    <label><input type="checkbox" id="togSocial" checked onchange="updateToggles()" /> Social Login</label>
+    <label><input type="checkbox" id="togFree" checked onchange="updateToggles()" /> Ohne Login</label>
+    <label><input type="checkbox" id="togActivity" checked onchange="updateToggles()" /> Live Stats</label>
+    <label><input type="checkbox" id="togPreview" onchange="updateToggles()" /> Content Preview</label>
+  </div>
+</div>
+
+<!-- ================================================================
+     DIRECTION A: Magazine cover
+     ================================================================ -->
+<div class="page active" id="page-a">
+
+  <div class="a-hero">
+    <div class="a-hero-visual">
+      <img class="a-hero-visual-img" src="https://mxz-assets.tchop.it/img/app-icons/aok/AOK+Logo.svg" alt="AOK" />
+    </div>
+    <div class="a-hero-login">
+      <div class="a-logo"><img src="https://mxz-assets.tchop.it/img/app-icons/aok/dialog_online_login.svg" alt="dialog online" /></div>
+      <div class="a-title">Willkommen bei dialog online</div>
+      <div class="a-subtitle">Dein internes Netzwerk für News, Teams und Austausch bei der AOK Niedersachsen.</div>
+      <div class="a-form">
+        <button class="btn btn-primary">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          Mit SSO anmelden
+        </button>
+        <button class="btn btn-secondary">Mit E-Mail anmelden</button>
+        <div class="social-row tog-social"></div>
+        <div class="divider tog-free"><span>oder</span></div>
+        <a class="free-link tog-free" href="#">Ohne Anmeldung fortfahren</a>
+        <div class="ext-links" style="margin-top:0.5rem;">
+          <a href="#">Datenschutz</a> <span>&middot;</span> <a href="#">AGB</a> <span>&middot;</span> <a href="#">FAQ</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="a-sections">
+    <div class="a-section">
+      <div class="a-section-title">Was dich erwartet</div>
+      <div class="a-section-sub">Aktuelle Nachrichten, Team-Austausch und mehr — alles an einem Ort.</div>
+      <div class="feature-cards"></div>
+    </div>
+
+    <div class="a-section tog-activity" style="background:var(--bg);border-top:0.0625rem solid var(--border);">
+      <div class="activity-bar" style="max-width:32rem;margin:0 auto;"></div>
+    </div>
+
+    <div class="a-section tog-preview" style="display:none;">
+      <div class="a-section-title">Was gerade passiert</div>
+      <div class="a-section-sub">Ein Blick in aktuelle Beiträge.</div>
+      <div class="preview-feed" style="max-width:28rem;margin:0 auto;"></div>
+    </div>
+
+    <div class="a-section">
+      <div class="qr-block" style="max-width:28rem;margin:0 auto;"></div>
+    </div>
+  </div>
+
+  <div class="a-footer">
+    <div class="ext-links">
+      <a href="#">Impressum</a> <span>&middot;</span> <a href="#">Datenschutz</a> <span>&middot;</span> <a href="#">Support: teamdialog@nds.aok.de</a>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================
+     DIRECTION B: Card with backdrop
+     ================================================================ -->
+<div class="page" id="page-b">
+
+  <div class="b-page">
+    <div class="b-card">
+      <div class="b-logo"><img src="https://mxz-assets.tchop.it/img/app-icons/aok/dialog_online_login.svg" alt="dialog online" /></div>
+      <div class="b-title">Willkommen</div>
+      <div class="b-subtitle">Melde dich an, um auf News, Team-Austausch und alle Inhalte der AOK Niedersachsen zuzugreifen.</div>
+      <div class="b-form">
+        <button class="btn btn-primary">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          Mit SSO anmelden
+        </button>
+        <button class="btn btn-secondary">Mit E-Mail anmelden</button>
+        <div class="social-row tog-social"></div>
+        <div class="divider tog-free"><span>oder</span></div>
+        <a class="free-link tog-free" href="#">Ohne Anmeldung fortfahren</a>
+      </div>
+
+      <div style="width:100%;border-top:0.0625rem solid var(--border);padding-top:1rem;margin-top:0.25rem;">
+        <div class="qr-block" style="border:none;padding:0.75rem;background:var(--bg2);"></div>
+      </div>
+
+      <div class="ext-links" style="margin-top:0.25rem;">
+        <a href="#">Datenschutz</a> <span>&middot;</span> <a href="#">AGB</a> <span>&middot;</span> <a href="#">FAQ</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================
+     DIRECTION C: Sliding panels
+     ================================================================ -->
+<div class="page" id="page-c">
+
+  <div class="c-page">
+    <div class="c-login">
+      <div class="a-logo" style="margin-bottom:1.5rem;"><img src="https://mxz-assets.tchop.it/img/app-icons/aok/dialog_online_login.svg" alt="dialog online" style="height:2.5rem;" /></div>
+      <div class="a-title" style="font-size:1.5rem;">Willkommen</div>
+      <div class="a-subtitle" style="font-size:0.875rem;margin-bottom:1.5rem;">Melde dich an, um alle Inhalte zu sehen.</div>
+      <div class="a-form">
+        <button class="btn btn-primary">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          Mit SSO anmelden
+        </button>
+        <button class="btn btn-secondary">Mit E-Mail anmelden</button>
+        <div class="social-row tog-social"></div>
+        <div class="divider tog-free"><span>oder</span></div>
+        <a class="free-link tog-free" href="#">Ohne Anmeldung fortfahren</a>
+        <div class="ext-links" style="margin-top:1rem;">
+          <a href="#">Datenschutz</a> <span>&middot;</span> <a href="#">AGB</a> <span>&middot;</span> <a href="#">FAQ</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="c-panel">
+      <div class="c-panel-section tog-activity">
+        <div class="c-panel-label">Deine Community</div>
+        <div class="activity-bar"></div>
+      </div>
+
+      <div class="c-panel-section">
+        <div class="c-panel-title">Was dich erwartet</div>
+        <div class="c-panel-sub">Aktuelle Nachrichten, Team-Kanäle und direkter Austausch — alles in einer App.</div>
+        <div class="feature-cards"></div>
+      </div>
+
+      <div class="c-panel-section tog-preview" style="display:none;">
+        <div class="c-panel-label">Aktuelle Beiträge</div>
+        <div class="preview-feed"></div>
+      </div>
+
+      <div class="c-panel-section">
+        <div class="c-panel-label">App herunterladen</div>
+        <div class="qr-block"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   Shared content injection
+   ============================================================ */
+
+const SOCIAL_HTML = `
+  <button class="social-btn"><svg viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.1a6.9 6.9 0 0 1 0-4.2V7.06H2.18a11 11 0 0 0 0 9.88l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38a5.9 5.9 0 0 1 4.2 1.64l3.15-3.15A10.5 10.5 0 0 0 12 1C7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>Google</button>
+  <button class="social-btn"><svg viewBox="0 0 24 24" fill="#000"><path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.08-.46-2.07-.48-3.2 0-1.42.62-2.17.44-3.03-.35C3.79 16.17 4.36 9.1 8.93 8.84c1.28.07 2.17.74 2.92.8.93-.19 1.82-.91 3.02-.82 1.44.1 2.53.59 3.24 1.63-2.83 1.73-2.15 5.52.55 6.58-.57 1.42-1.32 2.83-2.6 4.25zM12.03 8.78C11.88 6.5 13.74 4.6 15.89 4.4c.31 2.6-2.37 4.55-3.86 4.38z"/></svg>Apple</button>
+  <button class="social-btn"><svg viewBox="0 0 24 24" fill="#1877F2"><path d="M22 12a10 10 0 1 0-11.6 9.9v-7H7.9V12h2.5V9.8c0-2.5 1.5-3.8 3.7-3.8 1 0 2.2.2 2.2.2v2.5h-1.3c-1.2 0-1.6.8-1.6 1.6V12H16l-.4 2.9h-2.2v7A10 10 0 0 0 22 12z"/></svg>Facebook</button>`;
+
+const FEATURES_HTML = `
+  <div class="feature-card">
+    <div class="feature-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14h-8M15 18h-5M10 6h8v4h-8z"/></svg></div>
+    <h4>Aktuelle News</h4>
+    <p>Kuratierte Nachrichten und Updates aus deiner Organisation.</p>
+  </div>
+  <div class="feature-card">
+    <div class="feature-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+    <h4>Austausch</h4>
+    <p>Diskussionen, Kommentare und Direktnachrichten mit Kolleg:innen.</p>
+  </div>
+  <div class="feature-card">
+    <div class="feature-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+    <h4>Teams</h4>
+    <p>Eigene Kanäle für Abteilungen, Projekte und Standorte.</p>
+  </div>`;
+
+const ACTIVITY_HTML = `
+  <div class="activity-item"><div class="activity-num">1.247</div><div class="activity-label">Mitglieder</div></div>
+  <div class="activity-item"><div class="activity-num">38</div><div class="activity-label">Beiträge heute</div></div>
+  <div class="activity-item"><div class="activity-num">12</div><div class="activity-label">Kommentare</div></div>`;
+
+const QR_SVG = `<svg viewBox="0 0 100 100" fill="none"><rect width="100" height="100" fill="#fff"/><g fill="#293033"><rect x="5" y="5" width="25" height="25"/><rect x="70" y="5" width="25" height="25"/><rect x="5" y="70" width="25" height="25"/><rect x="10" y="10" width="15" height="15" fill="#fff"/><rect x="75" y="10" width="15" height="15" fill="#fff"/><rect x="10" y="75" width="15" height="15" fill="#fff"/><rect x="14" y="14" width="7" height="7"/><rect x="79" y="14" width="7" height="7"/><rect x="14" y="79" width="7" height="7"/><rect x="35" y="5" width="5" height="5"/><rect x="45" y="5" width="5" height="5"/><rect x="55" y="5" width="5" height="5"/><rect x="35" y="15" width="5" height="5"/><rect x="50" y="15" width="5" height="5"/><rect x="60" y="15" width="5" height="5"/><rect x="35" y="25" width="5" height="5"/><rect x="45" y="25" width="5" height="5"/><rect x="5" y="35" width="5" height="5"/><rect x="15" y="35" width="5" height="5"/><rect x="25" y="35" width="5" height="5"/><rect x="35" y="35" width="5" height="5"/><rect x="50" y="35" width="5" height="5"/><rect x="60" y="35" width="5" height="5"/><rect x="70" y="35" width="5" height="5"/><rect x="85" y="35" width="5" height="5"/><rect x="5" y="45" width="5" height="5"/><rect x="20" y="45" width="5" height="5"/><rect x="35" y="45" width="5" height="5"/><rect x="45" y="45" width="5" height="5"/><rect x="55" y="45" width="5" height="5"/><rect x="75" y="45" width="5" height="5"/><rect x="90" y="45" width="5" height="5"/><rect x="5" y="55" width="5" height="5"/><rect x="15" y="55" width="5" height="5"/><rect x="25" y="55" width="5" height="5"/><rect x="40" y="55" width="5" height="5"/><rect x="55" y="55" width="5" height="5"/><rect x="70" y="55" width="5" height="5"/><rect x="80" y="55" width="5" height="5"/><rect x="90" y="55" width="5" height="5"/><rect x="35" y="70" width="5" height="5"/><rect x="50" y="70" width="5" height="5"/><rect x="60" y="70" width="5" height="5"/><rect x="75" y="70" width="5" height="5"/><rect x="90" y="70" width="5" height="5"/><rect x="35" y="80" width="5" height="5"/><rect x="45" y="80" width="5" height="5"/><rect x="70" y="80" width="5" height="5"/><rect x="85" y="80" width="5" height="5"/><rect x="35" y="90" width="5" height="5"/><rect x="55" y="90" width="5" height="5"/><rect x="70" y="90" width="5" height="5"/><rect x="80" y="90" width="5" height="5"/></g></svg>`;
+
+const QR_BLOCK_HTML = `
+  <div class="qr-code">${QR_SVG}</div>
+  <div class="qr-text">
+    <strong>App herunterladen</strong>
+    Scanne den QR-Code oder lade die App direkt aus dem Store.
+    <div class="store-badges">
+      <a class="store-badge" href="#"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.08-.46-2.07-.48-3.2 0-1.42.62-2.17.44-3.03-.35C3.79 16.17 4.36 9.1 8.93 8.84c1.28.07 2.17.74 2.92.8.93-.19 1.82-.91 3.02-.82 1.44.1 2.53.59 3.24 1.63-2.83 1.73-2.15 5.52.55 6.58-.57 1.42-1.32 2.83-2.6 4.25zM12.03 8.78C11.88 6.5 13.74 4.6 15.89 4.4c.31 2.6-2.37 4.55-3.86 4.38z"/></svg><div><small>Laden im</small>App Store</div></a>
+      <a class="store-badge" href="#"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3.61 1.81L13.43 12 3.61 22.19a1.18 1.18 0 0 1-.61-1V2.81c0-.44.24-.82.61-1zM14.87 13.44l2.62 1.52-3.46 2L12.57 12l1.46-4.96 3.46 2-2.62 1.52zM21.4 10.94l-2.56 1.49L15.7 12l3.14-1.82 2.56 1.49c.77.44.77 1.16 0 1.6v-.33zM4.44.88L14.87 7.57 13.43 12 4.44.88z"/></svg><div><small>Jetzt bei</small>Google Play</div></a>
+    </div>
+  </div>`;
+
+const PREVIEW_HTML = `
+  <div class="preview-card"><div class="preview-card-title">Neue Gleitzeitregelung ab Mai</div><div class="preview-card-meta">Heute, 14:30 &middot; Personal</div></div>
+  <div class="preview-card"><div class="preview-card-title">Gesundheitstag am 22. April: Programm steht</div><div class="preview-card-meta">Gestern &middot; AOK Intern</div></div>
+  <div class="preview-card"><div class="preview-card-title">VPN-Update: Was sich ändert</div><div class="preview-card-meta">15. Apr &middot; IT</div></div>
+  <div class="preview-card"><div class="preview-card-title">Teamausflug Wolfsburg — Anmeldung offen</div><div class="preview-card-meta">14. Apr &middot; Team NDS</div></div>
+  <div class="preview-overlay"><span>Melde dich an, um alles zu sehen</span></div>`;
+
+/* ============================================================
+   Inject shared content into all three pages
+   ============================================================ */
+function injectShared() {
+  // Social login rows
+  document.querySelectorAll('.social-row.tog-social').forEach(el => { el.innerHTML = SOCIAL_HTML; });
+
+  // Feature cards
+  document.querySelectorAll('.feature-cards').forEach(el => { el.innerHTML = FEATURES_HTML; });
+
+  // Activity bars
+  document.querySelectorAll('.activity-bar').forEach(el => { el.innerHTML = ACTIVITY_HTML; });
+
+  // QR blocks
+  document.querySelectorAll('.qr-block').forEach(el => { el.innerHTML = QR_BLOCK_HTML; });
+
+  // Preview feeds
+  document.querySelectorAll('.preview-feed').forEach(el => { el.innerHTML = PREVIEW_HTML; });
+}
+
+/* ============================================================
+   Switcher + toggle logic
+   ============================================================ */
+function show(id, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  document.querySelectorAll('.switcher button').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function updateToggles() {
+  const social  = document.getElementById('togSocial').checked;
+  const free    = document.getElementById('togFree').checked;
+  const activity= document.getElementById('togActivity').checked;
+  const preview = document.getElementById('togPreview').checked;
+
+  document.querySelectorAll('.tog-social').forEach(el => el.style.display = social ? '' : 'none');
+  document.querySelectorAll('.tog-free').forEach(el => el.style.display = free ? '' : 'none');
+  document.querySelectorAll('.tog-activity').forEach(el => el.style.display = activity ? '' : 'none');
+  document.querySelectorAll('.tog-preview').forEach(el => el.style.display = preview ? '' : 'none');
+}
+
+/* Init */
+injectShared();
+updateToggles();
+</script>
+</body>
+</html>

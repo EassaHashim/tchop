@@ -1,0 +1,1 @@
+Scrape a LinkedIn Sales Navigator saved search via PhantomBuster, enrich leads with emails, and create a ready-to-use prospect list. Follow the full workflow defined in .agents/skills/lead-scraper/SKILL.md

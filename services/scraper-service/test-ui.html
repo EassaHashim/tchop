@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scraper Service - Test UI</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f5; color: #1a1a1a; padding: 24px; max-width: 860px; margin: 0 auto; }
+  h1 { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
+  .subtitle { color: #666; font-size: 13px; margin-bottom: 24px; }
+  .card { background: #fff; border-radius: 8px; padding: 20px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+  .card h2 { font-size: 15px; font-weight: 600; margin-bottom: 16px; }
+  .tabs { display: flex; gap: 0; margin-bottom: 20px; background: #e8e8e8; border-radius: 6px; padding: 2px; }
+  .tab { flex: 1; padding: 8px 16px; text-align: center; border-radius: 5px; cursor: pointer; font-size: 13px; font-weight: 500; color: #666; transition: all 0.15s; user-select: none; }
+  .tab.active { background: #fff; color: #1a1a1a; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+  label { display: block; font-size: 12px; font-weight: 500; color: #666; margin-bottom: 4px; margin-top: 12px; }
+  input, select { width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; font-family: inherit; }
+  input:focus, select:focus { outline: none; border-color: #4a7fff; box-shadow: 0 0 0 2px rgba(74,127,255,0.15); }
+  .row { display: flex; gap: 12px; }
+  .row > * { flex: 1; }
+  .row-3 > * { flex: 1; min-width: 0; }
+  .btn { padding: 8px 16px; border: none; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.15s; }
+  .btn-primary { background: #4a7fff; color: #fff; }
+  .btn-primary:hover { background: #3a6fee; }
+  .btn-primary:disabled { background: #a0b8e8; cursor: not-allowed; }
+  .btn-secondary { background: #e8e8e8; color: #333; }
+  .btn-secondary:hover { background: #ddd; }
+  .btn-success { background: #22c55e; color: #fff; }
+  .btn-success:hover { background: #16a34a; }
+  .btn-danger { background: #ef4444; color: #fff; font-size: 12px; padding: 4px 10px; }
+  .btn-danger:hover { background: #dc2626; }
+  .actions { display: flex; gap: 8px; margin-top: 16px; justify-content: flex-end; }
+  .config-bar { display: flex; gap: 12px; align-items: flex-end; margin-bottom: 20px; flex-wrap: wrap; }
+  .config-bar label { margin-top: 0; }
+  .config-bar input { width: 280px; }
+  .config-bar .btn { margin-bottom: 1px; }
+  .status { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }
+  .status-ok { background: #22c55e; }
+  .status-error { background: #ef4444; }
+  .status-inactive { background: #d1d5db; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { text-align: left; padding: 8px 10px; border-bottom: 2px solid #eee; font-weight: 600; color: #666; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
+  td { padding: 8px 10px; border-bottom: 1px solid #f0f0f0; }
+  tr:hover td { background: #fafafa; }
+  .preview-list { max-height: 400px; overflow-y: auto; }
+  .preview-item { padding: 12px; border-bottom: 1px solid #f0f0f0; display: flex; gap: 12px; }
+  .preview-item:last-child { border-bottom: none; }
+  .preview-img { width: 80px; height: 60px; object-fit: cover; border-radius: 4px; background: #eee; flex-shrink: 0; }
+  .preview-text h3 { font-size: 14px; font-weight: 500; margin-bottom: 2px; }
+  .preview-text p { font-size: 12px; color: #666; line-height: 1.4; }
+  .preview-text .meta { font-size: 11px; color: #999; margin-top: 2px; }
+  .preview-text a { font-size: 11px; color: #4a7fff; text-decoration: none; }
+  .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid #fff; border-top-color: transparent; border-radius: 50%; animation: spin 0.6s linear infinite; margin-right: 6px; vertical-align: middle; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .empty { text-align: center; padding: 40px; color: #999; font-size: 14px; }
+  .error-msg { background: #fef2f2; color: #dc2626; padding: 10px 14px; border-radius: 6px; font-size: 13px; margin-top: 12px; }
+  .success-msg { background: #f0fdf4; color: #16a34a; padding: 10px 14px; border-radius: 6px; font-size: 13px; margin-top: 12px; }
+  .hidden { display: none; }
+  .toggle-row { display: flex; gap: 20px; margin-top: 12px; flex-wrap: wrap; }
+  .toggle { display: flex; align-items: center; gap: 6px; font-size: 13px; cursor: pointer; }
+  .toggle input { width: auto; }
+  .section-divider { border-top: 1px solid #eee; margin: 16px 0; padding-top: 16px; }
+  .section-divider h3 { font-size: 13px; font-weight: 600; color: #999; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+  .hint { font-size: 11px; color: #999; margin-top: 2px; }
+</style>
+</head>
+<body>
+
+<h1>Scraper Service</h1>
+<p class="subtitle">Test UI for the tchop content scraper</p>
+
+<!-- Connection -->
+<div class="config-bar">
+  <div>
+    <label>Worker URL</label>
+    <input type="text" id="workerUrl" value="">
+  </div>
+  <div>
+    <label>API Token</label>
+    <input type="password" id="apiToken" placeholder="x-api-key for worker auth">
+  </div>
+  <button class="btn btn-secondary" onclick="checkHealth()">Check Health</button>
+  <span id="healthStatus"></span>
+</div>
+
+<!-- New Integration -->
+<div class="card">
+  <h2>New Integration</h2>
+
+  <label>Name</label>
+  <input type="text" id="intName" placeholder="e.g. TechCrunch AI News">
+
+  <!-- Single mode: Find Articles (crawl) -->
+
+  <!-- Crawl fields -->
+  <div id="crawlFields">
+    <label>URL to Monitor</label>
+    <input type="url" id="sourceUrl" placeholder="https://www.spiegel.de/politik/">
+    <p class="hint">Enter the page where articles appear. E.g. https://www.spiegel.de/politik/ or https://blog.tchop.io/en/</p>
+
+    <label>Sample Article URL (optional)</label>
+    <input type="url" id="sampleUrl" placeholder="e.g. https://www.bild.de/sport/fussball/darmstadt-98-das-ist-die-..." oninput="toggleSearchSample()">
+    <p class="hint">Paste one example article URL. Enables browser rendering for JS-heavy sites. Disables search term.</p>
+
+    <div id="searchTermWrapper">
+      <label>Search Term (optional)</label>
+      <input type="text" id="searchTerms" placeholder="e.g. Friedrich Merz">
+      <p class="hint">Only discover articles matching this term. Not available with sample URL.</p>
+    </div>
+
+    <div class="row row-3">
+      <div>
+        <label>Max Articles</label>
+        <input type="number" id="maxPages" value="20" min="1" max="50">
+        <p class="hint">Per run</p>
+      </div>
+      <div>
+        <label>Initial Backfill</label>
+        <select id="initialBackfill">
+          <option value="0">None</option>
+          <option value="2">Last 2 articles</option>
+          <option value="5" selected>Last 5 articles</option>
+          <option value="10">Last 10 articles</option>
+          <option value="20">Last 20 articles</option>
+        </select>
+        <p class="hint">On first run only.</p>
+      </div>
+      <div>
+        <label>Schedule</label>
+        <select id="scheduleInterval">
+          <option value="15m">Every 15 min</option>
+          <option value="30m">Every 30 min</option>
+          <option value="1h" selected>Every hour</option>
+          <option value="4h">Every 4 hours</option>
+          <option value="12h">Every 12 hours</option>
+          <option value="1d">Daily</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scrape fields -->
+
+  <!-- tchop target -->
+  <div class="section-divider">
+    <h3>Target in tchop</h3>
+  </div>
+  <div class="row row-3">
+    <div>
+      <label>Org</label>
+      <input type="text" id="orgId" value="quantum">
+    </div>
+    <div>
+      <label>Channel ID</label>
+      <input type="number" id="channelId" placeholder="e.g. 2381">
+    </div>
+    <div>
+      <label>Mix ID (Story ID)</label>
+      <input type="number" id="mixId" placeholder="e.g. 60962">
+    </div>
+  </div>
+
+  <!-- Card settings -->
+  <div class="section-divider">
+    <h3>Card Settings</h3>
+  </div>
+  <div class="row row-3">
+    <div>
+      <label>Card Type</label>
+      <select id="cardType">
+        <option value="article">Article</option>
+        <option value="longpost">Long Post (beta)</option>
+      </select>
+    </div>
+    <div>
+      <label>Teaser Layout</label>
+      <select id="teaserStyle">
+        <option value="">Standard</option>
+        <option value="SMALL_WITH_TEXT">Small with text</option>
+        <option value="SMALL_WITHOUT_TEXT">Small without text</option>
+        <option value="BIG_WITHOUT_TEXT">Big without text</option>
+      </select>
+      <p class="hint">Only applies when image is present.</p>
+    </div>
+    <div>
+      <label>Source Override</label>
+      <input type="text" id="sourceOverride" placeholder="e.g. tchop Blog">
+      <p class="hint">Custom source name. If empty, uses og:site_name or domain.</p>
+    </div>
+  </div>
+
+  <div class="toggle-row">
+    <label class="toggle"><input type="checkbox" id="includeImages" checked> Include images</label>
+    <label class="toggle"><input type="checkbox" id="autoPublish" checked> Auto-publish</label>
+  </div>
+
+  <div class="actions">
+    <button class="btn btn-primary" id="testBtn" onclick="runPreview()">Test</button>
+    <button class="btn btn-success" id="saveBtn" onclick="saveIntegration()">Save Integration</button>
+  </div>
+
+  <div id="previewError" class="error-msg hidden"></div>
+  <div id="previewSuccess" class="success-msg hidden"></div>
+
+  <div id="previewResults" class="hidden" style="margin-top: 16px;">
+    <h2 id="previewCount"></h2>
+    <div class="preview-list" id="previewList"></div>
+  </div>
+</div>
+
+<!-- Integration Status -->
+<div class="card">
+  <h2>Integration Status</h2>
+  <button class="btn btn-secondary" onclick="loadStatus()" style="margin-bottom: 12px;">Refresh</button>
+
+  <div id="statusEmpty" class="empty">Click Refresh to load integration statuses</div>
+  <div id="statusError" class="error-msg hidden"></div>
+
+  <table id="statusTable" class="hidden">
+    <thead>
+      <tr>
+        <th>Status</th>
+        <th>Name</th>
+        <th>Mode</th>
+        <th>URL to Monitor</th>
+        <th>Last Run</th>
+        <th>Found</th>
+        <th>Posted</th>
+        <th>Error</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody id="statusBody"></tbody>
+  </table>
+</div>
+
+<script>
+let currentMode = 'crawl';
+
+// Persist worker URL and token in localStorage
+const savedUrl = localStorage.getItem('scraper_worker_url');
+const savedToken = localStorage.getItem('scraper_api_token');
+document.getElementById('workerUrl').value = savedUrl || window.location.origin || 'http://localhost:3000';
+if (savedToken) document.getElementById('apiToken').value = savedToken;
+
+function saveConfig() {
+  localStorage.setItem('scraper_worker_url', document.getElementById('workerUrl').value);
+  localStorage.setItem('scraper_api_token', document.getElementById('apiToken').value);
+}
+
+// Auto-save on change
+document.getElementById('workerUrl').addEventListener('change', saveConfig);
+document.getElementById('apiToken').addEventListener('change', saveConfig);
+
+function getHeaders() {
+  const token = document.getElementById('apiToken').value;
+  return { 'Content-Type': 'application/json', 'x-api-key': token };
+}
+
+function baseUrl() {
+  return document.getElementById('workerUrl').value.replace(/\/$/, '');
+}
+
+function toggleSearchSample() {
+  const sampleUrl = document.getElementById('sampleUrl').value.trim();
+  const wrapper = document.getElementById('searchTermWrapper');
+  const searchInput = document.getElementById('searchTerms');
+  if (sampleUrl) {
+    wrapper.style.opacity = '0.4';
+    searchInput.disabled = true;
+    searchInput.value = '';
+    searchInput.placeholder = 'Disabled when sample URL is set';
+  } else {
+    wrapper.style.opacity = '1';
+    searchInput.disabled = false;
+    searchInput.placeholder = 'e.g. Friedrich Merz';
+  }
+}
+
+function setMode(mode) {
+  currentMode = mode;
+  document.querySelectorAll('.tab').forEach((t, i) => {
+    t.classList.toggle('active', (mode === 'crawl' && i === 0) || (mode === 'scrape' && i === 1));
+  });
+  document.getElementById('crawlFields').classList.toggle('hidden', mode !== 'crawl');
+}
+
+async function checkHealth() {
+  const el = document.getElementById('healthStatus');
+  try {
+    const res = await fetch(baseUrl() + '/health');
+    const data = await res.json();
+    el.innerHTML = data.status === 'ok'
+      ? '<span class="status status-ok"></span>OK (' + data.integrations + ' integrations, uptime ' + Math.round(data.uptime) + 's)'
+      : '<span class="status status-error"></span>Unhealthy';
+  } catch (e) {
+    el.innerHTML = '<span class="status status-error"></span>Unreachable';
+  }
+}
+
+async function runPreview() {
+  const btn = document.getElementById('testBtn');
+  const errEl = document.getElementById('previewError');
+  const succEl = document.getElementById('previewSuccess');
+  const resultsEl = document.getElementById('previewResults');
+
+  errEl.classList.add('hidden');
+  succEl.classList.add('hidden');
+  resultsEl.classList.add('hidden');
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Testing...';
+
+  const body = { monitoring_mode: currentMode };
+  if (currentMode === 'crawl') {
+    body.source_url = document.getElementById('sourceUrl').value;
+    body.url_pattern = '.*';
+    body.max_pages = parseInt(document.getElementById('maxPages').value) || 10;
+    const sampleUrl = document.getElementById('sampleUrl').value.trim();
+    if (sampleUrl) {
+      body.sample_url = sampleUrl;
+    } else {
+      const search = document.getElementById('searchTerms').value;
+      if (search) body.search_terms = search;
+    }
+  } else {
+    body.source_url = document.getElementById('sourceUrl').value;
+  }
+
+  try {
+    const res = await fetch(baseUrl() + '/preview', {
+      method: 'POST', headers: getHeaders(), body: JSON.stringify(body),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ error: res.statusText }));
+      throw new Error(err.error || 'Request failed');
+    }
+    const data = await res.json();
+    renderPreview(data);
+  } catch (e) {
+    errEl.textContent = e.message;
+    errEl.classList.remove('hidden');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = 'Test';
+  }
+}
+
+function renderPreview(data) {
+  const el = document.getElementById('previewResults');
+  const countEl = document.getElementById('previewCount');
+  const listEl = document.getElementById('previewList');
+
+  countEl.textContent = data.count + ' item(s) found';
+  listEl.innerHTML = '';
+
+  if (data.items.length === 0) {
+    listEl.innerHTML = '<div class="empty">No content found. Try adjusting your URL pattern.</div>';
+  } else {
+    data.items.forEach(item => {
+      const div = document.createElement('div');
+      div.className = 'preview-item';
+      div.innerHTML =
+        (item.image ? '<img class="preview-img" src="' + escHtml(item.image) + '" onerror="this.style.display=\'none\'">' : '') +
+        '<div class="preview-text">' +
+          '<h3>' + escHtml(item.title || 'Untitled') + '</h3>' +
+          '<p>' + escHtml((item.description || '').slice(0, 200)) + '</p>' +
+          '<div class="meta">Source: ' + escHtml(item.source || 'unknown') + '</div>' +
+          '<a href="' + escHtml(item.url) + '" target="_blank">' + escHtml(item.url) + '</a>' +
+        '</div>';
+      listEl.appendChild(div);
+    });
+  }
+  el.classList.remove('hidden');
+}
+
+async function saveIntegration() {
+  const errEl = document.getElementById('previewError');
+  const succEl = document.getElementById('previewSuccess');
+  errEl.classList.add('hidden');
+  succEl.classList.add('hidden');
+
+  const name = document.getElementById('intName').value;
+  const orgId = document.getElementById('orgId').value;
+  const channelId = parseInt(document.getElementById('channelId').value);
+  const mixId = parseInt(document.getElementById('mixId').value) || null;
+  const cardType = document.getElementById('cardType').value;
+  const sourceOverride = document.getElementById('sourceOverride').value || null;
+  const includeImages = document.getElementById('includeImages').checked;
+  const autoPublish = document.getElementById('autoPublish').checked;
+
+  if (!name || !orgId || !channelId) {
+    errEl.textContent = 'Name, Org, and Channel ID are required';
+    errEl.classList.remove('hidden');
+    return;
+  }
+
+  const row = {
+    name,
+    org_id: orgId,
+    channel_id: channelId,
+    mix_id: mixId,
+    monitoring_mode: currentMode,
+    source_url: document.getElementById('sourceUrl').value,
+    card_type: cardType,
+    auto_publish: autoPublish,
+    include_images: includeImages,
+    source_override: sourceOverride,
+    teaser_style: document.getElementById('teaserStyle').value || null,
+    url_pattern: currentMode === 'crawl' ? '.*' : null,
+    search_terms: currentMode === 'crawl' && !document.getElementById('sampleUrl').value.trim() ? (document.getElementById('searchTerms').value || null) : null,
+    sample_url: currentMode === 'crawl' ? (document.getElementById('sampleUrl').value.trim() || null) : null,
+    max_pages: currentMode === 'crawl' ? parseInt(document.getElementById('maxPages').value) || 50 : 1,
+    initial_backfill: currentMode === 'crawl' ? parseInt(document.getElementById('initialBackfill').value) || 0 : 0,
+    schedule_interval: document.getElementById('scheduleInterval').value,
+    is_active: true,
+  };
+
+  try {
+    const res = await fetch(baseUrl() + '/integrations', {
+      method: 'POST',
+      headers: getHeaders(),
+      body: JSON.stringify(row),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ error: res.statusText }));
+      throw new Error(err.error || 'Save failed');
+    }
+    const data = await res.json();
+    succEl.textContent = 'Integration saved (id: ' + data[0].id + '). Worker will pick it up on next poll cycle.';
+    succEl.classList.remove('hidden');
+    loadStatus();
+  } catch (e) {
+    errEl.textContent = 'Save failed: ' + e.message;
+    errEl.classList.remove('hidden');
+  }
+}
+
+async function toggleIntegration(id, currentlyActive) {
+  const token = document.getElementById('apiToken').value;
+  await fetch(baseUrl() + '/integrations/' + id, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', 'x-api-key': token },
+    body: JSON.stringify({ is_active: !currentlyActive }),
+  });
+  loadStatus();
+}
+
+async function deleteIntegration(id) {
+  if (!confirm('Delete integration ' + id + '?')) return;
+  const token = document.getElementById('apiToken').value;
+  await fetch(baseUrl() + '/integrations/' + id, {
+    method: 'DELETE',
+    headers: { 'x-api-key': token },
+  });
+  loadStatus();
+}
+
+async function loadStatus() {
+  const emptyEl = document.getElementById('statusEmpty');
+  const errEl = document.getElementById('statusError');
+  const tableEl = document.getElementById('statusTable');
+  const bodyEl = document.getElementById('statusBody');
+
+  emptyEl.classList.add('hidden');
+  errEl.classList.add('hidden');
+  tableEl.classList.add('hidden');
+
+  try {
+    const res = await fetch(baseUrl() + '/integrations/status', { headers: getHeaders() });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ error: res.statusText }));
+      throw new Error(err.error || 'Request failed');
+    }
+
+    const data = await res.json();
+    bodyEl.innerHTML = '';
+
+    if (!data.integrations || data.integrations.length === 0) {
+      emptyEl.textContent = 'No integrations configured';
+      emptyEl.classList.remove('hidden');
+      return;
+    }
+
+    data.integrations.forEach(i => {
+      const statusClass = !i.is_active ? 'status-inactive' : (i.last_error ? 'status-error' : 'status-ok');
+      const lastRun = i.last_run_at ? new Date(i.last_run_at).toLocaleString() : 'Never';
+      const tr = document.createElement('tr');
+      tr.innerHTML =
+        '<td><span class="status ' + statusClass + '"></span>' + (i.is_active ? 'Active' : 'Paused') + '</td>' +
+        '<td>' + escHtml(i.name) + '</td>' +
+        '<td>' + escHtml(i.monitoring_mode) + '</td>' +
+        '<td title="' + escHtml(i.source_url) + '">' + escHtml(truncate(i.source_url, 30)) + '</td>' +
+        '<td>' + lastRun + '</td>' +
+        '<td>' + (i.items_found || 0) + '</td>' +
+        '<td>' + (i.items_posted || 0) + '</td>' +
+        '<td style="color:#dc2626;font-size:12px" title="' + escHtml(i.last_error || '') + '">' + escHtml(truncate(i.last_error || '', 30)) + '</td>' +
+        '<td style="white-space:nowrap">' +
+          '<button class="btn ' + (i.is_active ? 'btn-secondary' : 'btn-primary') + '" style="font-size:12px;padding:4px 10px;margin-right:4px" onclick="toggleIntegration(' + i.id + ',' + i.is_active + ')">' + (i.is_active ? 'Pause' : 'Resume') + '</button>' +
+          '<button class="btn btn-danger" onclick="deleteIntegration(' + i.id + ')">Delete</button>' +
+        '</td>';
+      bodyEl.appendChild(tr);
+    });
+
+    tableEl.classList.remove('hidden');
+  } catch (e) {
+    errEl.textContent = e.message;
+    errEl.classList.remove('hidden');
+  }
+}
+
+function deriveDomain(url) {
+  try {
+    const u = new URL(url);
+    return u.origin;
+  } catch { return url; }
+}
+
+function derivePattern(url) {
+  try {
+    const u = new URL(url);
+    const path = u.pathname.replace(/\/$/, '');
+    return path ? path + '/.*' : '/.*';
+  } catch { return '/.*'; }
+}
+
+function escHtml(s) {
+  const d = document.createElement('div');
+  d.textContent = s || '';
+  return d.innerHTML;
+}
+
+function truncate(s, n) {
+  return s && s.length > n ? s.slice(0, n) + '...' : s || '';
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,70 @@
+{
+  "tchop": {
+    "mix_id": 19922,
+    "org": "lilien",
+    "api_url": "https://tchop.io/api/graphql/webapp"
+  },
+  "accounts": {
+    "x": ["SVDNews_", "ScoutingD98", "nedrise2"],
+    "bluesky": [
+      "machstenocheins.de",
+      "arthur-schoenbein.bsky.social",
+      "ariakethama.bsky.social",
+      "schappida.bsky.social",
+      "lilienhashtags.bsky.social",
+      "andisvd.bsky.social",
+      "dodo98.bsky.social",
+      "davidrossmann.bsky.social",
+      "ulilie.bsky.social",
+      "derchillen.bsky.social"
+    ]
+  },
+  "match_window": {
+    "minutes_before_kickoff": 60,
+    "match_duration_minutes": 105,
+    "minutes_after_final_whistle": 90
+  },
+  "post_match_extended": {
+    "hours_after_final_whistle": 24,
+    "check_interval_minutes": 180
+  },
+  "rate_limit": {
+    "max_posts": 3,
+    "window_minutes": 20
+  },
+  "publishing": {
+    "auto_publish": true,
+    "max_candidates_per_run": 20
+  },
+  "lineup": {
+    "trigger_account": "SVDNews_",
+    "keywords": [
+      "Unser Team",
+      "unsere Startelf",
+      "Startaufstellung",
+      "So starten die Lilien",
+      "Starting XI"
+    ],
+    "exclude_keywords": ["Voraussichtliche"],
+    "push_channel_id": 1730,
+    "push_mix_id": 19922
+  },
+  "matchday_morning": {
+    "trigger_account": "SVDNews_",
+    "keywords": ["MATCHDAY"],
+    "check_from_hour_utc": 6,
+    "check_to_hour_utc": 12,
+    "push_channel_id": 1730,
+    "push_mix_id": 19922
+  },
+  "fanradio": {
+    "url": "https://fanradio.fufa-sv98.de/livestream/",
+    "story_id": 11783,
+    "source_name": "FuFa Fanradio",
+    "push_channel_id": 1730,
+    "card_minutes_before_kickoff": 10,
+    "push_minutes_before_kickoff": 5,
+    "push_title": "Jetzt live im Fanradio \u269c\ufe0f"
+  },
+  "curation_prompt": "You are curating fan-generated social media posts about SV Darmstadt 98 (Lilien) match days for the Lilien News community feed.\n\nINCLUDE posts that are:\n- First-hand stadium shots, atmosphere videos, or photos from the Böllenfalltor\n- Fan reactions to match events (goals, chances, decisions, atmosphere)\n- Opinions on the team's performance (positive OR negative / critical)\n- Personal commentary with original perspective\n- Match-related jokes, memes, or emotional moments\n\nEXCLUDE posts that are:\n- Pure score updates without any commentary (\"1:0 Darmstadt\")\n- Private or personal content unrelated to the match\n- Anything too offensive, insulting, or hateful\n- Spam, ads, or bot-like content\n- Generic retweets/quote posts without added perspective\n\nTONE: Pro-Darmstadt fan perspective. Authentic fan voices. Criticism of the team is welcome when it reflects genuine fan frustration -- just never cross into hate speech or personal attacks.\n\nFor each post return: url, include (true/false), score (0-10), reason (one short sentence in German or English).\n\nRank by score descending. Only mark include=true for posts you'd confidently publish to the community feed."
+}

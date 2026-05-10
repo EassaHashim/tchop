@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>IT Status Card — Pill Tag on Feed Card</title>
+<link rel="icon" href="https://mxz-assets.tchop.it/img/app-icons/aok/dialog_onlinefavicon.ico" />
+<style>
+  @font-face {
+    font-family: 'AOKBuenosAires';
+    src: url('https://mxz-assets.tchop.it/font/aok/AOKBuenosAiresText-Regular.woff2') format('woff2');
+    font-style: normal; font-weight: 400; font-display: swap;
+  }
+  @font-face {
+    font-family: 'AOKBuenosAires';
+    src: url('https://mxz-assets.tchop.it/font/aok/AOKBuenosAiresText-SemiBold.woff2') format('woff2');
+    font-style: normal; font-weight: 600; font-display: swap;
+  }
+  @font-face {
+    font-family: 'AOKBuenosAires';
+    src: url('https://mxz-assets.tchop.it/font/aok/AOKBuenosAiresText-Bold.woff2') format('woff2');
+    font-style: normal; font-weight: 700; font-display: swap;
+  }
+
+  :root {
+    /* Tokens mirror generated.json for dialogonline-aok_nds. In production,
+       every value resolves through var(--…) set at runtime by setConfigCSSVariables().
+       In this prototype we define them once so the file is self-contained. */
+    --primary:         #005E3F;
+    --secondary:       #18AB42;
+    --tint-green:      #E8F4F2;
+    --button-primary:  #91F54A;
+    --button-primary-text: #004730;
+
+    --txt-prominent:   #005E3F;
+    --txt-base:        #293033;
+    --txt-secondary:   #6D767C;
+    --txt-disabled:    #98A1A6;
+
+    --bg-base:         #FFFFFF;
+    --bg-secondary:    #F8F8F8;
+
+    --border-card:     #EBEBEB;
+    --border-divider:  #DFE3E6;
+    --border-default:  #B3B3B3;
+
+    /* Status tag — single tint-on-primary scheme for every status.
+       Shape of the leading icon distinguishes state. See statusColors map. */
+    --status-tag-bg:   var(--tint-green);
+    --status-tag-fg:   var(--primary);
+
+    /* Spacing scale mirrors generated.json exactly. */
+    --sp-0-25: 0.25rem;
+    --sp-0-5:  0.5rem;
+    --sp-0-75: 0.75rem;
+    --sp-1:    1rem;
+    --sp-1-5:  1.5rem;
+    --sp-2:    2rem;
+    --sp-3:    3rem;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { font-size: 16px; }
+  @media (max-width: 600px) { html { font-size: 14px; } }
+
+  body {
+    font-family: 'AOKBuenosAires', sans-serif;
+    background: var(--bg-secondary);
+    color: var(--txt-base);
+    font-size: 1rem;
+    line-height: 1.5rem;
+    -webkit-font-smoothing: antialiased;
+    padding: var(--sp-2);
+  }
+
+  /* ============================================================
+     Page header (design-explanation chrome, not part of the card)
+     ============================================================ */
+  .page-header { max-width: 40rem; margin-bottom: var(--sp-2); }
+  .page-header h1 {
+    font-size: 1.5rem; /* 24px headlineMd */
+    font-weight: 700;
+    line-height: 2rem;
+    color: var(--primary);
+    margin-bottom: var(--sp-0-25);
+  }
+  .page-header p {
+    font-size: 0.875rem; /* 14px contextNormal */
+    font-weight: 400;
+    line-height: 1.25rem;
+    color: var(--txt-secondary);
+  }
+  .variant-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--txt-disabled);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin: var(--sp-2) 0 var(--sp-0-5);
+  }
+  .variant-note {
+    font-size: 0.8125rem;
+    color: var(--txt-secondary);
+    margin-top: var(--sp-0-5);
+    max-width: 40rem;
+  }
+
+  /* ============================================================
+     Feed card — reproduces the live component enough to review the tag
+     ============================================================ */
+  .card {
+    width: 100%;
+    max-width: 40rem;              /* content-max-width = 39.375rem rounded */
+    background: var(--bg-base);
+    border: 0.0625rem solid var(--border-card);
+    border-radius: 0.5rem;         /* 8px — elevated surface */
+    padding: var(--sp-1-5);
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-0-75);
+  }
+
+  /* Status tag — pill style, mirrors the widget vocabulary. Text-only. */
+  .status-tag {
+    align-self: flex-start;        /* sits top-left, ABOVE the title */
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.625rem;
+    background: var(--status-tag-bg);
+    color: var(--status-tag-fg);
+    border-radius: 0.25rem;        /* AOK tight radius */
+    font-size: 0.75rem;            /* 12px — slightly more prominent than the widget's 10px, since this is the card's leading signal */
+    font-weight: 600;
+    line-height: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+  }
+
+  /* Image-card variant: hero image bleeds to the card edges. The status tag
+     sits BELOW the image and ABOVE the title — same position as the existing
+     "AOK" source label in the live app, so tag placement is consistent between
+     image-cards and plain cards (always right above the title). */
+  .card-media {
+    margin: calc(var(--sp-1-5) * -1) calc(var(--sp-1-5) * -1) 0;
+    border-radius: 0.5rem 0.5rem 0 0;
+    overflow: hidden;
+    aspect-ratio: 16 / 9;
+    background: var(--bg-secondary);
+  }
+  .card-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  /* Card title — headlineMd 24/700/32, green (txtProminent). */
+  .card-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 2rem;
+    color: var(--txt-prominent);
+    /* Tight top margin: the tag already creates the breathing room above. */
+  }
+
+  /* Excerpt / body — bodyNormal 16/400/24. */
+  .card-body {
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5rem;
+    color: var(--txt-base);
+  }
+  .card-body strong { font-weight: 700; }
+
+  /* Weiterlesen link — secondary green, bodyStrong weight. */
+  .card-more {
+    align-self: flex-start;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--secondary);
+    text-decoration: none;
+    line-height: 1.5rem;
+  }
+  .card-more:hover { color: var(--primary); }
+
+  /* Meta line — "vor 3 Tagen" and author row. */
+  .card-meta {
+    font-size: 0.875rem;
+    font-weight: 400;
+    line-height: 1.25rem;
+    color: var(--txt-secondary);
+  }
+  .card-author {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-0-5);
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    color: var(--txt-secondary);
+  }
+  .card-author-name {
+    color: var(--primary);
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-0-25);
+  }
+  .card-author-pencil { width: 0.875rem; height: 0.875rem; stroke: var(--primary); }
+  .card-author-sep { color: var(--txt-disabled); }
+
+  /* Action row — Gefällt mir / Kommentare / Zurückziehen / pencil / more. */
+  .card-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-1-5);
+    padding-top: var(--sp-0-5);
+    border-top: 0.0625rem solid var(--border-divider);
+  }
+  .card-actions-spacer { flex: 1; }
+  .card-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-size: 0.875rem;       /* 14px — contextStrong */
+    font-weight: 600;
+    line-height: 1.25rem;
+    color: var(--txt-base);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    background: none;
+    border: 0;
+    padding: 0;
+    cursor: pointer;
+  }
+  .card-action svg { width: 0.875rem; height: 0.875rem; stroke: currentColor; fill: none; stroke-width: 1.75; }
+  .card-action:hover { color: var(--primary); }
+  .card-action-icon {
+    background: none;
+    border: 0;
+    padding: 0.25rem;
+    cursor: pointer;
+    color: var(--txt-base);
+    line-height: 0;
+  }
+  .card-action-icon svg { width: 1rem; height: 1rem; stroke: currentColor; fill: none; stroke-width: 1.75; }
+  .card-action-icon:hover { color: var(--primary); }
+
+  /* Comment composer. */
+  .card-composer {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--sp-0-75);
+    padding-top: var(--sp-0-5);
+  }
+  .card-composer-avatar {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    background: #F1E0CF center/cover no-repeat;   /* warm placeholder so avatars feel like Liz, not a gray dot */
+    flex-shrink: 0;
+  }
+  .card-composer-input {
+    flex: 1;
+    background: var(--tint-green);
+    border: 0.0625rem solid transparent;
+    border-radius: 0.25rem;
+    padding: var(--sp-0-75);
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-0-5);
+    min-height: 4rem;
+  }
+  .card-composer-input:focus-within { border-color: var(--primary); }
+  .card-composer-placeholder {
+    font-size: 1rem;
+    line-height: 1.5rem;
+    color: var(--txt-disabled);
+  }
+  .card-composer-tools {
+    display: flex;
+    gap: var(--sp-0-75);
+    color: var(--txt-disabled);
+  }
+  .card-composer-tools svg { width: 1.125rem; height: 1.125rem; stroke: currentColor; fill: none; stroke-width: 1.5; }
+
+  /* Stack of cards. */
+  .cards-stack { display: flex; flex-direction: column; gap: var(--sp-2); }
+</style>
+</head>
+<body>
+
+<header class="page-header">
+  <h1>IT Status Card with Pill Tag</h1>
+  <p>Optional status tag above the title, matching the pill style from the right-rail widget. One tag component, four possible values ("Neu", "In Bearbeitung", "In Planung", "Gelöst"). All use primary green on tint; the label carries the meaning, no color-coding by status.</p>
+</header>
+
+<!-- ============================================================
+     VARIANT A: "In Planung" — matches the current screenshot scenario
+     (tag only, no leading icon — quieter state)
+     ============================================================ -->
+<div class="variant-label">A. Plain card — "In Planung"</div>
+<div class="cards-stack">
+  <article class="card">
+    <span class="status-tag">In Planung</span>
+
+    <h2 class="card-title">Eingeschränkte Erreichbarkeit am Standort Dresden</h2>
+
+    <p class="card-body">Aufgrund geplanter Wartungsarbeiten an der Telefonanlage kommt es am Standort Dresden am <strong>23.04.2026 von 15:00 bis 19:00 Uhr</strong> zu Einschränkungen in der telefonischen Erreichbarkeit.</p>
+
+    <a class="card-more" href="#">Weiterlesen</a>
+
+    <p class="card-meta">vor 3 Tagen</p>
+
+    <p class="card-author">
+      <span class="card-author-name">
+        Liz Hackl
+        <svg class="card-author-pencil" viewBox="0 0 24 24" fill="none" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5Z"/></svg>
+      </span>
+      <span class="card-author-sep">·</span>
+      <span>Erstellt 21.04.2026, 15:50</span>
+    </p>
+
+    <div class="card-actions">
+      <button class="card-action" type="button">
+        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 10v12"/><path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H7a4 4 0 0 1-4-4v-7a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2h0a3.13 3.13 0 0 1 3 3.88Z"/></svg>
+        Gefällt mir
+      </button>
+      <button class="card-action" type="button">
+        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2Z"/></svg>
+        Kommentare (0)
+      </button>
+      <button class="card-action" type="button">
+        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="11 17 6 12 11 7"/><polyline points="18 17 13 12 18 7"/></svg>
+        Zurückziehen
+      </button>
+      <button class="card-action-icon" type="button" aria-label="Bearbeiten">
+        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5Z"/></svg>
+      </button>
+      <div class="card-actions-spacer"></div>
+      <button class="card-action-icon" type="button" aria-label="Mehr">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"/><circle cx="19" cy="12" r="1" fill="currentColor" stroke="none"/><circle cx="5" cy="12" r="1" fill="currentColor" stroke="none"/></svg>
+      </button>
+    </div>
+
+    <div class="card-composer">
+      <div class="card-composer-avatar" style="background-image: radial-gradient(circle at 50% 40%, #f3d7b0 0 35%, #c98a4e 35% 62%, #4a2f1d 62% 100%);"></div>
+      <div class="card-composer-input">
+        <div class="card-composer-placeholder">Kommentar schreiben</div>
+        <div class="card-composer-tools">
+          <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+          <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+        </div>
+      </div>
+    </div>
+  </article>
+</div>
+
+<p class="variant-note">Replaces the legacy hashtag variant <code>#In Planung</code>. Text-only pill — the four status values carry the full vocabulary without extra iconography.</p>
+
+<!-- ============================================================
+     VARIANT B: "Neu" — urgent, high-attention incident
+     ============================================================ -->
+<div class="variant-label">B. Plain card — "Neu" (active incident)</div>
+<div class="cards-stack">
+  <article class="card">
+    <span class="status-tag">Neu</span>
+
+    <h2 class="card-title">E-Mail-Server aktuell nicht erreichbar</h2>
+
+    <p class="card-body">Seit ca. <strong>17:45 Uhr</strong> ist der zentrale E-Mail-Server nicht erreichbar. Ein- und ausgehende Nachrichten werden zwischengespeichert und nach Behebung automatisch zugestellt. Wir arbeiten an einer Lösung. Nächstes Update: <strong>18:30 Uhr</strong>.</p>
+
+    <a class="card-more" href="#">Weiterlesen</a>
+
+    <p class="card-meta">Gerade eben</p>
+
+    <p class="card-author">
+      <span class="card-author-name">
+        IT-Service
+        <svg class="card-author-pencil" viewBox="0 0 24 24" fill="none" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5Z"/></svg>
+      </span>
+      <span class="card-author-sep">·</span>
+      <span>Erstellt 24.04.2026, 17:48</span>
+    </p>
+
+    <div class="card-actions">
+      <button class="card-action" type="button">
+        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 10v12"/><path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H7a4 4 0 0 1-4-4v-7a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2h0a3.13 3.13 0 0 1 3 3.88Z"/></svg>
+        Gefällt mir
+      </button>
+      <button class="card-action" type="button">
+        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2Z"/></svg>
+        Kommentare (3)
+      </button>
+      <button class="card-action" type="button">
+        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="11 17 6 12 11 7"/><polyline points="18 17 13 12 18 7"/></svg>
+        Zurückziehen
+      </button>
+      <button class="card-action-icon" type="button" aria-label="Bearbeiten">
+        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5Z"/></svg>
+      </button>
+      <div class="card-actions-spacer"></div>
+      <button class="card-action-icon" type="button" aria-label="Mehr">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"/><circle cx="19" cy="12" r="1" fill="currentColor" stroke="none"/><circle cx="5" cy="12" r="1" fill="currentColor" stroke="none"/></svg>
+      </button>
+    </div>
+
+    <div class="card-composer">
+      <div class="card-composer-avatar" style="background-image: radial-gradient(circle at 50% 40%, #fde3c2 0 35%, #1a6b4a 35% 62%, #0b3525 62% 100%);"></div>
+      <div class="card-composer-input">
+        <div class="card-composer-placeholder">Kommentar schreiben</div>
+        <div class="card-composer-tools">
+          <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+          <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+        </div>
+      </div>
+    </div>
+  </article>
+</div>
+
+<p class="variant-note">"Neu" works without a warning color: the pill itself is the signal; the meta line (<em>"Gerade eben"</em>) supplies the time context.</p>
+
+<!-- ============================================================
+     VARIANT C: "Gelöst" — resolved, calmer
+     ============================================================ -->
+<div class="variant-label">C. Plain card — "Gelöst"</div>
+<div class="cards-stack">
+  <article class="card">
+    <span class="status-tag">Gelöst</span>
+
+    <h2 class="card-title">VPN-Störung Außenstelle Hannover behoben</h2>
+
+    <p class="card-body">Die seit gestern bestehende VPN-Störung an der Außenstelle Hannover ist <strong>seit 09:15 Uhr behoben</strong>. Alle Dienste sind wieder regulär erreichbar. Danke für die Geduld und die Hinweise aus dem Standort.</p>
+
+    <a class="card-more" href="#">Weiterlesen</a>
+
+    <p class="card-meta">Gestern</p>
+
+    <p class="card-author">
+      <span class="card-author-name">
+        IT-Service
+        <svg class="card-author-pencil" viewBox="0 0 24 24" fill="none" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5Z"/></svg>
+      </span>
+      <span class="card-author-sep">·</span>
+      <span>Erstellt 23.04.2026, 09:22</span>
+    </p>
+
+    <div class="card-actions">
+      <button class="card-action" type="button">
+        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 10v12"/><path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H7a4 4 0 0 1-4-4v-7a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2h0a3.13 3.13 0 0 1 3 3.88Z"/></svg>
+        Gefällt mir
+      </button>
+      <button class="card-action" type="button">
+        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2Z"/></svg>
+        Kommentare (1)
+      </button>
+      <button class="card-action" type="button">
+        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="11 17 6 12 11 7"/><polyline points="18 17 13 12 18 7"/></svg>
+        Zurückziehen
+      </button>
+      <button class="card-action-icon" type="button" aria-label="Bearbeiten">
+        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5Z"/></svg>
+      </button>
+      <div class="card-actions-spacer"></div>
+      <button class="card-action-icon" type="button" aria-label="Mehr">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"/><circle cx="19" cy="12" r="1" fill="currentColor" stroke="none"/><circle cx="5" cy="12" r="1" fill="currentColor" stroke="none"/></svg>
+      </button>
+    </div>
+
+    <div class="card-composer">
+      <div class="card-composer-avatar" style="background-image: radial-gradient(circle at 50% 40%, #e7cdb1 0 35%, #8a6a4a 35% 62%, #3a2612 62% 100%);"></div>
+      <div class="card-composer-input">
+        <div class="card-composer-placeholder">Kommentar schreiben</div>
+        <div class="card-composer-tools">
+          <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+          <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+        </div>
+      </div>
+    </div>
+  </article>
+</div>
+
+<p class="variant-note">Resolved cards read quieter in the timeline than active incidents, even though color and shape are identical. The tag stays consistent.</p>
+
+<!-- ============================================================
+     VARIANT D: Image-card — hero image with tag overlaid on bottom-left
+     Solves the "no white space above title" problem on media-rich cards.
+     ============================================================ -->
+<div class="variant-label">D. Image card — tag between image and title</div>
+<div class="cards-stack">
+  <article class="card">
+    <div class="card-media">
+      <img src="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=1200&q=80&auto=format&fit=crop" alt="Impfung wird von Ärztin verabreicht" />
+    </div>
+
+    <span class="status-tag">In Bearbeitung</span>
+
+    <h2 class="card-title">Änderungen bei Impfungen gegen Meningokokken und Gürtelrose</h2>
+
+    <p class="card-body">Die Richtlinien für Impfungen gegen Meningokokken und Gürtelrose haben sich geändert. Alle wichtigen Infos für Versicherte.</p>
+
+    <a class="card-more" href="#">Weiterlesen</a>
+
+    <p class="card-meta">vor 2 Tagen</p>
+
+    <p class="card-author">
+      <span class="card-author-name">
+        Heiko Scherer
+        <svg class="card-author-pencil" viewBox="0 0 24 24" fill="none" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5Z"/></svg>
+      </span>
+      <span class="card-author-sep">·</span>
+      <span>Erstellt 22.04.2026, 15:20</span>
+    </p>
+
+    <div class="card-actions">
+      <button class="card-action" type="button">
+        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 10v12"/><path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H7a4 4 0 0 1-4-4v-7a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2h0a3.13 3.13 0 0 1 3 3.88Z"/></svg>
+        Gefällt mir
+      </button>
+      <button class="card-action" type="button">
+        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2Z"/></svg>
+        Kommentare (0)
+      </button>
+      <button class="card-action" type="button">
+        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="11 17 6 12 11 7"/><polyline points="18 17 13 12 18 7"/></svg>
+        Zurückziehen
+      </button>
+      <button class="card-action-icon" type="button" aria-label="Bearbeiten">
+        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5Z"/></svg>
+      </button>
+      <div class="card-actions-spacer"></div>
+      <button class="card-action-icon" type="button" aria-label="Mehr">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"/><circle cx="19" cy="12" r="1" fill="currentColor" stroke="none"/><circle cx="5" cy="12" r="1" fill="currentColor" stroke="none"/></svg>
+      </button>
+    </div>
+
+    <div class="card-composer">
+      <div class="card-composer-avatar" style="background-image: radial-gradient(circle at 50% 40%, #f3d7b0 0 35%, #c98a4e 35% 62%, #4a2f1d 62% 100%);"></div>
+      <div class="card-composer-input">
+        <div class="card-composer-placeholder">Kommentar schreiben</div>
+        <div class="card-composer-tools">
+          <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+          <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+        </div>
+      </div>
+    </div>
+  </article>
+</div>
+
+<p class="variant-note">On image cards the tag sits <strong>between image and title</strong>, in the same slot as the existing source label ("AOK" in the live app). Tag position stays consistent across all card variants: always directly above the title. No image overlay, no extra drop shadow. If source and status are both needed, stack them (source on top, status below) or align them in a flex row.</p>
+
+</body>
+</html>

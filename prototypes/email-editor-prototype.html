@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>tchop Email Editor</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --orange: #F6704D;
+    --orange-hover: #e55a38;
+    --yellow: #FFD138;
+    --blue: #488ED8;
+    --bg-light: #F1F1F3;
+    --bg-dark: #43445B;
+    --bg-footer: #2D2D46;
+    --white: #FFFFFF;
+    --text-primary: #2D2D46;
+    --text-secondary: #6B6B80;
+    --text-muted: #9B9BAD;
+    --border: #DDDDE2;
+    --border-focus: #488ED8;
+    --success: #38A169;
+    --font: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+  }
+
+  html { font-size: 16px; }
+  body {
+    font-family: var(--font);
+    background: var(--bg-light);
+    color: var(--text-primary);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Top bar */
+  .topbar {
+    background: var(--bg-dark);
+    height: 56px;
+    display: flex;
+    align-items: center;
+    padding: 0 24px;
+    gap: 16px;
+    flex-shrink: 0;
+  }
+  .topbar-logo {
+    color: var(--white);
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+  .topbar-logo span { color: var(--orange); }
+  .topbar-sep {
+    width: 1px;
+    height: 24px;
+    background: rgba(255,255,255,0.15);
+  }
+  .topbar-nav {
+    color: rgba(255,255,255,0.6);
+    font-size: 13px;
+    font-weight: 500;
+  }
+  .topbar-title {
+    color: var(--white);
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  /* Main layout */
+  .main {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  /* Sidebar */
+  .sidebar {
+    width: 280px;
+    background: var(--white);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+  }
+  .sidebar-header {
+    padding: 20px 20px 12px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+  }
+  .sidebar-section {
+    padding: 0 8px;
+    margin-bottom: 8px;
+  }
+  .sidebar-section-label {
+    padding: 6px 12px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+  }
+  .email-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-secondary);
+  }
+  .email-item:hover {
+    background: var(--bg-light);
+    color: var(--text-primary);
+  }
+  .email-item.active {
+    background: #F6704D12;
+    color: var(--orange);
+  }
+  .email-item .icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    flex-shrink: 0;
+  }
+  .email-item.active .icon {
+    background: #F6704D18;
+  }
+  .email-item:not(.active) .icon {
+    background: var(--bg-light);
+  }
+  .email-item .meta {
+    flex: 1;
+    min-width: 0;
+  }
+  .email-item .meta-name {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .email-item .meta-status {
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--text-muted);
+    margin-top: 1px;
+  }
+  .email-item.active .meta-status {
+    color: #F6704D88;
+  }
+  .status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 4px;
+    vertical-align: middle;
+  }
+  .status-dot.customized { background: var(--success); }
+  .status-dot.default { background: var(--text-muted); }
+
+  /* Editor pane */
+  .editor-pane {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+  .editor-toolbar {
+    height: 56px;
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+    flex-shrink: 0;
+  }
+  .editor-toolbar-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .editor-toolbar-title {
+    font-size: 15px;
+    font-weight: 600;
+  }
+  .editor-toolbar-badge {
+    font-size: 11px;
+    font-weight: 500;
+    padding: 3px 8px;
+    border-radius: 4px;
+    background: var(--bg-light);
+    color: var(--text-muted);
+  }
+  .editor-toolbar-badge.customized {
+    background: #38A16915;
+    color: var(--success);
+  }
+  .editor-toolbar-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .btn {
+    font-family: var(--font);
+    font-size: 13px;
+    font-weight: 600;
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .btn-primary {
+    background: var(--orange);
+    color: var(--white);
+  }
+  .btn-primary:hover { background: var(--orange-hover); }
+  .btn-secondary {
+    background: var(--white);
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+  }
+  .btn-secondary:hover { background: var(--bg-light); }
+  .btn-ghost {
+    background: transparent;
+    color: var(--text-secondary);
+    padding: 8px 10px;
+  }
+  .btn-ghost:hover { color: var(--text-primary); background: var(--bg-light); }
+
+  /* Split view */
+  .editor-content {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+  }
+
+  /* Form side */
+  .form-pane {
+    width: 420px;
+    flex-shrink: 0;
+    overflow-y: auto;
+    padding: 24px;
+    background: var(--white);
+    border-right: 1px solid var(--border);
+  }
+  .form-pane::-webkit-scrollbar { width: 4px; }
+  .form-pane::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  .form-section {
+    margin-bottom: 28px;
+  }
+  .form-section-title {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+    margin-bottom: 14px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  .form-group {
+    margin-bottom: 16px;
+  }
+  .form-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 6px;
+  }
+  .form-hint {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 4px;
+  }
+  .form-input,
+  .form-textarea {
+    width: 100%;
+    font-family: var(--font);
+    font-size: 13px;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text-primary);
+    background: var(--white);
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    outline: none;
+  }
+  .form-input:focus,
+  .form-textarea:focus {
+    border-color: var(--border-focus);
+    box-shadow: 0 0 0 3px #488ED820;
+  }
+  .form-textarea {
+    resize: vertical;
+    min-height: 80px;
+    line-height: 1.5;
+  }
+
+  /* Language tabs */
+  .lang-tabs {
+    display: flex;
+    gap: 2px;
+    background: var(--bg-light);
+    border-radius: 8px;
+    padding: 3px;
+    margin-bottom: 16px;
+  }
+  .lang-tab {
+    flex: 1;
+    font-family: var(--font);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 6px 12px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    background: transparent;
+    color: var(--text-muted);
+    transition: all 0.15s ease;
+  }
+  .lang-tab.active {
+    background: var(--white);
+    color: var(--text-primary);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  }
+
+  /* Color picker row */
+  .color-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .color-swatch {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    border: 2px solid var(--border);
+    cursor: pointer;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+  }
+  .color-swatch input[type="color"] {
+    position: absolute;
+    inset: -8px;
+    width: calc(100% + 16px);
+    height: calc(100% + 16px);
+    cursor: pointer;
+    border: none;
+    padding: 0;
+  }
+  .color-row .form-input { flex: 1; }
+
+  /* Preview pane */
+  .preview-pane {
+    flex: 1;
+    overflow-y: auto;
+    padding: 32px;
+    background: #E8E8EC;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .preview-pane::-webkit-scrollbar { width: 4px; }
+  .preview-pane::-webkit-scrollbar-thumb { background: #C8C8CE; border-radius: 2px; }
+
+  .preview-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .preview-label::before,
+  .preview-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: #C8C8CE;
+  }
+
+  .preview-device {
+    width: 100%;
+    max-width: 600px;
+    background: var(--white);
+    border-radius: 8px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.04);
+    overflow: hidden;
+  }
+  .preview-meta {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  .preview-meta-from { font-weight: 600; color: var(--text-primary); }
+  .preview-meta-subject {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 14px;
+    margin-top: 4px;
+  }
+  .preview-body {
+    padding: 0;
+  }
+
+  /* Rendered email styles inside preview */
+  .email-render {
+    font-family: var(--font);
+  }
+  .email-header {
+    padding: 32px 40px 24px;
+    text-align: center;
+  }
+  .email-logo {
+    height: 28px;
+    margin-bottom: 8px;
+  }
+  .email-hero-bar {
+    height: 4px;
+    width: 48px;
+    border-radius: 2px;
+    margin: 0 auto;
+  }
+  .email-content {
+    padding: 8px 40px 32px;
+  }
+  .email-headline {
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.3;
+    margin-bottom: 16px;
+    color: var(--text-primary);
+  }
+  .email-body-text {
+    font-size: 14px;
+    line-height: 1.65;
+    color: var(--text-secondary);
+    margin-bottom: 24px;
+    white-space: pre-wrap;
+  }
+  .email-cta-btn {
+    display: inline-block;
+    padding: 12px 28px;
+    border-radius: 8px;
+    color: var(--white);
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    letter-spacing: 0.01em;
+  }
+  .email-footer {
+    padding: 24px 40px;
+    text-align: center;
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--text-muted);
+    border-top: 1px solid var(--border);
+  }
+
+  /* Responsive */
+  @media (max-width: 1100px) {
+    .sidebar { width: 240px; }
+    .form-pane { width: 360px; }
+  }
+  @media (max-width: 860px) {
+    .sidebar { display: none; }
+    .form-pane { width: 320px; }
+  }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--bg-dark);
+    color: var(--white);
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+    transform: translateY(100px);
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 100;
+  }
+  .toast.show {
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  /* Fade in for initial load */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .form-section {
+    animation: fadeUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  .form-section:nth-child(2) { animation-delay: 0.05s; }
+  .form-section:nth-child(3) { animation-delay: 0.1s; }
+  .form-section:nth-child(4) { animation-delay: 0.15s; }
+</style>
+</head>
+<body>
+
+<!-- Top bar -->
+<div class="topbar">
+  <div class="topbar-logo">tchop<span>.io</span></div>
+  <div class="topbar-sep"></div>
+  <div class="topbar-nav">Settings</div>
+  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="opacity:0.4"><path d="M5 2l5 5-5 5" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg>
+  <div class="topbar-title">Email Templates</div>
+</div>
+
+<div class="main">
+
+  <!-- Sidebar: email type list -->
+  <div class="sidebar">
+    <div class="sidebar-header">Email Templates</div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Transactional</div>
+      <div class="email-item active" data-template="welcome">
+        <div class="icon">&#9993;</div>
+        <div class="meta">
+          <div class="meta-name">Welcome Email</div>
+          <div class="meta-status"><span class="status-dot default"></span>Default</div>
+        </div>
+      </div>
+      <div class="email-item" data-template="invite">
+        <div class="icon">&#128233;</div>
+        <div class="meta">
+          <div class="meta-name">User Invitation</div>
+          <div class="meta-status"><span class="status-dot default"></span>Default</div>
+        </div>
+      </div>
+      <div class="email-item" data-template="password">
+        <div class="icon">&#128274;</div>
+        <div class="meta">
+          <div class="meta-name">Password Reset</div>
+          <div class="meta-status"><span class="status-dot customized"></span>Customized</div>
+        </div>
+      </div>
+      <div class="email-item" data-template="verify">
+        <div class="icon">&#9989;</div>
+        <div class="meta">
+          <div class="meta-name">Email Verification</div>
+          <div class="meta-status"><span class="status-dot default"></span>Default</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Notifications</div>
+      <div class="email-item" data-template="digest">
+        <div class="icon">&#128240;</div>
+        <div class="meta">
+          <div class="meta-name">Daily Digest</div>
+          <div class="meta-status"><span class="status-dot default"></span>Default</div>
+        </div>
+      </div>
+      <div class="email-item" data-template="mention">
+        <div class="icon">&#128172;</div>
+        <div class="meta">
+          <div class="meta-name">New Mention</div>
+          <div class="meta-status"><span class="status-dot default"></span>Default</div>
+        </div>
+      </div>
+      <div class="email-item" data-template="comment">
+        <div class="icon">&#128488;</div>
+        <div class="meta">
+          <div class="meta-name">New Comment</div>
+          <div class="meta-status"><span class="status-dot default"></span>Default</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Editor -->
+  <div class="editor-pane">
+    <div class="editor-toolbar">
+      <div class="editor-toolbar-left">
+        <div class="editor-toolbar-title" id="toolbar-title">Welcome Email</div>
+        <div class="editor-toolbar-badge" id="toolbar-badge">Default</div>
+      </div>
+      <div class="editor-toolbar-right">
+        <button class="btn btn-ghost" id="btn-reset" title="Reset to default">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2.5 5.5A5 5 0 1 1 2 8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M2.5 2.5v3h3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Reset
+        </button>
+        <button class="btn btn-secondary" id="btn-test">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1.5 3.5l5.5 4 5.5-4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/><rect x="1" y="2" width="12" height="9" rx="2" stroke="currentColor" stroke-width="1.2"/></svg>
+          Send Test
+        </button>
+        <button class="btn btn-primary" id="btn-save">Save Changes</button>
+      </div>
+    </div>
+
+    <div class="editor-content">
+      <!-- Form -->
+      <div class="form-pane" id="form-pane">
+        <div class="lang-tabs">
+          <button class="lang-tab active" data-lang="en">English</button>
+          <button class="lang-tab" data-lang="de">Deutsch</button>
+        </div>
+
+        <div class="form-section">
+          <div class="form-section-title">Subject Line</div>
+          <div class="form-group">
+            <label class="form-label">Subject</label>
+            <input class="form-input" id="field-subject" type="text" value="Welcome to {{org_name}}" data-preview="subject">
+            <div class="form-hint">Use {{org_name}}, {{user_name}}, {{channel_name}} as placeholders</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Preview Text</label>
+            <input class="form-input" id="field-preview-text" type="text" value="Get started with your new community" data-preview="previewText">
+            <div class="form-hint">Shown in inbox preview, after subject line</div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <div class="form-section-title">Email Content</div>
+          <div class="form-group">
+            <label class="form-label">Headline</label>
+            <input class="form-input" id="field-headline" type="text" value="Welcome aboard, {{user_name}}!" data-preview="headline">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Body Text</label>
+            <textarea class="form-textarea" id="field-body" rows="4" data-preview="body">You've been added to {{org_name}}. Your new community is ready and waiting for you.
+
+Explore channels, connect with your team, and stay up to date with what matters most.</textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Button Text</label>
+            <input class="form-input" id="field-cta" type="text" value="Open the App" data-preview="cta">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Footer Text</label>
+            <textarea class="form-textarea" id="field-footer" rows="2" data-preview="footer">You received this email because you were added to {{org_name}}.
+If you believe this was a mistake, please contact your administrator.</textarea>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <div class="form-section-title">Branding</div>
+          <div class="form-group">
+            <label class="form-label">Logo URL</label>
+            <input class="form-input" id="field-logo" type="text" value="" placeholder="https://example.com/logo.png" data-preview="logo">
+            <div class="form-hint">Leave empty to use organisation default</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Primary Color</label>
+            <div class="color-row">
+              <div class="color-swatch" id="color-swatch">
+                <input type="color" id="field-color-picker" value="#F6704D">
+              </div>
+              <input class="form-input" id="field-color" type="text" value="#F6704D" data-preview="color">
+            </div>
+            <div class="form-hint">Used for buttons and accents</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Preview -->
+      <div class="preview-pane">
+        <div class="preview-label">Live Preview</div>
+        <div class="preview-device">
+          <div class="preview-meta">
+            <div class="preview-meta-from" id="prev-from">tchop.io &lt;noreply@tchop.io&gt;</div>
+            <div class="preview-meta-subject" id="prev-subject">Welcome to {{org_name}}</div>
+          </div>
+          <div class="preview-body">
+            <div class="email-render">
+              <div class="email-header">
+                <div id="prev-logo-wrap" style="display:none">
+                  <img class="email-logo" id="prev-logo" src="" alt="Logo">
+                </div>
+                <div class="email-hero-bar" id="prev-bar" style="background:#F6704D"></div>
+              </div>
+              <div class="email-content">
+                <div class="email-headline" id="prev-headline">Welcome aboard, {{user_name}}!</div>
+                <div class="email-body-text" id="prev-body">You've been added to {{org_name}}. Your new community is ready and waiting for you.
+
+Explore channels, connect with your team, and stay up to date with what matters most.</div>
+                <a class="email-cta-btn" id="prev-cta" style="background:#F6704D" href="#">Open the App</a>
+              </div>
+              <div class="email-footer" id="prev-footer">You received this email because you were added to {{org_name}}.<br>If you believe this was a mistake, please contact your administrator.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+  // Template data store
+  const templates = {
+    welcome: {
+      name: 'Welcome Email',
+      en: {
+        subject: 'Welcome to {{org_name}}',
+        previewText: 'Get started with your new community',
+        headline: 'Welcome aboard, {{user_name}}!',
+        body: "You've been added to {{org_name}}. Your new community is ready and waiting for you.\n\nExplore channels, connect with your team, and stay up to date with what matters most.",
+        cta: 'Open the App',
+        footer: 'You received this email because you were added to {{org_name}}.\nIf you believe this was a mistake, please contact your administrator.'
+      },
+      de: {
+        subject: 'Willkommen bei {{org_name}}',
+        previewText: 'Starte jetzt mit deiner neuen Community',
+        headline: 'Willkommen an Bord, {{user_name}}!',
+        body: "Du wurdest zu {{org_name}} hinzugefügt. Deine neue Community wartet auf dich.\n\nEntdecke Channels, vernetze dich mit deinem Team und bleib auf dem Laufenden.",
+        cta: 'App öffnen',
+        footer: 'Du erhältst diese E-Mail, weil du zu {{org_name}} hinzugefügt wurdest.\nWenn du glaubst, dass dies ein Fehler war, wende dich bitte an deinen Administrator.'
+      },
+      logo: '',
+      color: '#F6704D',
+      customized: false
+    },
+    invite: {
+      name: 'User Invitation',
+      en: {
+        subject: '{{inviter_name}} invited you to {{org_name}}',
+        previewText: 'Join your team on {{org_name}}',
+        headline: 'You\'re invited!',
+        body: "{{inviter_name}} has invited you to join {{org_name}}.\n\nAccept the invitation to get started and connect with your community.",
+        cta: 'Accept Invitation',
+        footer: 'This invitation was sent by {{inviter_name}}.\nIf you don\'t recognize this sender, you can ignore this email.'
+      },
+      de: {
+        subject: '{{inviter_name}} hat dich zu {{org_name}} eingeladen',
+        previewText: 'Tritt deinem Team bei {{org_name}} bei',
+        headline: 'Du bist eingeladen!',
+        body: "{{inviter_name}} hat dich eingeladen, {{org_name}} beizutreten.\n\nNimm die Einladung an und vernetze dich mit deiner Community.",
+        cta: 'Einladung annehmen',
+        footer: 'Diese Einladung wurde von {{inviter_name}} gesendet.\nWenn du den Absender nicht kennst, kannst du diese E-Mail ignorieren.'
+      },
+      logo: '',
+      color: '#488ED8',
+      customized: false
+    },
+    password: {
+      name: 'Password Reset',
+      en: {
+        subject: 'Reset your password',
+        previewText: 'A password reset was requested for your account',
+        headline: 'Reset your password',
+        body: "We received a request to reset your password for {{org_name}}.\n\nClick the button below to choose a new password. This link expires in 24 hours.",
+        cta: 'Reset Password',
+        footer: 'If you didn\'t request a password reset, you can safely ignore this email.\nYour password will not be changed.'
+      },
+      de: {
+        subject: 'Passwort zurücksetzen',
+        previewText: 'Ein Passwortzurücksetzung wurde angefordert',
+        headline: 'Passwort zurücksetzen',
+        body: "Wir haben eine Anfrage erhalten, dein Passwort für {{org_name}} zurückzusetzen.\n\nKlicke auf den Button, um ein neues Passwort zu wählen. Der Link ist 24 Stunden gültig.",
+        cta: 'Passwort zurücksetzen',
+        footer: 'Wenn du kein neues Passwort angefordert hast, kannst du diese E-Mail ignorieren.\nDein Passwort bleibt unverändert.'
+      },
+      logo: '',
+      color: '#F6704D',
+      customized: true
+    },
+    verify: {
+      name: 'Email Verification',
+      en: {
+        subject: 'Verify your email address',
+        previewText: 'Confirm your email to activate your account',
+        headline: 'Verify your email',
+        body: "Almost there! Please confirm your email address to complete your registration for {{org_name}}.",
+        cta: 'Verify Email',
+        footer: 'If you didn\'t create an account, you can safely ignore this email.'
+      },
+      de: {
+        subject: 'Bestätige deine E-Mail-Adresse',
+        previewText: 'Bestätige deine E-Mail, um dein Konto zu aktivieren',
+        headline: 'E-Mail bestätigen',
+        body: "Fast geschafft! Bitte bestatige deine E-Mail-Adresse, um die Registrierung bei {{org_name}} abzuschließen.",
+        cta: 'E-Mail bestätigen',
+        footer: 'Wenn du kein Konto erstellt hast, kannst du diese E-Mail ignorieren.'
+      },
+      logo: '',
+      color: '#38A169',
+      customized: false
+    },
+    digest: {
+      name: 'Daily Digest',
+      en: {
+        subject: 'Your daily update from {{org_name}}',
+        previewText: 'Here\'s what happened today',
+        headline: 'Your Daily Digest',
+        body: "Here's a summary of what happened in {{org_name}} today.\n\nStay connected and never miss an important update.",
+        cta: 'View All Updates',
+        footer: 'You\'re receiving this because you have digest notifications enabled.\nManage your notification preferences in the app.'
+      },
+      de: {
+        subject: 'Dein tägliches Update von {{org_name}}',
+        previewText: 'Das ist heute passiert',
+        headline: 'Deine tägliche Zusammenfassung',
+        body: "Hier ist eine Zusammenfassung dessen, was heute bei {{org_name}} passiert ist.\n\nBleib verbunden und verpasse kein wichtiges Update.",
+        cta: 'Alle Updates ansehen',
+        footer: 'Du erhältst diese E-Mail, weil du Digest-Benachrichtigungen aktiviert hast.\nVerwalte deine Benachrichtigungseinstellungen in der App.'
+      },
+      logo: '',
+      color: '#FFD138',
+      customized: false
+    },
+    mention: {
+      name: 'New Mention',
+      en: {
+        subject: '{{sender_name}} mentioned you in {{channel_name}}',
+        previewText: 'You were mentioned in a conversation',
+        headline: 'You were mentioned',
+        body: "{{sender_name}} mentioned you in {{channel_name}}.\n\nOpen the app to see the full conversation and respond.",
+        cta: 'View Mention',
+        footer: 'You\'re receiving this because someone mentioned you.\nManage your notification preferences in the app.'
+      },
+      de: {
+        subject: '{{sender_name}} hat dich in {{channel_name}} erwähnt',
+        previewText: 'Du wurdest in einer Unterhaltung erwähnt',
+        headline: 'Du wurdest erwähnt',
+        body: "{{sender_name}} hat dich in {{channel_name}} erwähnt.\n\nÖffne die App, um die Unterhaltung zu sehen und zu antworten.",
+        cta: 'Erwähnung ansehen',
+        footer: 'Du erhältst diese E-Mail, weil dich jemand erwähnt hat.\nVerwalte deine Benachrichtigungseinstellungen in der App.'
+      },
+      logo: '',
+      color: '#488ED8',
+      customized: false
+    },
+    comment: {
+      name: 'New Comment',
+      en: {
+        subject: '{{sender_name}} commented on your post',
+        previewText: 'New comment on your content',
+        headline: 'New comment on your post',
+        body: "{{sender_name}} left a comment on your post in {{channel_name}}.\n\nOpen the app to read the comment and reply.",
+        cta: 'View Comment',
+        footer: 'You\'re receiving this because someone commented on your content.\nManage your notification preferences in the app.'
+      },
+      de: {
+        subject: '{{sender_name}} hat deinen Beitrag kommentiert',
+        previewText: 'Neuer Kommentar zu deinem Inhalt',
+        headline: 'Neuer Kommentar zu deinem Beitrag',
+        body: "{{sender_name}} hat einen Kommentar zu deinem Beitrag in {{channel_name}} hinterlassen.\n\nÖffne die App, um den Kommentar zu lesen und zu antworten.",
+        cta: 'Kommentar ansehen',
+        footer: 'Du erhältst diese E-Mail, weil jemand deinen Inhalt kommentiert hat.\nVerwalte deine Benachrichtigungseinstellungen in der App.'
+      },
+      logo: '',
+      color: '#F6704D',
+      customized: false
+    }
+  };
+
+  let currentTemplate = 'welcome';
+  let currentLang = 'en';
+
+  // DOM refs
+  const fieldSubject = document.getElementById('field-subject');
+  const fieldPreviewText = document.getElementById('field-preview-text');
+  const fieldHeadline = document.getElementById('field-headline');
+  const fieldBody = document.getElementById('field-body');
+  const fieldCta = document.getElementById('field-cta');
+  const fieldFooter = document.getElementById('field-footer');
+  const fieldLogo = document.getElementById('field-logo');
+  const fieldColor = document.getElementById('field-color');
+  const fieldColorPicker = document.getElementById('field-color-picker');
+  const colorSwatch = document.getElementById('color-swatch');
+
+  const prevSubject = document.getElementById('prev-subject');
+  const prevHeadline = document.getElementById('prev-headline');
+  const prevBody = document.getElementById('prev-body');
+  const prevCta = document.getElementById('prev-cta');
+  const prevFooter = document.getElementById('prev-footer');
+  const prevLogo = document.getElementById('prev-logo');
+  const prevLogoWrap = document.getElementById('prev-logo-wrap');
+  const prevBar = document.getElementById('prev-bar');
+
+  const toolbarTitle = document.getElementById('toolbar-title');
+  const toolbarBadge = document.getElementById('toolbar-badge');
+  const toast = document.getElementById('toast');
+
+  function loadTemplate(key) {
+    currentTemplate = key;
+    const t = templates[key];
+    const content = t[currentLang];
+
+    fieldSubject.value = content.subject;
+    fieldPreviewText.value = content.previewText;
+    fieldHeadline.value = content.headline;
+    fieldBody.value = content.body;
+    fieldCta.value = content.cta;
+    fieldFooter.value = content.footer;
+    fieldLogo.value = t.logo;
+    fieldColor.value = t.color;
+    fieldColorPicker.value = t.color;
+    colorSwatch.style.background = t.color;
+
+    toolbarTitle.textContent = t.name;
+    toolbarBadge.textContent = t.customized ? 'Customized' : 'Default';
+    toolbarBadge.className = 'editor-toolbar-badge' + (t.customized ? ' customized' : '');
+
+    // Update sidebar active
+    document.querySelectorAll('.email-item').forEach(el => {
+      el.classList.toggle('active', el.dataset.template === key);
+    });
+
+    updatePreview();
+  }
+
+  function updatePreview() {
+    const color = fieldColor.value;
+
+    prevSubject.textContent = fieldSubject.value || 'No subject';
+    prevHeadline.textContent = fieldHeadline.value;
+    prevBody.textContent = fieldBody.value;
+    prevCta.textContent = fieldCta.value;
+    prevCta.style.background = color;
+    prevFooter.innerHTML = fieldFooter.value.replace(/\n/g, '<br>');
+    prevBar.style.background = color;
+
+    if (fieldLogo.value) {
+      prevLogo.src = fieldLogo.value;
+      prevLogoWrap.style.display = 'block';
+    } else {
+      prevLogoWrap.style.display = 'none';
+    }
+
+    colorSwatch.style.background = color;
+  }
+
+  // Live preview on input
+  document.querySelectorAll('.form-input, .form-textarea').forEach(el => {
+    el.addEventListener('input', updatePreview);
+  });
+
+  // Color sync
+  fieldColorPicker.addEventListener('input', () => {
+    fieldColor.value = fieldColorPicker.value;
+    updatePreview();
+  });
+  fieldColor.addEventListener('input', () => {
+    if (/^#[0-9A-Fa-f]{6}$/.test(fieldColor.value)) {
+      fieldColorPicker.value = fieldColor.value;
+    }
+    updatePreview();
+  });
+
+  // Sidebar clicks
+  document.querySelectorAll('.email-item').forEach(el => {
+    el.addEventListener('click', () => {
+      loadTemplate(el.dataset.template);
+    });
+  });
+
+  // Language tabs
+  document.querySelectorAll('.lang-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      // Save current to store
+      saveCurrentToStore();
+
+      currentLang = tab.dataset.lang;
+      document.querySelectorAll('.lang-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      loadTemplate(currentTemplate);
+    });
+  });
+
+  function saveCurrentToStore() {
+    const t = templates[currentTemplate];
+    t[currentLang] = {
+      subject: fieldSubject.value,
+      previewText: fieldPreviewText.value,
+      headline: fieldHeadline.value,
+      body: fieldBody.value,
+      cta: fieldCta.value,
+      footer: fieldFooter.value
+    };
+    t.logo = fieldLogo.value;
+    t.color = fieldColor.value;
+  }
+
+  // Save button
+  document.getElementById('btn-save').addEventListener('click', () => {
+    saveCurrentToStore();
+    templates[currentTemplate].customized = true;
+    toolbarBadge.textContent = 'Customized';
+    toolbarBadge.className = 'editor-toolbar-badge customized';
+
+    // Update sidebar status
+    const item = document.querySelector(`[data-template="${currentTemplate}"]`);
+    if (item) {
+      const dot = item.querySelector('.status-dot');
+      const statusText = item.querySelector('.meta-status');
+      dot.className = 'status-dot customized';
+      statusText.innerHTML = '<span class="status-dot customized"></span>Customized';
+    }
+
+    showToast('Changes saved successfully');
+  });
+
+  // Reset button
+  document.getElementById('btn-reset').addEventListener('click', () => {
+    showToast('Template reset to default');
+  });
+
+  // Test email
+  document.getElementById('btn-test').addEventListener('click', () => {
+    showToast('Test email sent to your address');
+  });
+
+  function showToast(msg) {
+    toast.textContent = msg;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2500);
+  }
+
+  // Init
+  loadTemplate('welcome');
+</script>
+</body>
+</html>

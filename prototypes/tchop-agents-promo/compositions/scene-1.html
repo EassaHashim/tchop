@@ -1,0 +1,156 @@
+<template id="scene-1-template">
+  <div data-composition-id="scene-1" data-width="1920" data-height="1080" data-start="0" data-duration="3.0">
+    <div class="scene-content">
+      <div class="meta-row">
+        <span class="scene-tag">// scene 01 — the shift</span>
+        <span class="timestamp">t+00:00</span>
+      </div>
+
+      <div class="headline-block">
+        <div class="prompt-mark">&gt;_</div>
+        <h1 class="headline">
+          <span class="line">Your content team</span>
+          <span class="line accent">just got 1,000 new colleagues.</span>
+          <span class="cursor">|</span>
+        </h1>
+      </div>
+
+      <div class="status-row">
+        <span class="dot"></span>
+        <span class="status-label">agent workforce spinning up</span>
+      </div>
+    </div>
+
+    <style>
+      [data-composition-id="scene-1"] {
+        position: absolute;
+        inset: 0;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        color: #F1F1F3;
+        font-family: 'Basier Circle', 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
+      }
+      [data-composition-id="scene-1"] .scene-content {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+        padding: 120px 160px;
+        gap: 48px;
+        box-sizing: border-box;
+        z-index: 10;
+      }
+      [data-composition-id="scene-1"] .meta-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-family: 'JetBrains Mono', 'IBM Plex Mono', ui-monospace, monospace;
+        font-size: 22px;
+        font-weight: 700;
+        color: #B8B8C7;
+        letter-spacing: 0.02em;
+        font-variant-numeric: tabular-nums;
+      }
+      [data-composition-id="scene-1"] .scene-tag { color: #FF8F72; }
+      [data-composition-id="scene-1"] .timestamp { color: #B8B8C7; }
+      [data-composition-id="scene-1"] .headline-block {
+        display: flex;
+        align-items: flex-start;
+        gap: 32px;
+      }
+      [data-composition-id="scene-1"] .prompt-mark {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 48px;
+        font-weight: 700;
+        color: #F6704D;
+        line-height: 1;
+        padding-top: 22px;
+      }
+      [data-composition-id="scene-1"] .headline {
+        font-size: 108px;
+        font-weight: 700;
+        line-height: 1.05;
+        letter-spacing: -0.025em;
+        color: #F1F1F3;
+        margin: 0;
+        max-width: 1400px;
+      }
+      [data-composition-id="scene-1"] .line {
+        display: block;
+      }
+      [data-composition-id="scene-1"] .line.accent {
+        color: #F6704D;
+      }
+      [data-composition-id="scene-1"] .cursor {
+        display: inline-block;
+        width: 8px;
+        height: 96px;
+        background: #F6704D;
+        vertical-align: -18px;
+        margin-left: 12px;
+        transform-origin: center;
+      }
+      [data-composition-id="scene-1"] .status-row {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 22px;
+        font-weight: 500;
+        color: #F1F1F3;
+      }
+      [data-composition-id="scene-1"] .dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: #FFD138;
+        box-shadow: 0 0 14px rgba(255,209,56,0.7);
+      }
+    </style>
+
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <script>
+      (function () {
+        window.__timelines = window.__timelines || {};
+        var tl = gsap.timeline({ paused: true });
+
+        // Meta row slides down
+        tl.from('[data-composition-id="scene-1"] .scene-tag',
+          { y: -24, opacity: 0, duration: 0.5, ease: "power3.out" }, 0.15);
+        tl.from('[data-composition-id="scene-1"] .timestamp',
+          { y: -24, opacity: 0, duration: 0.5, ease: "power3.out" }, 0.28);
+
+        // Prompt mark scales in
+        tl.from('[data-composition-id="scene-1"] .prompt-mark',
+          { scale: 0.4, opacity: 0, duration: 0.4, ease: "expo.out" }, 0.45);
+
+        // Line 1 slams in from below
+        tl.from('[data-composition-id="scene-1"] .line:not(.accent)',
+          { y: 80, opacity: 0, filter: "blur(14px)", duration: 0.55, ease: "power3.out" }, 0.55);
+
+        // Line 2 (accent) slams in with sharper punch
+        tl.from('[data-composition-id="scene-1"] .line.accent',
+          { y: 60, opacity: 0, filter: "blur(10px)", duration: 0.5, ease: "expo.out" }, 1.15);
+
+        // Cursor appears and blinks 4x
+        tl.from('[data-composition-id="scene-1"] .cursor',
+          { scaleY: 0, opacity: 0, duration: 0.25, ease: "power2.out" }, 1.75);
+        tl.to('[data-composition-id="scene-1"] .cursor',
+          { opacity: 0.15, duration: 0.38, ease: "power1.inOut", repeat: 5, yoyo: true }, 2.05);
+
+        // Status row fades up
+        tl.from('[data-composition-id="scene-1"] .status-row',
+          { y: 30, opacity: 0, duration: 0.55, ease: "power2.out" }, 2.0);
+        // Status dot pulse (finite repeats through end)
+        tl.to('[data-composition-id="scene-1"] .dot',
+          { scale: 1.4, opacity: 0.55, duration: 0.7, ease: "sine.inOut",
+            repeat: 3, yoyo: true }, 2.4);
+
+        window.__timelines["scene-1"] = tl;
+      })();
+    </script>
+  </div>
+</template>

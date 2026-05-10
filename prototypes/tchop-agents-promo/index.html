@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <title>tchop: teaser AI agents</title>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body {
+        margin: 0;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background: #2D2D46;
+        font-family: 'Basier Circle', 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
+      }
+      #root { position: relative; width: 1920px; height: 1080px; }
+
+      /* Scene container stacks */
+      .scene-layer {
+        position: absolute;
+        inset: 0;
+        width: 1920px;
+        height: 1080px;
+        will-change: opacity, filter, transform;
+      }
+      /* Scene 1 starts visible; scenes 2-5 start hidden (the timeline reveals them) */
+      #el-s1 { z-index: 10; opacity: 1; }
+      #el-s2 { z-index: 11; opacity: 0; }
+      #el-s3 { z-index: 12; opacity: 0; }
+      #el-s4 { z-index: 13; opacity: 0; }
+      #el-s5 { z-index: 14; opacity: 0; }
+
+      /* Ambient background sits behind everything */
+      #bg-ambient-layer {
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+      }
+      /* Captions sit above everything */
+      #el-captions {
+        position: absolute;
+        inset: 0;
+        z-index: 50;
+        pointer-events: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="main"
+      data-start="0"
+      data-duration="30"
+      data-width="1920"
+      data-height="1080"
+    >
+      <!-- Ambient background: starfield + radial glows — persistent 0-30s -->
+      <div
+        id="bg-ambient-layer"
+        class="clip"
+        data-composition-id="bg-ambient"
+        data-composition-src="compositions/bg-ambient.html"
+        data-start="0"
+        data-duration="30"
+        data-track-index="0"
+      ></div>
+
+      <!-- Scene 1 — The shift (0-3.0s) — narration 0.04-2.96 -->
+      <div
+        id="el-s1"
+        class="scene-layer clip"
+        data-composition-id="scene-1"
+        data-composition-src="compositions/scene-1.html"
+        data-start="0"
+        data-duration="3.0"
+        data-track-index="1"
+      ></div>
+
+      <!-- Scene 2 — The problem (2.4-9.1s) — narration 3.0-9.93, overlap 0.6s -->
+      <div
+        id="el-s2"
+        class="scene-layer clip"
+        data-composition-id="scene-2"
+        data-composition-src="compositions/scene-2.html"
+        data-start="2.4"
+        data-duration="6.7"
+        data-track-index="2"
+      ></div>
+
+      <!-- Scene 3 — The reveal (8.5-14.9s) — "tchop" word hits at 9.12, scene 3 fully visible by 9.1 -->
+      <div
+        id="el-s3"
+        class="scene-layer clip"
+        data-composition-id="scene-3"
+        data-composition-src="compositions/scene-3.html"
+        data-start="8.5"
+        data-duration="6.4"
+        data-track-index="3"
+      ></div>
+
+      <!-- Scene 4 — Proof in motion (14.0-20.8s) — narration 14.56-20.60 -->
+      <div
+        id="el-s4"
+        class="scene-layer clip"
+        data-composition-id="scene-4"
+        data-composition-src="compositions/scene-4.html"
+        data-start="14.0"
+        data-duration="6.8"
+        data-track-index="4"
+      ></div>
+
+      <!-- Scene 5 — Close (20.2-30.0s) — narration 20.64-25.36 + 4.64s CTA hold + fade -->
+      <div
+        id="el-s5"
+        class="scene-layer clip"
+        data-composition-id="scene-5"
+        data-composition-src="compositions/scene-5.html"
+        data-start="20.2"
+        data-duration="9.8"
+        data-track-index="5"
+      ></div>
+
+      <!-- Captions (0-30s) -->
+      <div
+        id="el-captions"
+        class="clip"
+        data-composition-id="captions"
+        data-composition-src="compositions/captions.html"
+        data-start="0"
+        data-duration="30"
+        data-track-index="6"
+      ></div>
+
+      <!-- Narration audio (bf_emma, 25.36s, fades out at end) -->
+      <audio
+        id="narration"
+        data-start="0"
+        data-duration="25.4"
+        data-track-index="7"
+        src="narration.wav"
+        data-volume="1"
+      ></audio>
+    </div>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+
+      // ──────────────────────────────────────────────────────────────────
+      //  Scene crossfades — premium blur-crossfade (cinematic/calm energy)
+      //  Each transition is 0.6s with 10px peak blur + 0.03 scale shift,
+      //  power2.inOut easing for smooth exchange.
+      //
+      //  Transitions time-locked to narration silence gaps:
+      //    T1 (2.4s)  — between "colleagues." (end 2.96) and "Every" (start 3.0)
+      //    T2 (8.5s)  — between "state." (end 9.12) and "tchop." (hits at 9.12, revealed)
+      //    T3 (14.0s) — between "govern." (end 14.52) and "An" (start 14.56)
+      //    T4 (20.2s) — between "status." (end 20.60) and "Give" (start 20.64)
+      // ──────────────────────────────────────────────────────────────────
+
+      // ── Transition 1 → 2 (2.4s - 3.0s) ──
+      var T1 = 2.4;
+      tl.to("#el-s1", {
+        opacity: 0, filter: "blur(12px)", scale: 1.035,
+        duration: 0.6, ease: "power2.inOut"
+      }, T1);
+      tl.fromTo("#el-s2",
+        { opacity: 0, filter: "blur(12px)", scale: 0.97 },
+        { opacity: 1, filter: "blur(0px)", scale: 1,
+          duration: 0.6, ease: "power2.inOut" },
+        T1);
+
+      // ── Transition 2 → 3 (8.5s - 9.1s) ──
+      var T2 = 8.5;
+      tl.to("#el-s2", {
+        opacity: 0, filter: "blur(12px)", scale: 1.035,
+        duration: 0.6, ease: "power2.inOut"
+      }, T2);
+      tl.fromTo("#el-s3",
+        { opacity: 0, filter: "blur(12px)", scale: 0.97 },
+        { opacity: 1, filter: "blur(0px)", scale: 1,
+          duration: 0.6, ease: "power2.inOut" },
+        T2);
+
+      // ── Transition 3 → 4 (14.0s - 14.6s) ──
+      var T3 = 14.0;
+      tl.to("#el-s3", {
+        opacity: 0, filter: "blur(12px)", scale: 1.035,
+        duration: 0.6, ease: "power2.inOut"
+      }, T3);
+      tl.fromTo("#el-s4",
+        { opacity: 0, filter: "blur(12px)", scale: 0.97 },
+        { opacity: 1, filter: "blur(0px)", scale: 1,
+          duration: 0.6, ease: "power2.inOut" },
+        T3);
+
+      // ── Transition 4 → 5 (20.2s - 20.8s) ──
+      var T4 = 20.2;
+      tl.to("#el-s4", {
+        opacity: 0, filter: "blur(12px)", scale: 1.035,
+        duration: 0.6, ease: "power2.inOut"
+      }, T4);
+      tl.fromTo("#el-s5",
+        { opacity: 0, filter: "blur(12px)", scale: 0.97 },
+        { opacity: 1, filter: "blur(0px)", scale: 1,
+          duration: 0.6, ease: "power2.inOut" },
+        T4);
+
+      window.__timelines["main"] = tl;
+    </script>
+  </body>
+</html>

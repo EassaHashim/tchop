@@ -1,0 +1,23 @@
+{
+  "_comment": "Upcoming SV Darmstadt 98 fixtures. gegner_check_card_id and gegner_check_story_id are set when the Gegner-Check post is created -- the matchday morning push links to it.",
+  "matches": [
+    {
+      "date": "2026-04-19",
+      "kickoff": "2026-04-19T13:30:00+02:00",
+      "opponent": "SpVgg Greuther Fürth",
+      "home": false,
+      "competition": "2. Bundesliga",
+      "gegner_check_card_id": null,
+      "gegner_check_story_id": null
+    },
+    {
+      "date": "2026-04-25",
+      "kickoff": "2026-04-25T20:30:00+02:00",
+      "opponent": "SV 07 Elversberg",
+      "home": true,
+      "competition": "2. Bundesliga",
+      "gegner_check_card_id": 46939146,
+      "gegner_check_story_id": 11795
+    }
+  ]
+}

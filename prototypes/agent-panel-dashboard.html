@@ -1,0 +1,1975 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>tchop Admin — Agent Panel Prototype</title>
+<style>
+  /* ── Basier Circle ── */
+  @font-face { font-family: 'Basier Circle'; src: url('/tchop-assets/fonts/BasierCircle-Regular.ttf') format('truetype'); font-weight: 400; font-style: normal; font-display: swap; }
+  @font-face { font-family: 'Basier Circle'; src: url('/tchop-assets/fonts/BasierCircle-Medium.ttf') format('truetype'); font-weight: 500; font-style: normal; font-display: swap; }
+  @font-face { font-family: 'Basier Circle'; src: url('/tchop-assets/fonts/BasierCircle-SemiBold.ttf') format('truetype'); font-weight: 600; font-style: normal; font-display: swap; }
+  @font-face { font-family: 'Basier Circle'; src: url('/tchop-assets/fonts/BasierCircle-Bold.ttf') format('truetype'); font-weight: 700; font-style: normal; font-display: swap; }
+
+  /* ── Reset ── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  /* ── Tokens (tchop design system) ── */
+  :root {
+    --orange: #F6704D;
+    --orange-dark: #E5603D;
+    --orange-glow: rgba(246,112,77,0.3);
+    --orange-tint: rgba(246,112,77,0.08);
+    --yellow: #FFD138;
+    --blue: #488ED8;
+    --blue-tint: rgba(72,142,216,0.08);
+
+    --bg-white: #FFFFFF;
+    --bg-light: #F1F1F3;
+    --bg-warm: #FAF7F7;
+    --bg-dark: #43445B;
+    --bg-footer: #2D2D46;
+    --bg-canvas: #373E4B;
+
+    --text-heading: #2D2D46;
+    --text-body: #43445B;
+    --text-muted: #6B6B7B;
+    --text-disabled: #9B9BAB;
+
+    --border: rgba(0,0,0,0.08);
+    --border-subtle: rgba(0,0,0,0.05);
+
+    --shadow-1: 0 2px 8px rgba(0,0,0,0.04);
+    --shadow-2: 0 4px 16px rgba(0,0,0,0.06);
+    --shadow-3: 0 8px 24px rgba(0,0,0,0.1);
+    --shadow-4: 0 12px 36px rgba(0,0,0,0.15);
+
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-card: 20px;
+    --radius-pill: 100px;
+
+    --sidebar-w: 240px;
+    --topbar-h: 56px;
+    --panel-w: 400px;
+
+    --font: 'Basier Circle', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+  }
+
+  body {
+    font-family: var(--font);
+    background: var(--bg-light);
+    color: var(--text-body);
+    font-size: 14px;
+    line-height: 1.5;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  /* ── Layout Shell ── */
+  .shell {
+    display: grid;
+    grid-template-columns: var(--sidebar-w) 1fr;
+    grid-template-rows: var(--topbar-h) 1fr;
+    height: 100vh;
+  }
+
+  /* ── Sidebar ── */
+  .sidebar {
+    grid-row: 1 / -1;
+    background: var(--bg-footer);
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+  }
+
+  .sidebar-logo {
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    height: var(--topbar-h);
+  }
+  .sidebar-logo .logo-mark {
+    width: 28px;
+    height: 28px;
+    background: var(--orange);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 13px;
+    color: #fff;
+    flex-shrink: 0;
+  }
+  .sidebar-logo span {
+    font-weight: 600;
+    font-size: 15px;
+    letter-spacing: -0.3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .sidebar-section {
+    padding: 16px 0 8px;
+  }
+  .sidebar-section-label {
+    padding: 0 20px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.35);
+    margin-bottom: 4px;
+  }
+
+  .sidebar-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 20px;
+    font-size: 13px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.6);
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+    border-left: 3px solid transparent;
+  }
+  .sidebar-item:hover {
+    background: rgba(255,255,255,0.05);
+    color: rgba(255,255,255,0.85);
+  }
+  .sidebar-item.active {
+    background: rgba(255,255,255,0.08);
+    color: #fff;
+    border-left-color: var(--orange);
+  }
+  .sidebar-item svg {
+    width: 18px;
+    height: 18px;
+    opacity: 0.7;
+    flex-shrink: 0;
+  }
+  .sidebar-item.active svg { opacity: 1; }
+
+  .sidebar-divider {
+    height: 1px;
+    background: rgba(255,255,255,0.06);
+    margin: 8px 20px;
+  }
+
+  /* ── Topbar ── */
+  .topbar {
+    background: var(--bg-white);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+    z-index: 10;
+  }
+  .topbar-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .topbar-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+  .topbar-breadcrumb strong {
+    color: var(--text-heading);
+    font-weight: 600;
+  }
+  .topbar-breadcrumb .sep {
+    color: var(--text-disabled);
+  }
+
+  .topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .topbar-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: var(--bg-white);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+    transition: border-color 0.15s, color 0.15s;
+  }
+  .topbar-btn:hover {
+    border-color: rgba(0,0,0,0.15);
+    color: var(--text-body);
+  }
+  .topbar-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--bg-dark);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* ── Main Content ── */
+  .main {
+    overflow-y: auto;
+    padding: 24px;
+    transition: margin-right 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .main.panel-open {
+    margin-right: var(--panel-w);
+  }
+
+  .main-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+  }
+  .main-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text-heading);
+    letter-spacing: -0.5px;
+  }
+  .main-actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 20px;
+    border-radius: var(--radius-pill);
+    font-family: var(--font);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.15s;
+  }
+  .btn-primary {
+    background: var(--orange);
+    color: #fff;
+    box-shadow: 0 2px 8px var(--orange-glow);
+  }
+  .btn-primary:hover {
+    background: var(--orange-dark);
+    box-shadow: 0 4px 12px var(--orange-glow);
+  }
+  .btn-secondary {
+    background: transparent;
+    color: var(--text-body);
+    border: 1px solid rgba(0,0,0,0.15);
+  }
+  .btn-secondary:hover {
+    background: var(--bg-light);
+  }
+  .btn-sm {
+    padding: 6px 14px;
+    font-size: 12px;
+  }
+  .btn-ghost {
+    background: transparent;
+    color: var(--text-muted);
+    padding: 6px 10px;
+  }
+  .btn-ghost:hover {
+    color: var(--text-body);
+    background: var(--bg-light);
+  }
+
+  /* ── Stats Row ── */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .stat-card {
+    background: var(--bg-white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 16px 20px;
+  }
+  .stat-label {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+  }
+  .stat-value {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text-heading);
+    letter-spacing: -0.5px;
+  }
+  .stat-change {
+    font-size: 11px;
+    font-weight: 500;
+    margin-top: 2px;
+  }
+  .stat-change.up { color: #2ECC71; }
+  .stat-change.down { color: #E74C3C; }
+
+  /* ── Content Cards (Mix/Feed) ── */
+  .content-section {
+    margin-bottom: 24px;
+  }
+  .content-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .content-section-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-heading);
+  }
+
+  .feed-list {
+    background: var(--bg-white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+  }
+  .feed-item {
+    display: grid;
+    grid-template-columns: 64px 1fr auto;
+    gap: 14px;
+    padding: 14px 18px;
+    align-items: center;
+    border-bottom: 1px solid var(--border-subtle);
+    transition: background 0.1s;
+    cursor: pointer;
+  }
+  .feed-item:last-child { border-bottom: none; }
+  .feed-item:hover { background: var(--bg-warm); }
+
+  .feed-thumb {
+    width: 64px;
+    height: 44px;
+    border-radius: 6px;
+    background: var(--bg-light);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-disabled);
+    font-size: 10px;
+  }
+  .feed-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .feed-body {
+    min-width: 0;
+  }
+  .feed-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-heading);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .feed-meta {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 2px;
+    display: flex;
+    gap: 12px;
+  }
+
+  .feed-stats {
+    display: flex;
+    gap: 16px;
+    font-size: 12px;
+    color: var(--text-muted);
+    white-space: nowrap;
+  }
+  .feed-stat {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    border-radius: var(--radius-pill);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+  }
+  .badge-article { background: var(--orange-tint); color: var(--orange); }
+  .badge-longpost { background: var(--blue-tint); color: var(--blue); }
+  .badge-thread { background: rgba(46,204,113,0.08); color: #2ECC71; }
+  .badge-poll { background: rgba(255,209,56,0.12); color: #B8941E; }
+
+  /* ── Agent FAB ── */
+  .agent-fab {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: var(--bg-dark);
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    box-shadow: var(--shadow-3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s, opacity 0.25s;
+    z-index: 100;
+  }
+  .agent-fab:hover {
+    transform: scale(1.08);
+    box-shadow: var(--shadow-4);
+  }
+  .agent-fab.hidden {
+    opacity: 0;
+    pointer-events: none;
+    transform: scale(0.8);
+  }
+  .agent-fab svg { width: 22px; height: 22px; }
+  .agent-fab .fab-dot {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #2ECC71;
+    border: 2px solid var(--bg-dark);
+  }
+
+  /* ── Agent Panel ── */
+  .agent-panel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: var(--panel-w);
+    height: 100vh;
+    background: var(--bg-white);
+    border-left: 1px solid var(--border);
+    box-shadow: -4px 0 24px rgba(0,0,0,0.08);
+    z-index: 90;
+    display: flex;
+    flex-direction: column;
+    transform: translateX(100%);
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .agent-panel.open {
+    transform: translateX(0);
+  }
+
+  .agent-header {
+    height: var(--topbar-h);
+    padding: 0 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .agent-header-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .agent-status {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #2ECC71;
+  }
+  .agent-header-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-heading);
+  }
+  .agent-header-right {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .agent-header-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.1s, color 0.1s;
+  }
+  .agent-header-btn:hover {
+    background: var(--bg-light);
+    color: var(--text-body);
+  }
+
+  .agent-context-bar {
+    padding: 8px 16px;
+    background: var(--bg-light);
+    border-bottom: 1px solid var(--border-subtle);
+    font-size: 11px;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+  .agent-context-bar svg {
+    width: 12px;
+    height: 12px;
+    flex-shrink: 0;
+  }
+  .agent-context-bar strong {
+    color: var(--text-body);
+    font-weight: 600;
+  }
+
+  /* ── Chat Messages ── */
+  .agent-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .msg {
+    max-width: 92%;
+    font-size: 13px;
+    line-height: 1.55;
+  }
+  .msg-agent {
+    align-self: flex-start;
+  }
+  .msg-user {
+    align-self: flex-end;
+  }
+
+  .msg-bubble {
+    padding: 10px 14px;
+    border-radius: 16px;
+    word-break: break-word;
+  }
+  .msg-agent .msg-bubble {
+    background: var(--bg-light);
+    color: var(--text-body);
+    border-bottom-left-radius: 4px;
+  }
+  .msg-user .msg-bubble {
+    background: var(--bg-dark);
+    color: #fff;
+    border-bottom-right-radius: 4px;
+  }
+
+  .msg-time {
+    font-size: 10px;
+    color: var(--text-disabled);
+    margin-top: 3px;
+    padding: 0 4px;
+  }
+  .msg-agent .msg-time { text-align: left; }
+  .msg-user .msg-time { text-align: right; }
+
+  /* ── Suggested Actions ── */
+  .suggestions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 4px;
+  }
+  .suggestion-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 12px;
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--border);
+    background: var(--bg-white);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-body);
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+    font-family: var(--font);
+  }
+  .suggestion-chip:hover {
+    border-color: var(--orange);
+    background: var(--orange-tint);
+    color: var(--orange-dark);
+  }
+
+  /* ── Confirmation Card ── */
+  .confirm-card {
+    background: var(--bg-white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    margin-top: 4px;
+    box-shadow: var(--shadow-1);
+  }
+  .confirm-card-header {
+    padding: 10px 14px;
+    background: var(--bg-light);
+    border-bottom: 1px solid var(--border-subtle);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-heading);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .confirm-card-body {
+    padding: 10px 14px;
+    font-size: 12px;
+    color: var(--text-body);
+  }
+  .confirm-card-body dt {
+    font-weight: 500;
+    color: var(--text-muted);
+    font-size: 11px;
+    margin-top: 6px;
+  }
+  .confirm-card-body dt:first-child { margin-top: 0; }
+  .confirm-card-body dd {
+    margin: 2px 0 0 0;
+    color: var(--text-heading);
+  }
+  .confirm-card-actions {
+    padding: 8px 14px;
+    border-top: 1px solid var(--border-subtle);
+    display: flex;
+    gap: 6px;
+    justify-content: flex-end;
+  }
+
+  /* ── Data Table (inline) ── */
+  .inline-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    margin-top: 8px;
+  }
+  .inline-table th {
+    text-align: left;
+    font-weight: 600;
+    color: var(--text-muted);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 6px 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  .inline-table td {
+    padding: 6px 8px;
+    border-bottom: 1px solid var(--border-subtle);
+    color: var(--text-body);
+  }
+  .inline-table tr:last-child td { border-bottom: none; }
+  .inline-table .num { text-align: right; font-variant-numeric: tabular-nums; }
+
+  /* ── Receipt ── */
+  .receipt {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    background: rgba(46,204,113,0.06);
+    border: 1px solid rgba(46,204,113,0.15);
+    border-radius: var(--radius-sm);
+    font-size: 12px;
+    color: var(--text-body);
+    margin-top: 4px;
+  }
+  .receipt svg {
+    width: 16px;
+    height: 16px;
+    color: #2ECC71;
+    flex-shrink: 0;
+  }
+  .receipt a {
+    color: var(--blue);
+    text-decoration: none;
+    font-weight: 500;
+  }
+  .receipt a:hover { text-decoration: underline; }
+
+  /* ── Typing Indicator ── */
+  .typing {
+    display: flex;
+    gap: 4px;
+    padding: 12px 14px;
+    align-self: flex-start;
+  }
+  .typing-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--text-disabled);
+    animation: typingPulse 1.4s infinite ease-in-out;
+  }
+  .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+  .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+  @keyframes typingPulse {
+    0%, 60%, 100% { opacity: 0.3; transform: scale(0.85); }
+    30% { opacity: 1; transform: scale(1); }
+  }
+
+  /* ── Input Bar ── */
+  .agent-input-bar {
+    padding: 12px 16px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    flex-shrink: 0;
+    background: var(--bg-white);
+  }
+  .agent-input-wrap {
+    flex: 1;
+    position: relative;
+  }
+  .agent-input {
+    width: 100%;
+    padding: 10px 14px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+    background: var(--bg-light);
+    font-family: var(--font);
+    font-size: 13px;
+    color: var(--text-body);
+    resize: none;
+    outline: none;
+    transition: border-color 0.15s, background 0.15s;
+    min-height: 40px;
+    max-height: 120px;
+    line-height: 1.4;
+  }
+  .agent-input::placeholder {
+    color: var(--text-disabled);
+  }
+  .agent-input:focus {
+    border-color: rgba(0,0,0,0.15);
+    background: var(--bg-white);
+  }
+  .agent-send {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-md);
+    background: var(--bg-dark);
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s;
+    flex-shrink: 0;
+  }
+  .agent-send:hover {
+    background: var(--text-heading);
+  }
+  .agent-send svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  /* ── Demo Interaction States ── */
+  .demo-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    background: rgba(45,45,70,0.6);
+    backdrop-filter: blur(4px);
+    align-items: center;
+    justify-content: center;
+  }
+  .demo-overlay.visible {
+    display: flex;
+  }
+  .demo-modal {
+    background: var(--bg-white);
+    border-radius: var(--radius-card);
+    padding: 32px;
+    max-width: 420px;
+    width: 90%;
+    box-shadow: var(--shadow-4);
+    text-align: center;
+  }
+  .demo-modal h3 {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-heading);
+    margin-bottom: 8px;
+  }
+  .demo-modal p {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 20px;
+    line-height: 1.6;
+  }
+  .demo-modal .btn { width: 100%; justify-content: center; }
+
+  /* ── Scroll ── */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.12); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.2); }
+
+  /* ── Panel Tabs ── */
+  .agent-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .agent-tab {
+    flex: 1;
+    padding: 10px 0;
+    text-align: center;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    font-family: var(--font);
+    transition: color 0.15s, border-color 0.15s;
+  }
+  .agent-tab:hover { color: var(--text-body); }
+  .agent-tab.active {
+    color: var(--text-heading);
+    border-bottom-color: var(--orange);
+  }
+  .agent-tab .tab-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 16px;
+    height: 16px;
+    padding: 0 4px;
+    border-radius: 8px;
+    background: var(--orange);
+    color: #fff;
+    font-size: 9px;
+    font-weight: 700;
+    margin-left: 4px;
+    vertical-align: middle;
+  }
+
+  /* ── Activity Feed ── */
+  .agent-activity {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px 16px;
+    display: none;
+    flex-direction: column;
+    gap: 0;
+  }
+  .agent-activity.visible {
+    display: flex;
+  }
+
+  .activity-entry {
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+  .activity-entry:last-child { border-bottom: none; }
+
+  .activity-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+  .activity-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .activity-icon.success { background: rgba(46,204,113,0.1); color: #2ECC71; }
+  .activity-icon.info { background: var(--blue-tint); color: var(--blue); }
+  .activity-icon.warning { background: rgba(255,209,56,0.12); color: #B8941E; }
+  .activity-icon.error { background: rgba(231,76,60,0.08); color: #E74C3C; }
+  .activity-icon svg { width: 14px; height: 14px; }
+
+  .activity-title-row {
+    flex: 1;
+    min-width: 0;
+  }
+  .activity-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-heading);
+  }
+  .activity-time {
+    font-size: 10px;
+    color: var(--text-disabled);
+  }
+
+  .activity-body {
+    margin-left: 36px;
+    font-size: 12px;
+    color: var(--text-body);
+    line-height: 1.55;
+  }
+  .activity-body ul {
+    list-style: none;
+    padding: 0;
+    margin: 4px 0 0;
+  }
+  .activity-body li {
+    padding: 2px 0;
+    color: var(--text-muted);
+  }
+  .activity-body li::before {
+    content: '';
+    display: inline-block;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--text-disabled);
+    margin-right: 8px;
+    vertical-align: middle;
+  }
+  .activity-actions {
+    margin: 8px 0 0 36px;
+    display: flex;
+    gap: 6px;
+  }
+  .activity-link {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--blue);
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .activity-link:hover { text-decoration: underline; }
+
+  /* ── FAB Badge ── */
+  .fab-badge {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: 9px;
+    background: var(--orange);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--bg-light);
+    line-height: 1;
+  }
+
+  /* ── Automations Page ── */
+  .page-automations { display: none; }
+  .page-automations.visible { display: block; }
+  .page-dashboard.hidden { display: none; }
+
+  .auto-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    background: var(--bg-white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+  }
+  .auto-item {
+    display: grid;
+    grid-template-columns: 36px 1fr auto auto;
+    gap: 12px;
+    padding: 14px 18px;
+    align-items: center;
+    border-bottom: 1px solid var(--border-subtle);
+    transition: background 0.1s;
+  }
+  .auto-item:last-child { border-bottom: none; }
+  .auto-item:hover { background: var(--bg-warm); }
+
+  .auto-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .auto-icon.schedule { background: var(--blue-tint); color: var(--blue); }
+  .auto-icon.event { background: var(--orange-tint); color: var(--orange); }
+  .auto-icon.condition { background: rgba(255,209,56,0.12); color: #B8941E; }
+  .auto-icon svg { width: 18px; height: 18px; }
+
+  .auto-body { min-width: 0; }
+  .auto-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-heading);
+  }
+  .auto-desc {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 1px;
+  }
+  .auto-last-run {
+    font-size: 11px;
+    color: var(--text-muted);
+    text-align: right;
+    white-space: nowrap;
+  }
+  .auto-last-run strong {
+    color: var(--text-body);
+    font-weight: 500;
+  }
+
+  .auto-toggle {
+    position: relative;
+    width: 36px;
+    height: 20px;
+    border-radius: 10px;
+    background: var(--text-disabled);
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s;
+    flex-shrink: 0;
+  }
+  .auto-toggle.on { background: #2ECC71; }
+  .auto-toggle::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #fff;
+    transition: transform 0.2s;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+  }
+  .auto-toggle.on::after { transform: translateX(16px); }
+
+  .template-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-top: 12px;
+  }
+  .template-card {
+    background: var(--bg-white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 16px;
+    cursor: pointer;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .template-card:hover {
+    border-color: var(--orange);
+    box-shadow: var(--shadow-2);
+  }
+  .template-card-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+  }
+  .template-card-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-heading);
+    margin-bottom: 4px;
+  }
+  .template-card-desc {
+    font-size: 11px;
+    color: var(--text-muted);
+    line-height: 1.45;
+  }
+
+  /* ── Utility ── */
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); }
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <!-- ═══ Sidebar ═══ -->
+  <nav class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-mark">L</div>
+      <span>Lilien News</span>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Content</div>
+      <div class="sidebar-item active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        Dashboard
+      </div>
+      <div class="sidebar-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+        News Feed
+      </div>
+      <div class="sidebar-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        Community
+      </div>
+      <div class="sidebar-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        Long Posts
+      </div>
+    </div>
+
+    <div class="sidebar-divider"></div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Manage</div>
+      <div class="sidebar-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Users
+      </div>
+      <div class="sidebar-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        Push
+      </div>
+      <div class="sidebar-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/></svg>
+        Analytics
+      </div>
+    </div>
+
+    <div class="sidebar-divider"></div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Settings</div>
+      <div class="sidebar-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        Channel Settings
+      </div>
+      <div class="sidebar-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        Integrations
+      </div>
+      <div class="sidebar-item" onclick="showAutomations()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        Automations
+      </div>
+    </div>
+  </nav>
+
+  <!-- ═══ Topbar ═══ -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <div class="topbar-breadcrumb">
+        <span>Lilien News</span>
+        <span class="sep">/</span>
+        <strong>Dashboard</strong>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <button class="topbar-btn" title="Search">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      </button>
+      <button class="topbar-btn" title="Notifications">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      </button>
+      <div class="topbar-avatar">HS</div>
+    </div>
+  </header>
+
+  <!-- ═══ Main Content ═══ -->
+  <main class="main" id="mainContent">
+
+    <!-- ═══ Dashboard Page ═══ -->
+    <div class="page-dashboard" id="pageDashboard">
+
+    <div class="main-header">
+      <h1 class="main-title">Dashboard</h1>
+      <div class="main-actions">
+        <button class="btn btn-secondary btn-sm">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Export
+        </button>
+        <button class="btn btn-primary btn-sm" onclick="showDemo()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+          Add Content
+        </button>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-label">Active Users (7d)</div>
+        <div class="stat-value">2,847</div>
+        <div class="stat-change up">+12.3% vs last week</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Cards Published</div>
+        <div class="stat-value">38</div>
+        <div class="stat-change up">+5 vs last week</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Comments</div>
+        <div class="stat-value">412</div>
+        <div class="stat-change up">+23.1% vs last week</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Push Open Rate</div>
+        <div class="stat-value">34%</div>
+        <div class="stat-change down">-2.1% vs last week</div>
+      </div>
+    </div>
+
+    <!-- Recent Content -->
+    <div class="content-section">
+      <div class="content-section-header">
+        <h2 class="content-section-title">Recent Content</h2>
+        <button class="btn btn-ghost btn-sm">View All</button>
+      </div>
+      <div class="feed-list">
+        <div class="feed-item">
+          <div class="feed-thumb" style="background: #1a472a; color: #fff; font-size: 9px; font-weight: 600;">IMG</div>
+          <div class="feed-body">
+            <div class="feed-title">Lilien verpflichten Stürmer aus der 2. Liga</div>
+            <div class="feed-meta">
+              <span class="badge badge-article">Article</span>
+              <span>Today, 14:32</span>
+              <span>by Redaktion</span>
+            </div>
+          </div>
+          <div class="feed-stats">
+            <span class="feed-stat">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              1.2k
+            </span>
+            <span class="feed-stat">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              47
+            </span>
+          </div>
+        </div>
+        <div class="feed-item">
+          <div class="feed-thumb" style="background: var(--bg-light); font-size: 9px;">TXT</div>
+          <div class="feed-body">
+            <div class="feed-title">Matchday-Thread: Darmstadt vs. Karlsruhe (Sa 15:30)</div>
+            <div class="feed-meta">
+              <span class="badge badge-thread">Thread</span>
+              <span>Today, 10:15</span>
+              <span>by Redaktion</span>
+            </div>
+          </div>
+          <div class="feed-stats">
+            <span class="feed-stat">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              834
+            </span>
+            <span class="feed-stat">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              128
+            </span>
+          </div>
+        </div>
+        <div class="feed-item">
+          <div class="feed-thumb" style="background: #333; color: #fff; font-size: 9px; font-weight: 600;">IMG</div>
+          <div class="feed-body">
+            <div class="feed-title">Saisonrückblick: Die besten Momente der Hinrunde</div>
+            <div class="feed-meta">
+              <span class="badge badge-longpost">Long Post</span>
+              <span>Yesterday, 18:00</span>
+              <span>by M. Weber</span>
+            </div>
+          </div>
+          <div class="feed-stats">
+            <span class="feed-stat">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              2.4k
+            </span>
+            <span class="feed-stat">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              63
+            </span>
+          </div>
+        </div>
+        <div class="feed-item">
+          <div class="feed-thumb" style="background: var(--bg-light); font-size: 9px;">POLL</div>
+          <div class="feed-body">
+            <div class="feed-title">Wer wird Spieler der Saison?</div>
+            <div class="feed-meta">
+              <span class="badge badge-poll">Poll</span>
+              <span>2 days ago</span>
+              <span>by Redaktion</span>
+            </div>
+          </div>
+          <div class="feed-stats">
+            <span class="feed-stat">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              1.8k
+            </span>
+            <span class="feed-stat">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+              891
+            </span>
+          </div>
+        </div>
+        <div class="feed-item">
+          <div class="feed-thumb" style="background: #1a472a; color: #fff; font-size: 9px; font-weight: 600;">IMG</div>
+          <div class="feed-body">
+            <div class="feed-title">Pressekonferenz vor dem Auswärtsspiel in Hannover</div>
+            <div class="feed-meta">
+              <span class="badge badge-article">Article</span>
+              <span>3 days ago</span>
+              <span>by Redaktion</span>
+            </div>
+          </div>
+          <div class="feed-stats">
+            <span class="feed-stat">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              672
+            </span>
+            <span class="feed-stat">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              19
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    </div><!-- /page-dashboard -->
+
+    <!-- ═══ Automations Page ═══ -->
+    <div class="page-automations" id="pageAutomations">
+
+      <div class="main-header">
+        <h1 class="main-title">Automations</h1>
+        <div class="main-actions">
+          <button class="btn btn-primary btn-sm" onclick="togglePanel(); switchTab('chat');">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+            Create with Agent
+          </button>
+        </div>
+      </div>
+
+      <!-- Active Automations -->
+      <div class="content-section">
+        <div class="content-section-header">
+          <h2 class="content-section-title">Active Automations</h2>
+          <span style="font-size: 12px; color: var(--text-muted);">3 active, 1 paused</span>
+        </div>
+        <div class="auto-list">
+
+          <div class="auto-item">
+            <div class="auto-icon schedule">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+            <div class="auto-body">
+              <div class="auto-name">Daily RSS import from kicker.de</div>
+              <div class="auto-desc">Every day at 08:00 -- imports top 3 articles into News Feed</div>
+            </div>
+            <div class="auto-last-run">
+              Last run: <strong>Today, 08:00</strong><br>3 articles imported
+            </div>
+            <button class="auto-toggle on" onclick="this.classList.toggle('on')"></button>
+          </div>
+
+          <div class="auto-item">
+            <div class="auto-icon event">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+            </div>
+            <div class="auto-body">
+              <div class="auto-name">Breaking news auto-push</div>
+              <div class="auto-desc">When a card tagged "eilmeldung" is published -- sends push to all users</div>
+            </div>
+            <div class="auto-last-run">
+              Last run: <strong>Apr 8, 16:42</strong><br>Push sent to 2,847
+            </div>
+            <button class="auto-toggle on" onclick="this.classList.toggle('on')"></button>
+          </div>
+
+          <div class="auto-item">
+            <div class="auto-icon schedule">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+            <div class="auto-body">
+              <div class="auto-name">Weekly engagement digest</div>
+              <div class="auto-desc">Every Friday at 18:00 -- creates Long Post with top 5 cards in Community</div>
+            </div>
+            <div class="auto-last-run">
+              Last run: <strong>Apr 4, 18:00</strong><br>Post created
+            </div>
+            <button class="auto-toggle on" onclick="this.classList.toggle('on')"></button>
+          </div>
+
+          <div class="auto-item" style="opacity: 0.6;">
+            <div class="auto-icon condition">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+            </div>
+            <div class="auto-body">
+              <div class="auto-name">Hot topic auto-push</div>
+              <div class="auto-desc">When a card gets 8+ comments in 2h -- sends push notification</div>
+            </div>
+            <div class="auto-last-run">
+              <span style="color: var(--text-disabled);">Paused</span>
+            </div>
+            <button class="auto-toggle" onclick="this.classList.toggle('on')"></button>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Templates -->
+      <div class="content-section">
+        <div class="content-section-header">
+          <h2 class="content-section-title">Templates</h2>
+        </div>
+        <div class="template-grid">
+
+          <div class="template-card" onclick="togglePanel(); switchTab('chat');">
+            <div class="template-card-icon" style="background: var(--blue-tint); color: var(--blue);">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 11a9 9 0 0 1 9 9"/><path d="M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1"/></svg>
+            </div>
+            <div class="template-card-title">Content import from RSS</div>
+            <div class="template-card-desc">Automatically import articles from any RSS feed on a schedule</div>
+          </div>
+
+          <div class="template-card" onclick="togglePanel(); switchTab('chat');">
+            <div class="template-card-icon" style="background: var(--orange-tint); color: var(--orange);">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            </div>
+            <div class="template-card-title">Smart push notifications</div>
+            <div class="template-card-desc">Send push based on tags, engagement thresholds, or schedules</div>
+          </div>
+
+          <div class="template-card" onclick="togglePanel(); switchTab('chat');">
+            <div class="template-card-icon" style="background: rgba(46,204,113,0.08); color: #2ECC71;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            </div>
+            <div class="template-card-title">Recurring content creation</div>
+            <div class="template-card-desc">Auto-generate weekly digests, matchday threads, or roundups</div>
+          </div>
+
+          <div class="template-card" onclick="togglePanel(); switchTab('chat');">
+            <div class="template-card-icon" style="background: rgba(255,209,56,0.12); color: #B8941E;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </div>
+            <div class="template-card-title">User re-engagement</div>
+            <div class="template-card-desc">Automated pushes to users who haven't opened the app recently</div>
+          </div>
+
+          <div class="template-card" onclick="togglePanel(); switchTab('chat');">
+            <div class="template-card-icon" style="background: var(--blue-tint); color: var(--blue);">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            </div>
+            <div class="template-card-title">Social media import</div>
+            <div class="template-card-desc">Mirror posts from X, Instagram, or LinkedIn into a mix</div>
+          </div>
+
+          <div class="template-card" onclick="togglePanel(); switchTab('chat');" style="border-style: dashed; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 24px;">
+            <div style="width: 32px; height: 32px; border-radius: 50%; border: 1px dashed var(--text-disabled); display: flex; align-items: center; justify-content: center; color: var(--text-muted); margin-bottom: 10px;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+            </div>
+            <div class="template-card-title">Create custom</div>
+            <div class="template-card-desc">Describe any automation in natural language</div>
+          </div>
+
+        </div>
+      </div>
+
+    </div><!-- /page-automations -->
+
+  </main>
+
+</div>
+
+<!-- ═══ Agent FAB ═══ -->
+<button class="agent-fab" id="agentFab" onclick="togglePanel()" title="Open Agent">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+    <path d="M12 2a4 4 0 0 1 4 4v1h1a3 3 0 0 1 3 3v6a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3v-6a3 3 0 0 1 3-3h1V6a4 4 0 0 1 4-4z"/>
+    <circle cx="9" cy="13" r="1.25" fill="currentColor" stroke="none"/>
+    <circle cx="15" cy="13" r="1.25" fill="currentColor" stroke="none"/>
+    <path d="M9 17.5c.5.5 1.5 1 3 1s2.5-.5 3-1"/>
+  </svg>
+  <span class="fab-badge" id="fabBadge">3</span>
+</button>
+
+<!-- ═══ Agent Panel ═══ -->
+<aside class="agent-panel" id="agentPanel">
+  <div class="agent-header">
+    <div class="agent-header-left">
+      <span class="agent-status"></span>
+      <span class="agent-header-title">Agent</span>
+    </div>
+    <div class="agent-header-right">
+      <button class="agent-header-btn" title="History">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      </button>
+      <button class="agent-header-btn" title="Settings">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+      </button>
+      <button class="agent-header-btn" onclick="togglePanel()" title="Close">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="agent-context-bar">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+    Viewing <strong>Dashboard</strong> in <strong>Lilien News</strong>
+  </div>
+
+  <!-- Tab Switcher -->
+  <div class="agent-tabs">
+    <button class="agent-tab active" id="tabChat" onclick="switchTab('chat')">Chat</button>
+    <button class="agent-tab" id="tabActivity" onclick="switchTab('activity')">Activity <span class="tab-badge">3</span></button>
+  </div>
+
+  <!-- Activity Feed -->
+  <div class="agent-activity" id="agentActivity">
+
+    <div class="activity-entry">
+      <div class="activity-head">
+        <div class="activity-icon success">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        </div>
+        <div class="activity-title-row">
+          <div class="activity-title">Daily RSS Import</div>
+          <div class="activity-time">Today, 08:00</div>
+        </div>
+      </div>
+      <div class="activity-body">
+        Imported 3 articles from kicker.de into News Feed
+        <ul>
+          <li>Lilien: Kader-Update vor dem Spiel</li>
+          <li>Trainingsauftakt nach Länderspielpause</li>
+          <li>Verletzte und Gesperrte vor Spieltag 28</li>
+        </ul>
+      </div>
+      <div class="activity-actions">
+        <a class="activity-link" onclick="showDemo()">View cards</a>
+        <a class="activity-link" onclick="showAutomations()">Edit automation</a>
+      </div>
+    </div>
+
+    <div class="activity-entry">
+      <div class="activity-head">
+        <div class="activity-icon success">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        </div>
+        <div class="activity-title-row">
+          <div class="activity-title">Breaking News Auto-Push</div>
+          <div class="activity-time">Yesterday, 16:42</div>
+        </div>
+      </div>
+      <div class="activity-body">
+        Sent push for "Eilmeldung: Trainer verlängert bis 2028"
+        <ul>
+          <li>Delivered to 2,847 users</li>
+          <li>Open rate: 41% (above average)</li>
+        </ul>
+      </div>
+      <div class="activity-actions">
+        <a class="activity-link" onclick="showDemo()">View push stats</a>
+      </div>
+    </div>
+
+    <div class="activity-entry">
+      <div class="activity-head">
+        <div class="activity-icon info">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+        </div>
+        <div class="activity-title-row">
+          <div class="activity-title">Daily RSS Import</div>
+          <div class="activity-time">Yesterday, 08:00</div>
+        </div>
+      </div>
+      <div class="activity-body">
+        No new articles matched your criteria. Feed checked, 0 new items since last run.
+      </div>
+    </div>
+
+    <div class="activity-entry">
+      <div class="activity-head">
+        <div class="activity-icon success">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        </div>
+        <div class="activity-title-row">
+          <div class="activity-title">Weekly Engagement Digest</div>
+          <div class="activity-time">Apr 4, 18:00</div>
+        </div>
+      </div>
+      <div class="activity-body">
+        Created Long Post "Wochenrückblick KW 14" in Community
+        <ul>
+          <li>Top card: Saisonrückblick (2,412 views)</li>
+          <li>Total engagement: +18% vs KW 13</li>
+        </ul>
+      </div>
+      <div class="activity-actions">
+        <a class="activity-link" onclick="showDemo()">View post</a>
+        <a class="activity-link" onclick="showAutomations()">Edit automation</a>
+      </div>
+    </div>
+
+    <div class="activity-entry">
+      <div class="activity-head">
+        <div class="activity-icon warning">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        </div>
+        <div class="activity-title-row">
+          <div class="activity-title">Daily RSS Import</div>
+          <div class="activity-time">Apr 3, 08:00</div>
+        </div>
+      </div>
+      <div class="activity-body">
+        Found 8 articles but mix has a 5-card daily limit. Published top 5, skipped 3.
+        <ul>
+          <li>Skipped: "Presseticker", "Tabelle aktuell", "Tippspiel"</li>
+        </ul>
+      </div>
+      <div class="activity-actions">
+        <a class="activity-link" onclick="showAutomations()">Adjust limit</a>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="agent-messages" id="agentMessages">
+
+    <!-- Welcome -->
+    <div class="msg msg-agent">
+      <div class="msg-bubble">
+        I can help you manage content, check analytics, or set up automations for this channel. What do you need?
+      </div>
+      <div class="suggestions">
+        <button class="suggestion-chip" onclick="sendSuggestion('Show me this week\'s top content')">Top content this week</button>
+        <button class="suggestion-chip" onclick="sendSuggestion('Import an article')">Import an article</button>
+        <button class="suggestion-chip" onclick="sendSuggestion('Send a push notification')">Send a push</button>
+      </div>
+    </div>
+
+    <!-- Demo conversation: user asks for top content -->
+    <div class="msg msg-user">
+      <div class="msg-bubble">Show me this week's top content</div>
+      <div class="msg-time">14:33</div>
+    </div>
+
+    <!-- Agent responds with data table -->
+    <div class="msg msg-agent">
+      <div class="msg-bubble">
+        Here are the top 5 cards by engagement this week:
+        <table class="inline-table">
+          <thead>
+            <tr>
+              <th>Card</th>
+              <th class="num">Views</th>
+              <th class="num">Comments</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Saisonrückblick: Die besten Momente</td>
+              <td class="num">2,412</td>
+              <td class="num">63</td>
+            </tr>
+            <tr>
+              <td>Wer wird Spieler der Saison?</td>
+              <td class="num">1,834</td>
+              <td class="num">891 votes</td>
+            </tr>
+            <tr>
+              <td>Lilien verpflichten Stürmer</td>
+              <td class="num">1,203</td>
+              <td class="num">47</td>
+            </tr>
+            <tr>
+              <td>Matchday-Thread: vs. Karlsruhe</td>
+              <td class="num">834</td>
+              <td class="num">128</td>
+            </tr>
+            <tr>
+              <td>Pressekonferenz Hannover</td>
+              <td class="num">672</td>
+              <td class="num">19</td>
+            </tr>
+          </tbody>
+        </table>
+        The season review long post got 3x more engagement than average. Thread comments are also up -- matchday threads consistently outperform.
+      </div>
+      <div class="msg-time">14:33</div>
+    </div>
+
+    <!-- User asks to create content -->
+    <div class="msg msg-user">
+      <div class="msg-bubble">Import this article into the News feed: https://sportschau.de/lilien-transfer-update</div>
+      <div class="msg-time">14:35</div>
+    </div>
+
+    <!-- Agent shows confirmation card -->
+    <div class="msg msg-agent">
+      <div class="msg-bubble" style="padding-bottom: 6px;">
+        I've scraped the URL. Here's what I'll publish:
+      </div>
+      <div class="confirm-card">
+        <div class="confirm-card-header">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          Create Article Card
+        </div>
+        <div class="confirm-card-body">
+          <dl>
+            <dt>Mix</dt>
+            <dd>News Feed</dd>
+            <dt>Title</dt>
+            <dd>Lilien: Neue Details zum Winter-Transfer</dd>
+            <dt>Source</dt>
+            <dd>sportschau.de</dd>
+            <dt>Push notification</dt>
+            <dd>Yes (auto-push enabled on this mix)</dd>
+          </dl>
+        </div>
+        <div class="confirm-card-actions">
+          <button class="btn btn-ghost btn-sm">Cancel</button>
+          <button class="btn btn-secondary btn-sm" onclick="showDemo()">Edit</button>
+          <button class="btn btn-primary btn-sm" onclick="confirmAction()">Confirm</button>
+        </div>
+      </div>
+      <div class="msg-time">14:35</div>
+    </div>
+
+    <!-- Receipt after confirmation (hidden initially, shown on confirm click) -->
+    <div class="msg msg-agent" id="receiptMsg" style="display: none;">
+      <div class="receipt">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        <span>Article published in News Feed. Push sent to 2,847 users. <a href="#">View card</a></span>
+      </div>
+      <div class="suggestions" style="margin-top: 8px;">
+        <button class="suggestion-chip" onclick="sendSuggestion('Create a matchday thread for Saturday')">Create matchday thread</button>
+        <button class="suggestion-chip" onclick="sendSuggestion('Set up auto-import for kicker.de')">Set up auto-import</button>
+      </div>
+      <div class="msg-time">14:35</div>
+    </div>
+
+  </div>
+
+  <div class="agent-input-bar">
+    <div class="agent-input-wrap">
+      <textarea class="agent-input" id="agentInput" rows="1" placeholder="Ask the agent anything..." onkeydown="handleKey(event)"></textarea>
+    </div>
+    <button class="agent-send" onclick="sendMessage()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+    </button>
+  </div>
+</aside>
+
+<!-- Demo overlay -->
+<div class="demo-overlay" id="demoOverlay">
+  <div class="demo-modal">
+    <h3>Prototype Only</h3>
+    <p>This is a static UI prototype showing how the agent panel integrates into the tchop admin dashboard. In production, this action would execute against the tchop API.</p>
+    <button class="btn btn-primary" onclick="closeDemoOverlay()">Got it</button>
+  </div>
+</div>
+
+<script>
+  const panel = document.getElementById('agentPanel');
+  const fab = document.getElementById('agentFab');
+  const main = document.getElementById('mainContent');
+  const messages = document.getElementById('agentMessages');
+  const input = document.getElementById('agentInput');
+  let panelOpen = false;
+  let currentTab = 'chat';
+
+  function togglePanel() {
+    panelOpen = !panelOpen;
+    panel.classList.toggle('open', panelOpen);
+    fab.classList.toggle('hidden', panelOpen);
+    main.classList.toggle('panel-open', panelOpen);
+    if (panelOpen) {
+      setTimeout(() => input.focus(), 350);
+    }
+  }
+
+  function switchTab(tab) {
+    currentTab = tab;
+    document.getElementById('tabChat').classList.toggle('active', tab === 'chat');
+    document.getElementById('tabActivity').classList.toggle('active', tab === 'activity');
+    document.getElementById('agentMessages').style.display = tab === 'chat' ? 'flex' : 'none';
+    document.getElementById('agentActivity').classList.toggle('visible', tab === 'activity');
+    document.querySelector('.agent-input-bar').style.display = tab === 'chat' ? 'flex' : 'none';
+    // Clear badge when viewing activity
+    if (tab === 'activity') {
+      const tabBadge = document.querySelector('.tab-badge');
+      if (tabBadge) tabBadge.style.display = 'none';
+      document.getElementById('fabBadge').style.display = 'none';
+    }
+  }
+
+  function showAutomations() {
+    closeDemoOverlay();
+    document.getElementById('pageDashboard').classList.add('hidden');
+    document.getElementById('pageAutomations').classList.add('visible');
+    // Update sidebar
+    document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+    document.querySelectorAll('.sidebar-item').forEach(i => {
+      if (i.textContent.trim() === 'Automations') i.classList.add('active');
+    });
+    // Update breadcrumb
+    document.querySelector('.topbar-breadcrumb strong').textContent = 'Automations';
+  }
+
+  function showDashboard() {
+    document.getElementById('pageDashboard').classList.remove('hidden');
+    document.getElementById('pageAutomations').classList.remove('visible');
+    document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+    document.querySelectorAll('.sidebar-item')[0].classList.add('active');
+    document.querySelector('.topbar-breadcrumb strong').textContent = 'Dashboard';
+  }
+
+  // Make Dashboard sidebar item clickable
+  document.querySelectorAll('.sidebar-item')[0].addEventListener('click', showDashboard);
+
+  function handleKey(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  }
+
+  function sendMessage() {
+    const text = input.value.trim();
+    if (!text) return;
+    appendUserMsg(text);
+    input.value = '';
+    input.style.height = 'auto';
+    showTyping();
+    setTimeout(() => {
+      hideTyping();
+      appendAgentMsg('I understand your request. In a production environment, I would execute this against the tchop API. This prototype demonstrates the UI pattern.');
+    }, 1500);
+  }
+
+  function sendSuggestion(text) {
+    appendUserMsg(text);
+    showTyping();
+    setTimeout(() => {
+      hideTyping();
+      appendAgentMsg('Processing your request. In a production build, this would trigger the relevant MCP tool calls and return live data from your channel.');
+    }, 1200);
+  }
+
+  function appendUserMsg(text) {
+    const div = document.createElement('div');
+    div.className = 'msg msg-user';
+    div.innerHTML = `<div class="msg-bubble">${esc(text)}</div><div class="msg-time">${now()}</div>`;
+    messages.appendChild(div);
+    scrollBottom();
+  }
+
+  function appendAgentMsg(text) {
+    const div = document.createElement('div');
+    div.className = 'msg msg-agent';
+    div.innerHTML = `<div class="msg-bubble">${esc(text)}</div><div class="msg-time">${now()}</div>`;
+    messages.appendChild(div);
+    scrollBottom();
+  }
+
+  function showTyping() {
+    const div = document.createElement('div');
+    div.className = 'typing';
+    div.id = 'typingIndicator';
+    div.innerHTML = '<span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span>';
+    messages.appendChild(div);
+    scrollBottom();
+  }
+
+  function hideTyping() {
+    const el = document.getElementById('typingIndicator');
+    if (el) el.remove();
+  }
+
+  function confirmAction() {
+    document.getElementById('receiptMsg').style.display = '';
+    scrollBottom();
+  }
+
+  function showDemo() {
+    document.getElementById('demoOverlay').classList.add('visible');
+  }
+  function closeDemoOverlay() {
+    document.getElementById('demoOverlay').classList.remove('visible');
+  }
+
+  function scrollBottom() {
+    messages.scrollTo({ top: messages.scrollHeight, behavior: 'smooth' });
+  }
+
+  function esc(s) {
+    const d = document.createElement('div');
+    d.textContent = s;
+    return d.innerHTML;
+  }
+
+  function now() {
+    const d = new Date();
+    return d.getHours().toString().padStart(2, '0') + ':' + d.getMinutes().toString().padStart(2, '0');
+  }
+
+  // Auto-resize textarea
+  input.addEventListener('input', () => {
+    input.style.height = 'auto';
+    input.style.height = Math.min(input.scrollHeight, 120) + 'px';
+  });
+</script>
+
+</body>
+</html>

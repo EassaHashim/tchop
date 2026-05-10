@@ -1,0 +1,1941 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Content & Workflow Preparation — SIL Global</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+
+        /* ===========================================
+           CSS CUSTOM PROPERTIES — tchop Brand System
+           =========================================== */
+        :root {
+            --color-primary: #F6704D;
+            --color-secondary: #FFD138;
+            --color-accent: #488ED8;
+            --color-green: #7CC88F;
+            --color-bg-light: #F1F1F3;
+            --color-bg-dark: #43445B;
+            --color-bg-footer: #2D2D46;
+            --color-white: #FFFFFF;
+
+            --font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+
+            --title-size: clamp(2rem, 5vw, 3.5rem);
+            --h2-size: clamp(1.5rem, 3.5vw, 2.5rem);
+            --h3-size: clamp(1.1rem, 2vw, 1.5rem);
+            --body-size: clamp(0.85rem, 1.4vw, 1.1rem);
+            --small-size: clamp(0.7rem, 1vw, 0.85rem);
+            --label-size: clamp(0.6rem, 0.9vw, 0.75rem);
+
+            --slide-padding: clamp(1.5rem, 4vw, 4rem);
+            --content-gap: clamp(0.75rem, 2vw, 1.5rem);
+            --element-gap: clamp(0.4rem, 1vw, 0.75rem);
+
+            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+            --duration: 0.6s;
+        }
+
+        /* ===========================================
+           BASE
+           =========================================== */
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            scroll-snap-type: y mandatory;
+            height: 100%;
+            overflow-x: hidden;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background: var(--color-bg-light);
+            color: var(--color-bg-footer);
+            height: 100%;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ===========================================
+           SLIDE CONTAINER
+           =========================================== */
+        .slide {
+            width: 100vw;
+            height: 100vh;
+            height: 100dvh;
+            overflow: hidden;
+            scroll-snap-align: start;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .slide-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            max-height: 100%;
+            overflow: hidden;
+            padding: var(--slide-padding);
+        }
+
+        /* ===========================================
+           SLIDE VARIANTS
+           =========================================== */
+        .slide--light {
+            background: var(--color-bg-light);
+            color: var(--color-bg-footer);
+        }
+
+        .slide--white {
+            background: var(--color-white);
+            color: var(--color-bg-footer);
+        }
+
+        .slide--dark {
+            background: var(--color-bg-dark);
+            color: var(--color-white);
+        }
+
+        .slide--deep {
+            background: var(--color-bg-footer);
+            color: var(--color-white);
+        }
+
+        .slide--orange {
+            background: var(--color-primary);
+            color: var(--color-white);
+        }
+
+        /* ===========================================
+           LOGOS
+           =========================================== */
+        .slide-logo {
+            position: absolute;
+            bottom: clamp(0.5rem, 1.2vw, 1rem);
+            left: 50%;
+            transform: translateX(-50%);
+            height: clamp(16px, 2vw, 24px);
+            opacity: 0.4;
+            z-index: 10;
+        }
+
+        .slide-logo--svg {
+            height: clamp(38px, 5vw, 58px);
+        }
+
+        .client-logo {
+            position: absolute;
+            top: clamp(0.75rem, 1.5vw, 1.25rem);
+            left: 50%;
+            transform: translateX(-50%);
+            height: clamp(40px, 5vw, 64px);
+            opacity: 0.9;
+            z-index: 10;
+        }
+
+        .slide--dark .client-logo,
+        .slide--deep .client-logo,
+        .slide--orange .client-logo {
+            display: none;
+        }
+
+        /* ===========================================
+           TYPOGRAPHY
+           =========================================== */
+        .slide-label {
+            font-size: var(--label-size);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: var(--color-primary);
+            margin-bottom: var(--element-gap);
+        }
+
+        .slide--dark .slide-label { color: var(--color-secondary); }
+        .slide--deep .slide-label { color: var(--color-secondary); }
+        .slide--orange .slide-label { color: rgba(255, 255, 255, 0.7); }
+
+        .slide-title {
+            font-size: var(--title-size);
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: var(--content-gap);
+        }
+
+        .slide-h2 {
+            font-size: var(--h2-size);
+            font-weight: 700;
+            line-height: 1.15;
+            margin-bottom: var(--content-gap);
+        }
+
+        .slide-h3 {
+            font-size: var(--h3-size);
+            font-weight: 600;
+            line-height: 1.25;
+        }
+
+        .slide-body {
+            font-size: var(--body-size);
+            line-height: 1.5;
+            opacity: 0.7;
+        }
+
+        .slide--dark .slide-body,
+        .slide--deep .slide-body,
+        .slide--orange .slide-body {
+            opacity: 0.85;
+        }
+
+        .accent { color: var(--color-primary); }
+        .slide--orange .accent { color: var(--color-secondary); }
+        .slide--dark .accent { color: var(--color-primary); }
+        .slide--deep .accent { color: var(--color-primary); }
+
+        /* ===========================================
+           WORKSTREAM GRID
+           =========================================== */
+        .ws-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+            gap: clamp(0.5rem, 1.5vw, 1rem);
+            margin-top: var(--content-gap);
+        }
+
+        .ws-card {
+            background: var(--color-white);
+            border: 1px solid rgba(0, 0, 0, 0.06);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+            border-radius: clamp(8px, 1vw, 12px);
+            padding: clamp(0.75rem, 1.5vw, 1.25rem);
+            display: flex;
+            flex-direction: column;
+            gap: var(--element-gap);
+        }
+
+        .slide--dark .ws-card,
+        .slide--deep .ws-card {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: none;
+        }
+
+        .slide--orange .ws-card {
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: none;
+            color: #fff;
+        }
+
+        .ws-card-number {
+            font-size: var(--label-size);
+            font-weight: 700;
+            color: var(--color-primary);
+            width: clamp(20px, 2.5vw, 28px);
+            height: clamp(20px, 2.5vw, 28px);
+            border-radius: 50%;
+            background: rgba(246, 112, 77, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .slide--dark .ws-card-number,
+        .slide--deep .ws-card-number {
+            background: rgba(246, 112, 77, 0.25);
+            color: var(--color-primary);
+        }
+
+        .slide--orange .ws-card-number {
+            background: rgba(255, 255, 255, 0.25);
+            color: #fff;
+        }
+
+        .ws-card-title {
+            font-size: var(--body-size);
+            font-weight: 600;
+            line-height: 1.3;
+        }
+
+        .ws-card-desc {
+            font-size: var(--small-size);
+            opacity: 0.6;
+            line-height: 1.4;
+        }
+
+        .slide--orange .ws-card-desc {
+            opacity: 0.85;
+        }
+
+        /* ===========================================
+           DETAIL LIST
+           =========================================== */
+        .detail-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: clamp(0.4rem, 1vh, 0.75rem);
+            margin-top: var(--content-gap);
+        }
+
+        .detail-list li {
+            font-size: var(--body-size);
+            line-height: 1.5;
+            padding-left: clamp(1rem, 2vw, 1.5rem);
+            position: relative;
+        }
+
+        .detail-list li::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: clamp(0.4rem, 0.7vw, 0.55rem);
+            width: clamp(5px, 0.6vw, 7px);
+            height: clamp(5px, 0.6vw, 7px);
+            border-radius: 50%;
+            background: var(--color-primary);
+        }
+
+        .slide--orange .detail-list li::before { background: var(--color-secondary); }
+        .slide--dark .detail-list li::before { background: var(--color-primary); }
+        .slide--deep .detail-list li::before { background: var(--color-primary); }
+
+        /* ===========================================
+           TWO COLUMN LAYOUT
+           =========================================== */
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: clamp(1rem, 3vw, 2.5rem);
+            margin-top: var(--content-gap);
+        }
+
+        @media (max-width: 700px) {
+            .two-col {
+                grid-template-columns: 1fr;
+                gap: var(--content-gap);
+            }
+        }
+
+        .col-header {
+            font-size: var(--small-size);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--color-primary);
+            margin-bottom: var(--element-gap);
+        }
+
+        .slide--dark .col-header,
+        .slide--deep .col-header { color: var(--color-secondary); }
+
+        /* ===========================================
+           DISCUSSION PROMPT
+           =========================================== */
+        .discussion {
+            margin-top: var(--content-gap);
+            padding: clamp(0.75rem, 1.5vw, 1.25rem);
+            border-left: 3px solid var(--color-secondary);
+            background: rgba(255, 209, 56, 0.06);
+            border-radius: 0 clamp(6px, 0.8vw, 10px) clamp(6px, 0.8vw, 10px) 0;
+        }
+
+        .slide--light .discussion { background: rgba(255, 209, 56, 0.1); }
+
+        .slide--dark .discussion,
+        .slide--deep .discussion {
+            border-left-color: rgba(255, 255, 255, 0.4);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .discussion-label {
+            font-size: var(--small-size);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: var(--color-secondary);
+            margin-bottom: clamp(0.2rem, 0.5vw, 0.4rem);
+        }
+
+        .slide--dark .discussion-label,
+        .slide--deep .discussion-label { color: rgba(255, 255, 255, 0.7); }
+
+        .discussion p {
+            font-size: var(--body-size);
+            line-height: 1.5;
+            opacity: 0.8;
+            font-style: italic;
+        }
+
+        /* ===========================================
+           STRUCTURE LAYERS
+           =========================================== */
+        .structure-layers {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            margin-top: var(--content-gap);
+        }
+
+        .structure-layer {
+            display: flex;
+            align-items: flex-start;
+            gap: clamp(0.75rem, 1.5vw, 1.25rem);
+            padding: clamp(0.6rem, 1.2vw, 1rem) 0;
+        }
+
+        .structure-layer-icon {
+            width: clamp(28px, 3vw, 38px);
+            height: clamp(28px, 3vw, 38px);
+            border-radius: clamp(6px, 0.8vw, 10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: var(--small-size);
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .structure-layer-content { flex: 1; }
+
+        .structure-layer-title {
+            font-size: var(--body-size);
+            font-weight: 700;
+            line-height: 1.3;
+            margin-bottom: clamp(0.1rem, 0.3vw, 0.25rem);
+        }
+
+        .structure-layer-desc {
+            font-size: var(--small-size);
+            line-height: 1.5;
+            opacity: 0.65;
+        }
+
+        .structure-connector {
+            width: 2px;
+            height: clamp(8px, 1vh, 14px);
+            background: rgba(0, 0, 0, 0.1);
+            margin-left: clamp(13px, 1.5vw, 18px);
+        }
+
+        /* ===========================================
+           CARD TYPES GRID
+           =========================================== */
+        .card-types-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: clamp(0.4rem, 1vw, 0.75rem);
+            margin-top: var(--content-gap);
+        }
+
+        @media (max-width: 900px) {
+            .card-types-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+
+        .card-type-item {
+            background: var(--color-bg-light);
+            border-radius: clamp(6px, 0.8vw, 10px);
+            padding: clamp(0.5rem, 1.2vw, 1rem);
+            display: flex;
+            flex-direction: column;
+            gap: clamp(0.15rem, 0.4vw, 0.3rem);
+        }
+
+        .card-type-name {
+            font-size: var(--small-size);
+            font-weight: 700;
+            color: var(--color-primary);
+        }
+
+        .card-type-desc {
+            font-size: var(--label-size);
+            line-height: 1.45;
+            opacity: 0.6;
+        }
+
+        /* Card type group labels */
+        .card-group-label {
+            font-size: var(--label-size);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            opacity: 0.4;
+            grid-column: 1 / -1;
+            padding-top: clamp(0.3rem, 0.5vw, 0.5rem);
+        }
+
+        /* ===========================================
+           TIMELINE
+           =========================================== */
+        .timeline {
+            display: flex;
+            gap: clamp(0.25rem, 0.5vw, 0.5rem);
+            margin-top: var(--content-gap);
+            align-items: stretch;
+        }
+
+        .timeline-phase {
+            flex: 1;
+            background: var(--color-white);
+            border-radius: clamp(6px, 0.8vw, 10px);
+            padding: clamp(0.6rem, 1.2vw, 1rem);
+            border-top: 3px solid var(--color-primary);
+            display: flex;
+            flex-direction: column;
+            gap: clamp(0.2rem, 0.4vw, 0.4rem);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+        }
+
+        .timeline-phase:nth-child(2) { border-top-color: var(--color-secondary); }
+        .timeline-phase:nth-child(3) { border-top-color: var(--color-accent); }
+        .timeline-phase:nth-child(4) { border-top-color: var(--color-green); }
+        .timeline-phase:nth-child(5) { border-top-color: #B27ADB; }
+
+        .timeline-week {
+            font-size: var(--label-size);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            opacity: 0.5;
+        }
+
+        .timeline-name {
+            font-size: var(--small-size);
+            font-weight: 600;
+        }
+
+        .timeline-items {
+            font-size: clamp(0.55rem, 0.85vw, 0.75rem);
+            opacity: 0.6;
+            line-height: 1.5;
+        }
+
+        @media (max-width: 700px) {
+            .timeline { flex-direction: column; }
+        }
+
+        /* ===========================================
+           RACI TABLE
+           =========================================== */
+        .raci {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: var(--content-gap);
+            font-size: var(--small-size);
+        }
+
+        .raci th, .raci td {
+            padding: clamp(0.3rem, 0.6vw, 0.5rem) clamp(0.5rem, 1vw, 0.75rem);
+            text-align: left;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+        }
+
+        .raci th {
+            font-weight: 600;
+            font-size: var(--label-size);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            opacity: 0.5;
+        }
+
+        .raci td:nth-child(2),
+        .raci td:nth-child(3),
+        .raci td:nth-child(4),
+        .raci td:nth-child(5) { text-align: center; }
+
+        .raci th:nth-child(2),
+        .raci th:nth-child(3),
+        .raci th:nth-child(4),
+        .raci th:nth-child(5) { text-align: center; }
+
+        .badge {
+            display: inline-block;
+            padding: 0.1em 0.5em;
+            border-radius: 4px;
+            font-size: var(--label-size);
+            font-weight: 600;
+        }
+
+        .badge--orange { background: rgba(246, 112, 77, 0.2); color: var(--color-primary); }
+        .badge--blue { background: rgba(72, 142, 216, 0.2); color: var(--color-accent); }
+        .badge--green { background: rgba(124, 200, 143, 0.2); color: #5A9E6B; }
+        .badge--both { background: rgba(255, 209, 56, 0.15); color: #B89A00; }
+
+        /* ===========================================
+           CARD DEEP DIVE LAYOUT (text left, image right)
+           =========================================== */
+        .card-dive {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: clamp(1.5rem, 3vw, 3rem);
+            margin-top: var(--content-gap);
+            align-items: center;
+        }
+
+        .card-dive-img {
+            width: 100%;
+            max-height: min(60vh, 500px);
+            object-fit: contain;
+            border-radius: clamp(8px, 1vw, 14px);
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
+        }
+
+        .slide--dark .card-dive-img,
+        .slide--deep .card-dive-img {
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.35);
+        }
+
+        @media (max-width: 700px) {
+            .card-dive {
+                grid-template-columns: 1fr;
+            }
+            .card-dive-img {
+                max-height: min(35vh, 280px);
+            }
+        }
+
+        @media (max-height: 600px) {
+            .card-dive-img { max-height: min(40vh, 300px); }
+        }
+
+        /* ===========================================
+           RATIO BAR (content mix visual)
+           =========================================== */
+        .ratio-bar {
+            display: flex;
+            border-radius: clamp(6px, 0.8vw, 10px);
+            overflow: hidden;
+            height: clamp(32px, 4vw, 48px);
+            margin-top: var(--content-gap);
+        }
+
+        .ratio-segment {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: var(--small-size);
+            font-weight: 600;
+            color: #fff;
+        }
+
+        /* ===========================================
+           PROGRESS BAR
+           =========================================== */
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: var(--color-primary);
+            z-index: 100;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        /* ===========================================
+           NAV DOTS
+           =========================================== */
+        .nav-dots {
+            position: fixed;
+            right: clamp(0.5rem, 1.5vw, 1.25rem);
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: clamp(4px, 0.6vw, 8px);
+            z-index: 90;
+        }
+
+        .nav-dot {
+            width: clamp(6px, 0.6vw, 8px);
+            height: clamp(6px, 0.6vw, 8px);
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.15);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            padding: 0;
+        }
+
+        .nav-dot.active {
+            background: var(--color-primary);
+            transform: scale(1.4);
+        }
+
+        /* ===========================================
+           SLIDE COUNTER
+           =========================================== */
+        .slide-counter {
+            position: fixed;
+            bottom: clamp(0.75rem, 1.5vw, 1.25rem);
+            right: clamp(0.75rem, 1.5vw, 1.25rem);
+            font-size: var(--label-size);
+            font-weight: 600;
+            opacity: 0.35;
+            z-index: 90;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* ===========================================
+           ANIMATIONS
+           =========================================== */
+        .reveal {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity var(--duration) var(--ease-out-expo),
+                        transform var(--duration) var(--ease-out-expo);
+        }
+
+        .slide.visible .reveal {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .reveal:nth-child(1) { transition-delay: 0.05s; }
+        .reveal:nth-child(2) { transition-delay: 0.12s; }
+        .reveal:nth-child(3) { transition-delay: 0.19s; }
+        .reveal:nth-child(4) { transition-delay: 0.26s; }
+        .reveal:nth-child(5) { transition-delay: 0.33s; }
+
+        .reveal-card {
+            opacity: 0;
+            transform: translateY(15px);
+            transition: opacity 0.5s var(--ease-out-expo),
+                        transform 0.5s var(--ease-out-expo);
+        }
+
+        .slide.visible .reveal-card { opacity: 1; transform: translateY(0); }
+        .slide.visible .reveal-card:nth-child(1) { transition-delay: 0.1s; }
+        .slide.visible .reveal-card:nth-child(2) { transition-delay: 0.15s; }
+        .slide.visible .reveal-card:nth-child(3) { transition-delay: 0.2s; }
+        .slide.visible .reveal-card:nth-child(4) { transition-delay: 0.25s; }
+        .slide.visible .reveal-card:nth-child(5) { transition-delay: 0.3s; }
+        .slide.visible .reveal-card:nth-child(6) { transition-delay: 0.35s; }
+        .slide.visible .reveal-card:nth-child(7) { transition-delay: 0.4s; }
+
+        /* ===========================================
+           RESPONSIVE BREAKPOINTS
+           =========================================== */
+        @media (max-height: 700px) {
+            :root {
+                --slide-padding: clamp(1rem, 3vw, 2.5rem);
+                --content-gap: clamp(0.5rem, 1.5vw, 1rem);
+                --title-size: clamp(1.5rem, 4.5vw, 2.5rem);
+                --h2-size: clamp(1.25rem, 3vw, 1.75rem);
+            }
+        }
+
+        @media (max-height: 600px) {
+            :root {
+                --slide-padding: clamp(0.75rem, 2.5vw, 1.5rem);
+                --content-gap: clamp(0.4rem, 1vw, 0.75rem);
+                --title-size: clamp(1.25rem, 4vw, 2rem);
+                --body-size: clamp(0.7rem, 1.2vw, 0.95rem);
+            }
+            .nav-dots, .discussion { display: none; }
+        }
+
+        @media (max-height: 500px) {
+            :root {
+                --slide-padding: clamp(0.5rem, 2vw, 1rem);
+                --title-size: clamp(1rem, 3.5vw, 1.5rem);
+                --h2-size: clamp(0.9rem, 2.5vw, 1.25rem);
+                --body-size: clamp(0.65rem, 1vw, 0.85rem);
+            }
+        }
+
+        @media (max-width: 600px) {
+            :root {
+                --title-size: clamp(1.5rem, 7vw, 2.5rem);
+            }
+            .ws-grid { grid-template-columns: 1fr 1fr; }
+            .grid-3 { grid-template-columns: 1fr !important; }
+            .card-types-grid { grid-template-columns: repeat(2, 1fr); }
+            .raci { font-size: clamp(0.6rem, 2.5vw, 0.8rem); }
+            .raci th, .raci td {
+                padding: clamp(0.2rem, 1vw, 0.4rem) clamp(0.3rem, 1.5vw, 0.5rem);
+            }
+            .badge {
+                font-size: clamp(0.5rem, 2vw, 0.65rem);
+                padding: 0.1em 0.35em;
+            }
+            .slide { overflow-y: auto; scroll-snap-align: start; }
+            .slide-content { min-height: auto; }
+        }
+
+        @media print {
+            @page { size: landscape; margin: 0; }
+
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                color-adjust: exact !important;
+            }
+
+            html, body {
+                height: auto;
+                overflow: visible;
+                scroll-snap-type: none;
+                font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+            }
+
+            .slide {
+                height: 100vh;
+                min-height: 100vh;
+                page-break-after: always;
+                break-after: page;
+                page-break-inside: avoid;
+                break-inside: avoid;
+                scroll-snap-align: none;
+                overflow: hidden;
+                position: relative;
+            }
+
+            .slide:last-child { page-break-after: avoid; break-after: avoid; }
+
+            .reveal, .reveal-card {
+                opacity: 1 !important;
+                transform: none !important;
+                transition: none !important;
+                animation: none !important;
+            }
+
+            .progress-bar, .nav-dots, .slide-counter { display: none !important; }
+            .discussion { display: block !important; }
+            .slide-logo, .slide-logo--svg, .client-logo { opacity: 1 !important; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.2s !important;
+            }
+            html { scroll-behavior: auto; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="progress-bar" id="progressBar"></div>
+    <nav class="nav-dots" id="navDots"></nav>
+    <div class="slide-counter" id="slideCounter"></div>
+
+    <!-- ===================== SLIDE 1: TITLE ===================== -->
+    <section class="slide slide--dark">
+        <img src="frontend-slides/Tchop_M_neg.svg" alt="tchop" class="slide-logo slide-logo--svg">
+        <div class="slide-content" style="justify-content: center; align-items: center; text-align: center;">
+            <p class="slide-label reveal">Content & Workflow Preparation</p>
+            <h1 class="slide-title reveal" style="max-width: min(90vw, 700px);">
+                Getting <span class="accent">SIL Global</span><br>
+                ready to launch
+            </h1>
+            <p class="slide-body reveal" style="max-width: min(80vw, 500px); margin-top: var(--element-gap);">
+                Your guide to preparing content strategy, editorial workflows, and internal resources before the setup phase begins.
+            </p>
+            <p class="reveal" style="font-size: var(--small-size); opacity: 0.5; margin-top: var(--content-gap);">SIL Global &middot; 2026 &middot; Online</p>
+        </div>
+    </section>
+
+    <!-- ===================== SLIDE 2: SESSION OVERVIEW ===================== -->
+    <section class="slide slide--white">
+        <img src="frontend-slides/tchop-assets/master_tchop-logo.png_3.3x0.8.png" alt="tchop" class="slide-logo">
+        <div class="slide-content" style="justify-content: center;">
+            <p class="slide-label reveal">What this session is about</p>
+            <h2 class="slide-h2 reveal">Three goals, <span class="accent">one session.</span></h2>
+            <div class="grid-3 reveal" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(0.5rem, 1.5vw, 1.25rem); margin-top: var(--content-gap);">
+                <div style="background: var(--color-bg-light); border-radius: clamp(8px, 1vw, 12px); padding: clamp(1.25rem, 2.5vw, 2rem); text-align: center;">
+                    <div style="font-size: clamp(1.5rem, 3vw, 2.5rem); font-weight: 700; color: var(--color-primary); margin-bottom: var(--element-gap);">1</div>
+                    <div style="font-size: var(--body-size); font-weight: 700; margin-bottom: var(--element-gap);">Understand</div>
+                    <div style="font-size: var(--small-size); opacity: 0.7; line-height: 1.5;">How content works in tchop - the building blocks you'll use every day</div>
+                </div>
+                <div style="background: var(--color-bg-light); border-radius: clamp(8px, 1vw, 12px); padding: clamp(1.25rem, 2.5vw, 2rem); text-align: center;">
+                    <div style="font-size: clamp(1.5rem, 3vw, 2.5rem); font-weight: 700; color: var(--color-primary); margin-bottom: var(--element-gap);">2</div>
+                    <div style="font-size: var(--body-size); font-weight: 700; margin-bottom: var(--element-gap);">Prepare</div>
+                    <div style="font-size: var(--small-size); opacity: 0.7; line-height: 1.5;">What you need to figure out internally before we start the setup</div>
+                </div>
+                <div style="background: var(--color-bg-light); border-radius: clamp(8px, 1vw, 12px); padding: clamp(1.25rem, 2.5vw, 2rem); text-align: center;">
+                    <div style="font-size: clamp(1.5rem, 3vw, 2.5rem); font-weight: 700; color: var(--color-primary); margin-bottom: var(--element-gap);">3</div>
+                    <div style="font-size: var(--body-size); font-weight: 700; margin-bottom: var(--element-gap);">Learn</div>
+                    <div style="font-size: var(--small-size); opacity: 0.7; line-height: 1.5;">Best practices and patterns from other organisations like yours</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== SLIDE 3: INTERNAL HOMEWORK ===================== -->
+    <section class="slide slide--light">
+        <img src="frontend-slides/tchop-assets/master_tchop-logo.png_3.3x0.8.png" alt="tchop" class="slide-logo">
+        <div class="slide-content">
+            <p class="slide-label reveal">Your Internal Homework</p>
+            <h2 class="slide-h2 reveal">What to <span class="accent">prepare</span> before setup begins</h2>
+            <ul class="detail-list reveal">
+                <li>Understand the platform's content model (cards, mixes, channels)</li>
+                <li>Define your content categories and who creates what</li>
+                <li>Plan your editorial team structure and assign responsibilities</li>
+                <li>Build a first content calendar skeleton</li>
+                <li>Collect existing content that can be imported on day one</li>
+            </ul>
+            <div class="discussion reveal">
+                <div class="discussion-label">Think of it this way</div>
+                <p>This is your preparation guide. Work through it as a team before the setup phase begins. The better you prepare, the faster you launch.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== SLIDE 3b: LEARNINGS UPFRONT ===================== -->
+    <section class="slide slide--orange">
+        <img src="frontend-slides/Tchop_M_neg.svg" alt="tchop" class="slide-logo slide-logo--svg">
+        <div class="slide-content" style="justify-content: center;">
+            <p class="slide-label reveal">Before we dive in</p>
+            <h2 class="slide-h2 reveal">Some learnings upfront <span style="color: var(--color-secondary);">from many internal comms projects</span></h2>
+            <ul class="detail-list reveal" style="max-width: 55ch;">
+                <li>Don't get lost in small features or functional details - this is often distracting in the early stages</li>
+                <li>Focus on <strong>content, value for your employees</strong> and the operations that enable this first</li>
+                <li>Understand what you can <strong>reuse or simply integrate</strong> - and what you will need to create or recreate</li>
+                <li>How can you ensure a <strong>great mix</strong> that provides maximum value?</li>
+                <li>Start with a <strong>simple structure</strong> and then grow - don't build too much complexity in the beginning</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- ===================== SLIDE 4: CONTENT HIERARCHY ===================== -->
+    <section class="slide slide--light">
+        <img src="frontend-slides/tchop-assets/master_tchop-logo.png_3.3x0.8.png" alt="tchop" class="slide-logo">
+        <div class="slide-content">
+            <p class="slide-label reveal">Understanding tchop</p>
+            <h2 class="slide-h2 reveal">Content <span class="accent">Hierarchy</span></h2>
+            <p class="slide-body reveal" style="max-width: 55ch; margin-bottom: var(--element-gap);">Four layers make up every tchop app. Think of channels as audiences, mixes as sections, cards as individual posts.</p>
+            <div class="structure-layers reveal">
+                <div class="structure-layer">
+                    <div class="structure-layer-icon" style="background: var(--color-bg-dark); color: #fff;">O</div>
+                    <div class="structure-layer-content">
+                        <div class="structure-layer-title">Organisation</div>
+                        <div class="structure-layer-desc">Top level. Your entire app instance. Holds all content, users, settings. One organisation = one branded app.</div>
+                    </div>
+                </div>
+                <div class="structure-connector"></div>
+                <div class="structure-layer">
+                    <div class="structure-layer-icon" style="background: var(--color-primary); color: #fff;">C</div>
+                    <div class="structure-layer-content">
+                        <div class="structure-layer-title">Channels</div>
+                        <div class="structure-layer-desc">Who sees what. Separate spaces for departments, regions, topics, or target groups. Each with its own editors and content.</div>
+                    </div>
+                </div>
+                <div class="structure-connector"></div>
+                <div class="structure-layer">
+                    <div class="structure-layer-icon" style="background: var(--color-secondary); color: var(--color-bg-footer);">M</div>
+                    <div class="structure-layer-content">
+                        <div class="structure-layer-title">Mixes</div>
+                        <div class="structure-layer-desc">Sections within a channel. The news feed, topic areas, pinned resources. This is where you organise your content structure.</div>
+                    </div>
+                </div>
+                <div class="structure-connector"></div>
+                <div class="structure-layer">
+                    <div class="structure-layer-icon" style="background: var(--color-accent); color: #fff;">K</div>
+                    <div class="structure-layer-content">
+                        <div class="structure-layer-title">Content Cards</div>
+                        <div class="structure-layer-desc">The atomic unit. Every piece of content is a card. 12 different types for different needs. Cards live inside mixes.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== SLIDE 5: CARD TYPES ===================== -->
+    <section class="slide slide--white">
+        <img src="frontend-slides/tchop-assets/master_tchop-logo.png_3.3x0.8.png" alt="tchop" class="slide-logo">
+        <div class="slide-content">
+            <p class="slide-label reveal">Content Cards</p>
+            <h2 class="slide-h2 reveal">Card Types <span class="accent">for Internal Comms</span></h2>
+            <div class="card-types-grid reveal">
+                <div class="card-type-item" style="border-left: 3px solid var(--color-primary);">
+                    <div class="card-type-name">Article</div>
+                    <div class="card-type-desc">Link to any URL. Auto-scraped teaser. Your curation workhorse.</div>
+                </div>
+                <div class="card-type-item" style="border-left: 3px solid var(--color-primary);">
+                    <div class="card-type-name">Long Post</div>
+                    <div class="card-type-desc">Native longform with block editor. The editorial powerhouse.</div>
+                </div>
+                <div class="card-type-item" style="border-left: 3px solid var(--color-accent);">
+                    <div class="card-type-name">Short Post</div>
+                    <div class="card-type-desc">Quick text update. Fast, informal, like a status message.</div>
+                </div>
+                <div class="card-type-item" style="border-left: 3px solid var(--color-accent);">
+                    <div class="card-type-name">Image</div>
+                    <div class="card-type-desc">Photo with optional text. Team moments, events, behind the scenes.</div>
+                </div>
+                <div class="card-type-item" style="border-left: 3px solid var(--color-accent);">
+                    <div class="card-type-name">Video</div>
+                    <div class="card-type-desc">Native video. CEO messages, training clips, event recordings.</div>
+                </div>
+                <div class="card-type-item" style="border-left: 3px solid var(--color-green);">
+                    <div class="card-type-name">Thread</div>
+                    <div class="card-type-desc">Discussion starter. Opens into comments. Q&A, brainstorms, feedback.</div>
+                </div>
+                <div class="card-type-item" style="border-left: 3px solid var(--color-green);">
+                    <div class="card-type-name">Poll</div>
+                    <div class="card-type-desc">Quick surveys. Real-time results. Pulse checks and decisions.</div>
+                </div>
+                <div class="card-type-item" style="border-left: 3px solid var(--color-secondary);">
+                    <div class="card-type-name">PDF</div>
+                    <div class="card-type-desc">Documents with auto-generated teaser. Policies, guides, forms.</div>
+                </div>
+                <div class="card-type-item" style="border-left: 3px solid var(--color-secondary);">
+                    <div class="card-type-name">Audio</div>
+                    <div class="card-type-desc">Audio player. Internal podcasts, voice updates, devotionals.</div>
+                </div>
+                <div class="card-type-item" style="border-left: 3px solid var(--color-secondary);">
+                    <div class="card-type-name">Gallery</div>
+                    <div class="card-type-desc">2-20 images in a carousel. Events, project updates, team albums.</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== SLIDE 5a: ARTICLE CARD ===================== -->
+    <section class="slide slide--white">
+        <img src="frontend-slides/tchop-assets/master_tchop-logo.png_3.3x0.8.png" alt="tchop" class="slide-logo">
+        <div class="slide-content">
+            <p class="slide-label reveal">Card Deep Dive</p>
+            <h2 class="slide-h2 reveal">Article <span class="accent">Card</span></h2>
+            <div class="card-dive">
+                <div class="reveal">
+                    <div class="col-header">What it does</div>
+                    <ul class="detail-list" style="margin-top: var(--element-gap);">
+                        <li>Links to <strong>any external URL</strong>. The primary curation card.</li>
+                        <li>Auto-scrapes teaser data (title, image, description).</li>
+                        <li>Opens in-app browser (mobile) or new tab (web).</li>
+                        <li>4 teaser styles to keep feeds visually varied.</li>
+                    </ul>
+                    <div class="col-header" style="margin-top: var(--content-gap);">Best for</div>
+                    <ul class="detail-list" style="margin-top: var(--element-gap);">
+                        <li>Curating news, press mentions, partner content</li>
+                        <li>Linking to intranet, HR portals, training resources</li>
+                    </ul>
+                    <div class="col-header" style="margin-top: var(--content-gap);">Good to know</div>
+                    <ul class="detail-list" style="margin-top: var(--element-gap);">
+                        <li>Content lives externally - if URL goes down, card breaks</li>
+                    </ul>
+                </div>
+                <img class="card-dive-img reveal" src="card-screenshots/article-card.png" alt="Article card" loading="lazy">
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== SLIDE 5b: LONG POST CARD ===================== -->
+    <section class="slide slide--light">
+        <img src="frontend-slides/tchop-assets/master_tchop-logo.png_3.3x0.8.png" alt="tchop" class="slide-logo">
+        <div class="slide-content">
+            <p class="slide-label reveal">Card Deep Dive</p>
+            <h2 class="slide-h2 reveal">Long Post <span class="accent">Card</span></h2>
+            <div class="card-dive">
+                <div class="reveal">
+                    <div class="col-header">What it does</div>
+                    <ul class="detail-list" style="margin-top: var(--element-gap);">
+                        <li><strong>Native longform article</strong> with a block-based editor.</li>
+                        <li>Opens in a native reader view (not a browser).</li>
+                        <li>17 block types: text, images, galleries, quotes, tables, embeds, audio, video, files, and more.</li>
+                    </ul>
+                    <div class="col-header" style="margin-top: var(--content-gap);">Best for</div>
+                    <ul class="detail-list" style="margin-top: var(--element-gap);">
+                        <li>CEO messages, strategy updates, employee spotlights</li>
+                        <li>Onboarding guides, policy explainers, reports</li>
+                    </ul>
+                    <div class="col-header" style="margin-top: var(--content-gap);">Good to know</div>
+                    <ul class="detail-list" style="margin-top: var(--element-gap);">
+                        <li>Can only be edited via web app, not mobile</li>
+                    </ul>
+                </div>
+                <img class="card-dive-img reveal" src="card-screenshots/longpost-card.png" alt="Long Post card" loading="lazy">
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== SLIDE 5c: TEXT CARD ===================== -->
+    <section class="slide slide--white">
+        <img src="frontend-slides/tchop-assets/master_tchop-logo.png_3.3x0.8.png" alt="tchop" class="slide-logo">
+        <div class="slide-content">
+            <p class="slide-label reveal">Card Deep Dive</p>
+            <h2 class="slide-h2 reveal">Text <span class="accent">Card</span></h2>
+            <div class="card-dive">
+                <div class="reveal">
+                    <div class="col-header">What it does</div>
+                    <ul class="detail-list" style="margin-top: var(--element-gap);">
+                        <li><strong>Simple text post</strong> - like a status update.</li>
+                        <li>No media required. Basic formatting only.</li>
+                        <li>Shows up to 4 lines in feed with "Read more".</li>
+                    </ul>
+                    <div class="col-header" style="margin-top: var(--content-gap);">Best for</div>
+                    <ul class="detail-list" style="margin-top: var(--element-gap);">
+                        <li>Quick announcements, reminders, shout-outs</li>
+                        <li>User-generated updates from the field</li>
+                    </ul>
+                    <div class="col-header" style="margin-top: var(--content-gap);">Good to know</div>
+                    <ul class="detail-list" style="margin-top: var(--element-gap);">
+                        <li>Text only - if you need media, use Image or Long Post</li>
+                    </ul>
+                </div>
+                <img class="card-dive-img reveal" src="card-screenshots/text-card.png" alt="Text card" loading="lazy">
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== SLIDE 5d: IMAGE CARD ===================== -->
+    <section class="slide slide--light">
+        <img src="frontend-slides/tchop-assets/master_tchop-logo.png_3.3x0.8.png" alt="tchop" class="slide-logo">
+        <div class="slide-content">
+            <p class="slide-label reveal">Card Deep Dive</p>
+            <h2 class="slide-h2 reveal">Image <span class="accent">Card</span></h2>
+            <div class="card-dive">
+                <div class="reveal">
+                    <div class="col-header">What it does</div>
+                    <ul class="detail-list" style="margin-top: var(--element-gap);">
+                        <li><strong>Single image with optional text.</strong> Image is mandatory.</li>
+                        <li>Supports GIF. Caption and copyright per image.</li>
+                    </ul>
+                    <div class="col-header" style="margin-top: var(--content-gap);">Best for</div>
+                    <ul class="detail-list" style="margin-top: var(--element-gap);">
+                        <li>Team photos, event moments, infographics</li>
+                        <li>User-generated content from employees</li>
+                    </ul>
+                    <div class="col-header" style="margin-top: var(--content-gap);">Good to know</div>
+                    <ul class="detail-list" style="margin-top: var(--element-gap);">
+                        <li>Single image, but can also have headlines or description text with flexible length. Simple formatting only - complex formatting only in Long Post.</li>
+                    </ul>
+                </div>
+                <img class="card-dive-img reveal" src="card-screenshots/image-card.png" alt="Image card" loading="lazy">
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== SLIDE 5e: GALLERY CARD ===================== -->
+    <section class="slide slide--white">
+        <img src="frontend-slides/tchop-assets/master_tchop-logo.png_3.3x0.8.png" alt="tchop" class="slide-logo">
+        <div class="slide-content">
+            <p class="slide-label reveal">Card Deep Dive</p>
+            <h2 class="slide-h2 reveal">Gallery <span class="accent">Card</span></h2>
+            <div class="card-dive">
+                <div class="reveal">
+                    <div class="col-header">What it does</div>
+                    <ul class="detail-list" style="margin-top: var(--element-gap);">
+                        <li><strong>2-20 images</strong> in a swipeable carousel.</li>
+                        <li>Each image has its own caption and copyright.</li>
+                        <li>First image shows in feed; users swipe for the rest.</li>
+                    </ul>
+                    <div class="col-header" style="margin-top: var(--content-gap);">Best for</div>
+                    <ul class="detail-list" style="margin-top: var(--element-gap);">
+                        <li>Event photo albums, project milestones</li>
+                        <li>Step-by-step visual guides, office tours</li>
+                    </ul>
+                    <div class="col-header" style="margin-top: var(--content-gap);">Good to know</div>
+                    <ul class="detail-list" style="margin-top: var(--element-gap);">
+                        <li>Minimum 2 images required. Use captions to tell a story.</li>
+                    </ul>
+                </div>
+                <img class="card-dive-img reveal" src="card-screenshots/gallery-card.png" alt="Gallery card" loading="lazy">
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== SLIDE 5f: VIDEO CARD ===================== -->
+    <section class="slide slide--light">
+        <img src="frontend-slides/tchop-assets/master_tchop-logo.png_3.3x0.8.png" alt="tchop" class="slide-logo">
+        <div class="slide-content">
+            <p class="slide-label reveal">Card Deep Dive</p>
+            <h2 class="slide-h2 reveal">Video <span class="accent">Card</span></h2>
+            <div class="card-dive">
+                <div class="reveal">
+                    <div class="col-header">What it does</div>
+                    <ul class="detail-list" style="margin-top: var(--element-gap);">
+                        <li><strong>Native video player</strong> with teaser image. Plays inline.</li>
+                        <li>Teaser image is mandatory - shows with a play icon.</li>
+                        <li>Supports any video format.</li>
+                    </ul>
+                    <div class="col-header" style="margin-top: var(--content-gap);">Best for</div>
+                    <ul class="detail-list" style="margin-top: var(--element-gap);">
+                        <li>CEO messages, townhall recordings, training clips</li>
+                        <li>Employee-generated video content</li>
+                    </ul>
+                    <div class="col-header" style="margin-top: var(--content-gap);">Good to know</div>
+                    <ul class="detail-list" style="margin-top: var(--element-gap);">
+                        <li>100 MB limit. Keep videos short (1-3 min).</li>
+                    </ul>
+                </div>
+                <img class="card-dive-img reveal" src="card-screenshots/video-card.png" alt="Video card" loading="lazy">
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== SLIDE 5g: AUDIO CARD ===================== -->
+    <section class="slide slide--white">
+        <img src="frontend-slides/tchop-assets/master_tchop-logo.png_3.3x0.8.png" alt="tchop" class="slide-logo">
+        <div class="slide-content">
+            <p class="slide-label reveal">Card Deep Dive</p>
+            <h2 class="slide-h2 reveal">Audio <span class="accent">Card</span></h2>
+            <div class="card-dive">
+                <div class="reveal">
+                    <div class="col-header">What it does</div>
+                    <ul class="detail-list" style="margin-top: var(--element-gap);">
+                        <li><strong>Native audio player</strong> with optional teaser image.</li>
+                        <li>Plays inline - users can listen while browsing.</li>
+                        <li>Supports .mp3, .wav, .aiff formats.</li>
+                    </ul>
+                    <div class="col-header" style="margin-top: var(--content-gap);">Best for</div>
+                    <ul class="detail-list" style="margin-top: var(--element-gap);">
+                        <li>Internal podcasts, leadership voice messages</li>
+                        <li>Audio summaries, devotionals, wellness content</li>
+                    </ul>
+                    <div class="col-header" style="margin-top: var(--content-gap);">Good to know</div>
+                    <ul class="detail-list" style="margin-top: var(--element-gap);">
+                        <li>Always add a teaser image - cards without get overlooked</li>
+                    </ul>
+                </div>
+                <img class="card-dive-img reveal" src="card-screenshots/audio-card.png" alt="Audio card" loading="lazy">
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== SLIDE 5h: PDF CARD ===================== -->
+    <section class="slide slide--light">
+        <img src="frontend-slides/tchop-assets/master_tchop-logo.png_3.3x0.8.png" alt="tchop" class="slide-logo">
+        <div class="slide-content">
+            <p class="slide-label reveal">Card Deep Dive</p>
+            <h2 class="slide-h2 reveal">PDF <span class="accent">Card</span></h2>
+            <div class="card-dive">
+                <div class="reveal">
+                    <div class="col-header">What it does</div>
+                    <ul class="detail-list" style="margin-top: var(--element-gap);">
+                        <li><strong>PDF viewer</strong> with auto-generated teaser from first page.</li>
+                        <li>Opens in native viewer (mobile) or new tab (web).</li>
+                        <li>Teaser image can be replaced with a custom one.</li>
+                    </ul>
+                    <div class="col-header" style="margin-top: var(--content-gap);">Best for</div>
+                    <ul class="detail-list" style="margin-top: var(--element-gap);">
+                        <li>Policies, handbooks, guidelines, reports</li>
+                        <li>Forms, templates, reference documents</li>
+                    </ul>
+                    <div class="col-header" style="margin-top: var(--content-gap);">Good to know</div>
+                    <ul class="detail-list" style="margin-top: var(--element-gap);">
+                        <li>Add a descriptive headline - users need context before opening</li>
+                    </ul>
+                </div>
+                <img class="card-dive-img reveal" src="card-screenshots/pdf-card.png" alt="PDF card" loading="lazy">
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== SLIDE 5i: THREAD CARD ===================== -->
+    <section class="slide slide--white">
+        <img src="frontend-slides/tchop-assets/master_tchop-logo.png_3.3x0.8.png" alt="tchop" class="slide-logo">
+        <div class="slide-content">
+            <p class="slide-label reveal">Card Deep Dive</p>
+            <h2 class="slide-h2 reveal">Thread <span class="accent">Card</span></h2>
+            <div class="card-dive">
+                <div class="reveal">
+                    <div class="col-header">What it does</div>
+                    <ul class="detail-list" style="margin-top: var(--element-gap);">
+                        <li><strong>Discussion starter</strong> - opens directly into comments.</li>
+                        <li>Only requires a headline. The simplest card type.</li>
+                        <li>Works like a forum thread for Q&A and dialogue.</li>
+                    </ul>
+                    <div class="col-header" style="margin-top: var(--content-gap);">Best for</div>
+                    <ul class="detail-list" style="margin-top: var(--element-gap);">
+                        <li>Q&A sessions, AMAs with leadership</li>
+                        <li>Brainstorming, idea collection, feedback</li>
+                    </ul>
+                    <div class="col-header" style="margin-top: var(--content-gap);">Good to know</div>
+                    <ul class="detail-list" style="margin-top: var(--element-gap);">
+                        <li>Headline only - no media. Pin for visibility.</li>
+                    </ul>
+                </div>
+                <img class="card-dive-img reveal" src="card-screenshots/thread-card.png" alt="Thread card" loading="lazy">
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== SLIDE 5j: POLL CARD ===================== -->
+    <section class="slide slide--dark">
+        <img src="frontend-slides/Tchop_M_neg.svg" alt="tchop" class="slide-logo slide-logo--svg">
+        <div class="slide-content">
+            <p class="slide-label reveal">Card Deep Dive</p>
+            <h2 class="slide-h2 reveal">Poll <span style="color: var(--color-primary);">Card</span></h2>
+            <div class="card-dive">
+                <div class="reveal">
+                    <div class="col-header">What it does</div>
+                    <ul class="detail-list" style="margin-top: var(--element-gap);">
+                        <li><strong>Interactive voting</strong> directly in the feed - one tap.</li>
+                        <li>Single or multi-choice. Results update dynamically.</li>
+                        <li>Optional expiration date and result visibility control.</li>
+                    </ul>
+                    <div class="col-header" style="margin-top: var(--content-gap);">Best for</div>
+                    <ul class="detail-list" style="margin-top: var(--element-gap);">
+                        <li>Pulse surveys, sentiment checks</li>
+                        <li>Event planning, editorial input, quick decisions</li>
+                    </ul>
+                    <div class="col-header" style="margin-top: var(--content-gap);">Good to know</div>
+                    <ul class="detail-list" style="margin-top: var(--element-gap);">
+                        <li>Cannot edit after publishing or first vote. 3-5 options ideal.</li>
+                    </ul>
+                </div>
+                <img class="card-dive-img reveal" src="card-screenshots/poll-card.png" alt="Poll card" loading="lazy">
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== SLIDE 5k: SOCIAL CARD ===================== -->
+    <section class="slide slide--white">
+        <img src="frontend-slides/tchop-assets/master_tchop-logo.png_3.3x0.8.png" alt="tchop" class="slide-logo">
+        <div class="slide-content">
+            <p class="slide-label reveal">Card Deep Dive</p>
+            <h2 class="slide-h2 reveal">Social <span class="accent">Card</span></h2>
+            <div class="card-dive">
+                <div class="reveal">
+                    <div class="col-header">What it does</div>
+                    <ul class="detail-list" style="margin-top: var(--element-gap);">
+                        <li><strong>Mirrors social media posts</strong> from Facebook, Instagram, X, TikTok.</li>
+                        <li>Auto-scrapes author, content, images from the URL.</li>
+                        <li>Clicking opens the original social post.</li>
+                    </ul>
+                    <div class="col-header" style="margin-top: var(--content-gap);">Best for</div>
+                    <ul class="detail-list" style="margin-top: var(--element-gap);">
+                        <li>Sharing company social posts with employees</li>
+                        <li>Curating industry voices, employer branding</li>
+                    </ul>
+                    <div class="col-header" style="margin-top: var(--content-gap);">Good to know</div>
+                    <ul class="detail-list" style="margin-top: var(--element-gap);">
+                        <li>Can be auto-imported via RSS or social integrations</li>
+                    </ul>
+                </div>
+                <img class="card-dive-img reveal" src="card-screenshots/social-card.png" alt="Social card" loading="lazy">
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== SLIDE 5l: CONTENT BECOMES SOCIAL ===================== -->
+    <section class="slide slide--dark">
+        <img src="frontend-slides/Tchop_M_neg.svg" alt="tchop" class="slide-logo slide-logo--svg">
+        <div class="slide-content">
+            <p class="slide-label reveal">Best Practice</p>
+            <h2 class="slide-h2 reveal">When content becomes <span style="color: var(--color-primary);">social</span></h2>
+            <div class="card-dive">
+                <div class="reveal">
+                    <div class="col-header">How it works</div>
+                    <ul class="detail-list" style="margin-top: var(--element-gap);">
+                        <li>Every card can <strong>display the user</strong> who posted it - or not. This is a setting per mix.</li>
+                        <li>Use this to separate <strong>corporate content</strong> (no user shown) from <strong>personal posts</strong> (user avatar + name visible).</li>
+                    </ul>
+                    <div class="col-header" style="margin-top: var(--content-gap);">Our recommendation</div>
+                    <ul class="detail-list" style="margin-top: var(--element-gap);">
+                        <li><strong>Human level is king.</strong> Most posts should show the person behind them.</li>
+                        <li>Only selected posts should appear "from corporate" without a user displayed.</li>
+                        <li>Even the comms team should mainly act as the <strong>persons they are</strong>.</li>
+                        <li>Let <strong>C-level post directly</strong> - or have ghostwriters do it. Personal voices drive engagement.</li>
+                    </ul>
+                </div>
+                <img class="card-dive-img reveal" src="card-screenshots/card-with-user.png" alt="Card with user display" loading="lazy">
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== SLIDE 6: MIXES ===================== -->
+    <section class="slide slide--white">
+        <img src="frontend-slides/tchop-assets/master_tchop-logo.png_3.3x0.8.png" alt="tchop" class="slide-logo">
+        <div class="slide-content">
+            <p class="slide-label reveal">Understanding tchop</p>
+            <h2 class="slide-h2 reveal">Mixes: Your Content <span class="accent">Architecture</span></h2>
+            <div class="two-col" style="margin-top: var(--element-gap);">
+                <div class="reveal">
+                    <div class="col-header">How mixes appear in the app</div>
+                    <ul class="detail-list" style="margin-top: var(--element-gap);">
+                        <li><strong>News Feed</strong> the main screen users see first. Built from one or more mixes.</li>
+                        <li><strong>Navigation List</strong> browsable lists of sections. Your content menu.</li>
+                        <li><strong>Pinned Tab</strong> single feeds you want to give quick access. Fixed in bottom navigation.</li>
+                        <li><strong>Horizontal Module</strong> swipeable carousel within the feed. Highlights and features.</li>
+                    </ul>
+                </div>
+                <div class="reveal">
+                    <div class="col-header">Example structure for SIL</div>
+                    <ul class="detail-list" style="margin-top: var(--element-gap);">
+                        <li><strong>Main Feed</strong> latest from across SIL, curated daily</li>
+                        <li><strong>From Leadership</strong> Executive Director updates, strategic messages</li>
+                        <li><strong>Team Stories</strong> people spotlights, project updates, field reports</li>
+                        <li><strong>Resources</strong> policies, guides, strategic plan (pinned tab)</li>
+                        <li><strong>Events</strong> townhalls, celebrations, key dates (horizontal carousel)</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="discussion reveal">
+                <div class="discussion-label">Prepare internally</div>
+                <p>Think of mixes like feeds. What kind of feeds do you want to deliver centrally, and what should regions do locally?</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== SLIDE 7: CHANNELS ===================== -->
+    <section class="slide slide--light">
+        <img src="frontend-slides/tchop-assets/master_tchop-logo.png_3.3x0.8.png" alt="tchop" class="slide-logo">
+        <div class="slide-content">
+            <p class="slide-label reveal">Understanding tchop</p>
+            <h2 class="slide-h2 reveal">Channels: <span class="accent">Who Sees What</span></h2>
+            <div class="two-col" style="margin-top: var(--element-gap);">
+                <div class="reveal">
+                    <div class="col-header">Channel use cases</div>
+                    <ul class="detail-list" style="margin-top: var(--element-gap);">
+                        <li><strong>All Staff</strong> company-wide content visible to everyone</li>
+                        <li><strong>Leadership</strong> exec-only updates, board materials, strategic planning</li>
+                        <li><strong>Regional</strong> Africa, Asia Pacific, Americas - localised content</li>
+                        <li><strong>Department</strong> HR, IT, Finance, Operations - team-specific spaces</li>
+                        <li><strong>Project</strong> temporary channels for initiatives, working groups</li>
+                    </ul>
+                </div>
+                <div class="reveal">
+                    <div class="col-header">Access & permissions</div>
+                    <ul class="detail-list" style="margin-top: var(--element-gap);">
+                        <li><strong>Org Admin</strong> full access to everything. Your platform owner.</li>
+                        <li><strong>Channel Admin</strong> manages one channel. Content, users, settings.</li>
+                        <li><strong>Editor</strong> creates and publishes content within a channel.</li>
+                        <li><strong>Limited Editor</strong> can post from the app. No dashboard access.</li>
+                        <li><strong>Reader</strong> consumes content, comments, reacts.</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="discussion reveal">
+                <div class="discussion-label">Prepare internally</div>
+                <p>Map your organisation to channels. Start simple - you can always add more later. Which audiences need separate spaces?</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== SLIDE 8: CONTENT PILLARS ===================== -->
+    <section class="slide slide--dark">
+        <img src="frontend-slides/Tchop_M_neg.svg" alt="tchop" class="slide-logo slide-logo--svg">
+        <div class="slide-content">
+            <p class="slide-label reveal">Developing Your Strategy</p>
+            <h2 class="slide-h2 reveal">Content <span style="color: var(--color-primary);">Pillars</span></h2>
+            <p class="slide-body reveal" style="max-width: 55ch;">Decide which pillars matter most for SIL. You don't need all five at launch.</p>
+            <div class="ws-grid">
+                <div class="ws-card reveal-card">
+                    <div class="ws-card-number">1</div>
+                    <div class="ws-card-title">Corporate News & Updates</div>
+                    <div class="ws-card-desc">Leadership messages, strategic milestones, organisational decisions</div>
+                </div>
+                <div class="ws-card reveal-card">
+                    <div class="ws-card-number">2</div>
+                    <div class="ws-card-title">People & Culture</div>
+                    <div class="ws-card-desc">Employee stories, team spotlights, new joiners, field reports</div>
+                </div>
+                <div class="ws-card reveal-card">
+                    <div class="ws-card-number">3</div>
+                    <div class="ws-card-title">Knowledge & Resources</div>
+                    <div class="ws-card-desc">Policies, guides, FAQs, onboarding docs, strategic plan</div>
+                </div>
+                <div class="ws-card reveal-card">
+                    <div class="ws-card-number">4</div>
+                    <div class="ws-card-title">Engagement & Dialogue</div>
+                    <div class="ws-card-desc">Polls, threads, Q&A, feedback loops, pulse checks</div>
+                </div>
+                <div class="ws-card reveal-card">
+                    <div class="ws-card-number">5</div>
+                    <div class="ws-card-title">Events & Community</div>
+                    <div class="ws-card-desc">Townhalls, celebrations, prayer requests, social moments</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== SLIDE 9: CONTENT CALENDAR ===================== -->
+    <section class="slide slide--white">
+        <img src="frontend-slides/tchop-assets/master_tchop-logo.png_3.3x0.8.png" alt="tchop" class="slide-logo">
+        <div class="slide-content">
+            <p class="slide-label reveal">Developing Your Strategy</p>
+            <h2 class="slide-h2 reveal">Building Your <span class="accent">Content Calendar</span></h2>
+            <div class="two-col" style="margin-top: var(--element-gap);">
+                <div class="reveal">
+                    <div class="col-header">Build the skeleton first</div>
+                    <ul class="detail-list" style="margin-top: var(--element-gap);">
+                        <li><strong>Step 1: Fixed dates</strong> annual events, company milestones, holidays, conferences</li>
+                        <li><strong>Step 2: Recurring formats</strong> weekly leadership update, monthly team spotlight, Friday poll</li>
+                    </ul>
+                </div>
+                <div class="reveal">
+                    <div class="col-header">Then refine</div>
+                    <ul class="detail-list" style="margin-top: var(--element-gap);">
+                        <li><strong>Step 3: Check for oversaturation</strong> don't publish 5 things on the same day</li>
+                        <li><strong>Step 4: Share with stakeholders</strong> get input from leadership, regional heads, HR</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="discussion reveal">
+                <div class="discussion-label">Prepare internally</div>
+                <p>What recurring formats would resonate with SIL's culture? Start with 2-3 formats and grow from there.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== SLIDE 10: CONTENT MIX ===================== -->
+    <section class="slide slide--light">
+        <img src="frontend-slides/tchop-assets/master_tchop-logo.png_3.3x0.8.png" alt="tchop" class="slide-logo">
+        <div class="slide-content">
+            <p class="slide-label reveal">Developing Your Strategy</p>
+            <h2 class="slide-h2 reveal">Finding the Right <span class="accent">Balance</span></h2>
+            <p class="slide-body reveal" style="max-width: 55ch;">Too much top-down kills engagement. Too much social creates noise. Find your balance.</p>
+            <div class="ratio-bar reveal">
+                <div class="ratio-segment" style="flex: 60; background: var(--color-accent);">60%</div>
+                <div class="ratio-segment" style="flex: 25; background: var(--color-primary);">25%</div>
+                <div class="ratio-segment" style="flex: 15; background: var(--color-secondary); color: var(--color-bg-footer);">15%</div>
+            </div>
+            <div class="ws-grid reveal" style="grid-template-columns: repeat(3, 1fr);">
+                <div class="ws-card">
+                    <div class="ws-card-title" style="color: var(--color-accent);">Informational</div>
+                    <div class="ws-card-desc">News, updates, resources, leadership messages, policy changes</div>
+                </div>
+                <div class="ws-card">
+                    <div class="ws-card-title" style="color: var(--color-primary);">Engagement</div>
+                    <div class="ws-card-desc">Polls, threads, Q&A, stories, discussions, user-generated content</div>
+                </div>
+                <div class="ws-card">
+                    <div class="ws-card-title" style="color: #B89A00;">Culture</div>
+                    <div class="ws-card-desc">Achievements, milestones, celebrations, team moments, fun</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== SLIDE 11: PUSH NOTIFICATIONS ===================== -->
+    <section class="slide slide--white">
+        <img src="frontend-slides/tchop-assets/master_tchop-logo.png_3.3x0.8.png" alt="tchop" class="slide-logo">
+        <div class="slide-content">
+            <p class="slide-label reveal">Developing Your Strategy</p>
+            <h2 class="slide-h2 reveal">Push Notifications: <span class="accent">Use With Care</span></h2>
+            <div class="two-col" style="margin-top: var(--element-gap);">
+                <div class="reveal">
+                    <div class="col-header">Types available</div>
+                    <ul class="detail-list" style="margin-top: var(--element-gap);">
+                        <li><strong>Editorial Push</strong> manually crafted, linked to a specific card or URL</li>
+                        <li><strong>Auto-Push per Mix</strong> every new card in a mix triggers a push automatically</li>
+                        <li><strong>Retention Push</strong> automated re-engagement for inactive users</li>
+                        <li><strong>Chat Push</strong> real-time notifications for messages</li>
+                    </ul>
+                </div>
+                <div class="reveal">
+                    <div class="col-header">Best practices</div>
+                    <ul class="detail-list" style="margin-top: var(--element-gap);">
+                        <li><strong>Be selective.</strong> Not everything deserves a push notification.</li>
+                        <li><strong>Reserve push for high-value content.</strong> Leadership messages, breaking news, urgent updates.</li>
+                        <li><strong>Avoid fatigue.</strong> More than 2-3 pushes per day and users will mute you.</li>
+                        <li><strong>Users control their own settings.</strong> Respect that.</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="discussion reveal">
+                <div class="discussion-label">Prepare internally</div>
+                <p>Decide upfront: what is push-worthy? Leadership messages? Breaking news? Everything? Write it down.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== SLIDE 12: MULTILINGUAL ===================== -->
+    <section class="slide slide--dark">
+        <img src="frontend-slides/Tchop_M_neg.svg" alt="tchop" class="slide-logo slide-logo--svg">
+        <div class="slide-content">
+            <p class="slide-label reveal">Developing Your Strategy</p>
+            <h2 class="slide-h2 reveal">Multilingual: <span style="color: var(--color-primary);">What Gets Translated?</span></h2>
+            <div class="two-col" style="margin-top: var(--element-gap);">
+                <div class="reveal">
+                    <div class="col-header">Questions to answer internally</div>
+                    <ul class="detail-list" style="margin-top: var(--element-gap);">
+                        <li>Which languages are essential at launch?</li>
+                        <li>What content must be translated vs. English-only?</li>
+                        <li>Who reviews translations for accuracy?</li>
+                        <li>How fast do translations need to be published?</li>
+                    </ul>
+                </div>
+                <div class="reveal">
+                    <div class="col-header">Approaches available</div>
+                    <ul class="detail-list" style="margin-top: var(--element-gap);">
+                        <li><strong>Separate language channels</strong> per region, curated independently</li>
+                        <li><strong>Mixed-language feeds</strong> with language tags for filtering</li>
+                        <li><strong>AI-assisted translation</strong> for speed, human review for key messages</li>
+                        <li><strong>Visual-first formats</strong> video, images, galleries that work across languages</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="discussion reveal" style="border-left-color: rgba(255,255,255,0.4); background: rgba(255,255,255,0.08);">
+                <div class="discussion-label" style="color: rgba(255,255,255,0.7);">Prepare internally</div>
+                <p style="color: rgba(255,255,255,0.7);">With 90+ nationalities, this is a key decision. Start simple - you can always expand language coverage later.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== SLIDE 13: EDITORIAL ROLES ===================== -->
+    <section class="slide slide--white">
+        <img src="frontend-slides/tchop-assets/master_tchop-logo.png_3.3x0.8.png" alt="tchop" class="slide-logo">
+        <div class="slide-content">
+            <p class="slide-label reveal">Organising Your Team</p>
+            <h2 class="slide-h2 reveal">Editorial Roles <span class="accent">You'll Need</span></h2>
+            <p class="slide-body reveal" style="max-width: 55ch;">Identify these people now. Who owns content? Who contributes? Who approves?</p>
+            <table class="raci reveal">
+                <thead>
+                    <tr>
+                        <th>Task</th>
+                        <th>Central Comms</th>
+                        <th>Regional Editors</th>
+                        <th>Contributors</th>
+                        <th>Leadership</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Content strategy & calendar</td>
+                        <td><span class="badge badge--orange">Owns</span></td>
+                        <td><span class="badge badge--blue">Input</span></td>
+                        <td></td>
+                        <td><span class="badge badge--blue">Approves</span></td>
+                    </tr>
+                    <tr>
+                        <td>Daily publishing</td>
+                        <td><span class="badge badge--orange">Owns</span></td>
+                        <td><span class="badge badge--orange">Owns</span></td>
+                        <td><span class="badge badge--green">Drafts</span></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>Story sourcing</td>
+                        <td><span class="badge badge--blue">Coordinates</span></td>
+                        <td><span class="badge badge--orange">Owns</span></td>
+                        <td><span class="badge badge--green">Sources</span></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>Review & approval</td>
+                        <td><span class="badge badge--orange">Owns</span></td>
+                        <td></td>
+                        <td></td>
+                        <td><span class="badge badge--blue">Sensitive</span></td>
+                    </tr>
+                    <tr>
+                        <td>Analytics & reporting</td>
+                        <td><span class="badge badge--orange">Owns</span></td>
+                        <td><span class="badge badge--blue">Reviews</span></td>
+                        <td></td>
+                        <td><span class="badge badge--blue">Receives</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+
+    <!-- ===================== SLIDE 15: GOVERNANCE ===================== -->
+    <section class="slide slide--white">
+        <img src="frontend-slides/tchop-assets/master_tchop-logo.png_3.3x0.8.png" alt="tchop" class="slide-logo">
+        <div class="slide-content">
+            <p class="slide-label reveal">Organising Your Team</p>
+            <h2 class="slide-h2 reveal">Governance: <span class="accent">Rules of the Road</span></h2>
+            <div class="two-col" style="margin-top: var(--element-gap);">
+                <div class="reveal">
+                    <div class="col-header">Content guidelines to define</div>
+                    <ul class="detail-list" style="margin-top: var(--element-gap);">
+                        <li><strong>Tone of voice</strong> how should SIL sound on the app? Formal, warm, inspiring?</li>
+                        <li><strong>Post length</strong> max words for different card types</li>
+                        <li><strong>Image standards</strong> quality, format, sizing, attribution requirements</li>
+                        <li><strong>Branding</strong> consistent use of SIL name, logos, terminology</li>
+                    </ul>
+                </div>
+                <div class="reveal">
+                    <div class="col-header">Operational rules to agree on</div>
+                    <ul class="detail-list" style="margin-top: var(--element-gap);">
+                        <li><strong>Response times</strong> who replies to comments? How quickly?</li>
+                        <li><strong>Archiving</strong> when does content get removed or archived?</li>
+                        <li><strong>Crisis comms</strong> who publishes urgent messages? What's the escalation path?</li>
+                        <li><strong>User-generated content</strong> can staff post? Where? What's moderated?</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="discussion reveal">
+                <div class="discussion-label">Prepare internally</div>
+                <p>Write these down before launch. Even a one-page document helps. It doesn't need to be perfect - just agreed upon.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== SLIDE 16: AI WORKFLOWS ===================== -->
+    <section class="slide slide--dark">
+        <img src="frontend-slides/Tchop_M_neg.svg" alt="tchop" class="slide-logo slide-logo--svg">
+        <div class="slide-content">
+            <p class="slide-label reveal">Organising Your Team</p>
+            <h2 class="slide-h2 reveal">AI-Powered <span style="color: var(--color-primary);">Workflows</span></h2>
+            <p class="slide-body reveal" style="max-width: 55ch;">Not required at launch, but good to know what's possible. These features evolve rapidly.</p>
+            <div class="two-col" style="margin-top: var(--element-gap);">
+                <div class="reveal">
+                    <div class="col-header">Content creation</div>
+                    <ul class="detail-list" style="margin-top: var(--element-gap);">
+                        <li><strong>Draft assistance</strong> AI helps write and refine posts</li>
+                        <li><strong>Translation drafts</strong> quick first drafts for multilingual content</li>
+                        <li><strong>Smart tagging</strong> auto-categorise content by topic</li>
+                    </ul>
+                </div>
+                <div class="reveal">
+                    <div class="col-header">Automation</div>
+                    <ul class="detail-list" style="margin-top: var(--element-gap);">
+                        <li><strong>Audio summaries</strong> generate spoken versions of written articles</li>
+                        <li><strong>Content digests</strong> auto-generated weekly summaries</li>
+                        <li><strong>Custom agents</strong> connect your own AI tools via API</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== SLIDE 17: WHAT WORKS ===================== -->
+    <section class="slide slide--orange">
+        <img src="frontend-slides/Tchop_M_neg.svg" alt="tchop" class="slide-logo slide-logo--svg">
+        <div class="slide-content">
+            <p class="slide-label reveal">Learnings from Other Clients</p>
+            <h2 class="slide-h2 reveal">What <span style="color: var(--color-secondary);">Works</span></h2>
+            <div class="ws-grid">
+                <div class="ws-card reveal-card">
+                    <div class="ws-card-number">1</div>
+                    <div class="ws-card-title">Start with 2-3 mixes, not 20</div>
+                    <div class="ws-card-desc">Less is more. Expand over time as your team gets comfortable.</div>
+                </div>
+                <div class="ws-card reveal-card">
+                    <div class="ws-card-number">2</div>
+                    <div class="ws-card-title">Leadership content on day one</div>
+                    <div class="ws-card-desc">A CEO or ED message drives first-week adoption like nothing else.</div>
+                </div>
+                <div class="ws-card reveal-card">
+                    <div class="ws-card-number">3</div>
+                    <div class="ws-card-title">One poll per week</div>
+                    <div class="ws-card-desc">Simple interactions double engagement rates. People love to vote.</div>
+                </div>
+                <div class="ws-card reveal-card">
+                    <div class="ws-card-number">4</div>
+                    <div class="ws-card-title">Pre-load content before inviting users</div>
+                    <div class="ws-card-desc">Nobody wants an empty app. Have 2 weeks of content ready at launch.</div>
+                </div>
+                <div class="ws-card reveal-card">
+                    <div class="ws-card-number">5</div>
+                    <div class="ws-card-title">Name your app</div>
+                    <div class="ws-card-desc">A branded name creates ownership and identity. "The SIL App" works - a custom name works better.</div>
+                </div>
+                <div class="ws-card reveal-card">
+                    <div class="ws-card-number">6</div>
+                    <div class="ws-card-title">Weekly editor sync for 90 days</div>
+                    <div class="ws-card-desc">Keep momentum. Share learnings. Celebrate wins. Adjust fast.</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== SLIDE 18: COMMON PITFALLS ===================== -->
+    <section class="slide slide--light">
+        <img src="frontend-slides/tchop-assets/master_tchop-logo.png_3.3x0.8.png" alt="tchop" class="slide-logo">
+        <div class="slide-content">
+            <p class="slide-label reveal">Learnings from Other Clients</p>
+            <h2 class="slide-h2 reveal">Common <span class="accent">Pitfalls</span> to Avoid</h2>
+            <div class="two-col" style="margin-top: var(--element-gap);">
+                <div class="reveal">
+                    <div class="col-header">What to avoid</div>
+                    <ul class="detail-list" style="margin-top: var(--element-gap);">
+                        <li><strong>Too many channels</strong> from the start. Complexity kills adoption.</li>
+                        <li><strong>No editorial rhythm.</strong> Without a cadence, the app goes silent.</li>
+                        <li><strong>Treating it like email.</strong> Broadcasting doesn't build community.</li>
+                        <li><strong>No content on launch day.</strong> First impressions matter enormously.</li>
+                    </ul>
+                </div>
+                <div class="reveal">
+                    <div class="col-header">How others recovered</div>
+                    <ul class="detail-list" style="margin-top: var(--element-gap);">
+                        <li><strong>Consolidate channels.</strong> Focus on 2-3, archive the rest.</li>
+                        <li><strong>Establish one recurring format first.</strong> A weekly update is enough to start.</li>
+                        <li><strong>Shift from broadcasting to dialogue.</strong> Polls, threads, and Q&A change the dynamic.</li>
+                        <li><strong>Pre-fill with 2 weeks of content</strong> before inviting anyone to the app.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== SLIDE 19: PREPARATION CHECKLIST ===================== -->
+    <section class="slide slide--white">
+        <img src="frontend-slides/tchop-assets/master_tchop-logo.png_3.3x0.8.png" alt="tchop" class="slide-logo">
+        <div class="slide-content">
+            <p class="slide-label reveal">Your Next Steps</p>
+            <h2 class="slide-h2 reveal">Preparation <span class="accent">Checklist</span></h2>
+            <div class="ws-grid">
+                <div class="ws-card reveal-card">
+                    <div class="ws-card-number">1</div>
+                    <div class="ws-card-title">Define 3-5 content pillars</div>
+                    <div class="ws-card-desc">Which content categories matter most for SIL?</div>
+                </div>
+                <div class="ws-card reveal-card">
+                    <div class="ws-card-number">2</div>
+                    <div class="ws-card-title">Draft channel + mix structure</div>
+                    <div class="ws-card-desc">Map your audiences to channels, your content to mixes</div>
+                </div>
+                <div class="ws-card reveal-card">
+                    <div class="ws-card-number">3</div>
+                    <div class="ws-card-title">Identify your editorial team</div>
+                    <div class="ws-card-desc">Names, not just roles. Who creates, reviews, approves?</div>
+                </div>
+                <div class="ws-card reveal-card">
+                    <div class="ws-card-number">4</div>
+                    <div class="ws-card-title">Create a 4-week calendar</div>
+                    <div class="ws-card-desc">Fixed dates + recurring formats = your content skeleton</div>
+                </div>
+                <div class="ws-card reveal-card">
+                    <div class="ws-card-number">5</div>
+                    <div class="ws-card-title">Set push notification policy</div>
+                    <div class="ws-card-desc">What is push-worthy? How many per day maximum?</div>
+                </div>
+                <div class="ws-card reveal-card">
+                    <div class="ws-card-number">6</div>
+                    <div class="ws-card-title">Write a one-page editorial guideline</div>
+                    <div class="ws-card-desc">Tone, formats, approval process. Keep it simple.</div>
+                </div>
+                <div class="ws-card reveal-card">
+                    <div class="ws-card-number">7</div>
+                    <div class="ws-card-title">Collect existing content</div>
+                    <div class="ws-card-desc">What can be imported on day one? Articles, videos, PDFs?</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== SLIDE 20: THANK YOU ===================== -->
+    <section class="slide slide--deep">
+        <img src="frontend-slides/Tchop_M_neg.svg" alt="tchop" class="slide-logo slide-logo--svg">
+        <div class="slide-content" style="justify-content: center; align-items: center; text-align: center;">
+            <p class="slide-label reveal">What's Next</p>
+            <h2 class="slide-h2 reveal" style="font-size: clamp(2rem, 5vw, 3.5rem); max-width: min(85vw, 700px);">Preparation is <span class="accent">everything.</span></h2>
+            <p class="slide-body reveal" style="max-width: min(80vw, 500px); margin-top: var(--element-gap);">
+                The better you prepare, the faster you launch.
+            </p>
+            <ul class="detail-list reveal" style="text-align: left; max-width: min(80vw, 560px); margin: var(--content-gap) auto 0;">
+                <li>Work through the checklist as a team</li>
+                <li>Bring your answers to the setup kickoff</li>
+                <li>Schedule the setup kickoff with tchop when ready</li>
+            </ul>
+        </div>
+    </section>
+
+    <script>
+        /* ===========================================
+           SLIDE PRESENTATION CONTROLLER
+           =========================================== */
+        class SlidePresentation {
+            constructor() {
+                this.slides = document.querySelectorAll('.slide');
+                this.totalSlides = this.slides.length;
+                this.progressBar = document.getElementById('progressBar');
+                this.navDots = document.getElementById('navDots');
+                this.slideCounter = document.getElementById('slideCounter');
+
+                this.createNavDots();
+                this.setupObserver();
+                this.setupKeyboard();
+                this.updateCounter(0);
+
+                /* Ensure first slide is visible on load immediately */
+                this.slides[0].querySelectorAll('.reveal, .reveal-card').forEach(el => {
+                    el.style.transitionDelay = '0s';
+                    el.style.transitionDuration = '0s';
+                });
+                this.slides[0].classList.add('visible');
+                this.setActive(0);
+            }
+
+            createNavDots() {
+                this.slides.forEach((_, i) => {
+                    const dot = document.createElement('button');
+                    dot.className = 'nav-dot';
+                    dot.setAttribute('aria-label', `Go to slide ${i + 1}`);
+                    dot.addEventListener('click', () => {
+                        this.slides[i].scrollIntoView({ behavior: 'smooth' });
+                    });
+                    this.navDots.appendChild(dot);
+                });
+                this.dots = this.navDots.querySelectorAll('.nav-dot');
+            }
+
+            setupObserver() {
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('visible');
+                            const index = Array.from(this.slides).indexOf(entry.target);
+                            this.setActive(index);
+                        }
+                    });
+                }, { threshold: 0.5 });
+
+                this.slides.forEach(slide => observer.observe(slide));
+            }
+
+            setActive(index) {
+                this.dots.forEach((dot, i) => {
+                    dot.classList.toggle('active', i === index);
+                });
+                const progress = ((index + 1) / this.totalSlides) * 100;
+                this.progressBar.style.width = progress + '%';
+                this.updateCounter(index);
+            }
+
+            updateCounter(index) {
+                this.slideCounter.textContent = `${index + 1} / ${this.totalSlides}`;
+            }
+
+            setupKeyboard() {
+                let currentSlide = 0;
+
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'ArrowDown' || e.key === 'ArrowRight' || e.key === ' ') {
+                        e.preventDefault();
+                        currentSlide = Math.min(currentSlide + 1, this.totalSlides - 1);
+                        this.slides[currentSlide].scrollIntoView({ behavior: 'smooth' });
+                    } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+                        e.preventDefault();
+                        currentSlide = Math.max(currentSlide - 1, 0);
+                        this.slides[currentSlide].scrollIntoView({ behavior: 'smooth' });
+                    }
+                });
+
+                /* Keep currentSlide synced with scroll */
+                const syncObserver = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            currentSlide = Array.from(this.slides).indexOf(entry.target);
+                        }
+                    });
+                }, { threshold: 0.5 });
+
+                this.slides.forEach(slide => syncObserver.observe(slide));
+            }
+        }
+
+        new SlidePresentation();
+
+        // Inject client logo into all slides
+        document.querySelectorAll('.slide').forEach(slide => {
+            const logo = document.createElement('img');
+            logo.src = 'frontend-slides/sil-global-logo.png';
+            logo.alt = 'SIL Global';
+            logo.className = 'client-logo';
+            slide.appendChild(logo);
+        });
+    </script>
+</body>
+</html>

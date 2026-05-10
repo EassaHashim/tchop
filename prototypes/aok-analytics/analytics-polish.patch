@@ -1,0 +1,293 @@
+diff --git a/src/pages/Organisation/Analytics/Analytics.module.scss b/src/pages/Organisation/Analytics/Analytics.module.scss
+index b83ef9af..0bba5452 100644
+--- a/src/pages/Organisation/Analytics/Analytics.module.scss
++++ b/src/pages/Organisation/Analytics/Analytics.module.scss
+@@ -13,32 +13,41 @@
+   @include mixins.flex-column(initial, flex-start);
+ 
+   gap: 0.5rem;
+-  margin-bottom: 10rem;
++  margin-bottom: 2rem;
+   position: relative;
+ 
++  &__header-row {
++    @include mixins.flex-row(center, space-between);
++
++    width: 100%;
++  }
++
+   &__header {
+-    @include mixins.font-style(1.5rem, #43445b, 600);
++    @include mixins.font-style(1.5rem, var(--card-text-color, #43445b), 600);
+ 
+     line-height: 2rem;
+   }
+ 
+   &__export {
+-    position: absolute;
+-    right: 0;
+-    top: 2.5rem;
++    flex-shrink: 0;
+   }
+ 
+   &__tab-content {
+     @include mixins.flex-column(initial, flex-start);
+ 
+-    gap: 1rem;
++    gap: 0.75rem;
+     margin-top: 1rem;
+ 
+     &-filters {
+       @include mixins.flex-row(center, flex-start);
+ 
+       width: 100%;
+-      gap: 0.25rem;
++      gap: 0.5rem;
++      flex-wrap: wrap;
++      padding: 0.75rem 1rem;
++      background-color: var(--card-bg-color, #fff);
++      border: 0.0625rem solid var(--card-border-color, #ebebeb);
++      border-radius: 0.25rem;
+ 
+       & > :first-child {
+         flex-shrink: 0;
+@@ -57,18 +66,19 @@
+   }
+ 
+   &__chart {
+-    border: 0.0625rem solid #ebebeb;
+-    background-color: #fff;
++    border: 0.0625rem solid var(--card-border-color, #ebebeb);
++    border-radius: 0.25rem;
++    background-color: var(--card-bg-color, #fff);
+ 
+     &-header {
+       @include mixins.flex-row(center, flex-start);
+ 
+       padding: 1rem;
+-      border-bottom: 0.0625rem solid #ebebeb;
++      border-bottom: 0.0625rem solid var(--card-border-color, #ebebeb);
+       gap: 0.5rem;
+ 
+       &-label {
+-        @include mixins.font-style(1rem, #1e1e1e, 600);
++        @include mixins.font-style(1rem, var(--card-text-color, #1e1e1e), 600);
+ 
+         line-height: 1.5rem;
+       }
+@@ -122,7 +132,7 @@
+ 
+         width: calc(100% / 3);
+         border: 0.0625rem solid;
+-        border-color: transparent transparent #ebebeb transparent;
++        border-color: transparent transparent var(--card-border-color, #ebebeb) transparent;
+         box-sizing: border-box;
+         padding: 1rem;
+         gap: 0.5rem;
+@@ -146,8 +156,8 @@
+             left: 0;
+             bottom: calc(100% + 0.75rem);
+             padding: 0.75rem;
+-            background: #fff;
+-            border: 0.0625rem solid #ebebeb;
++            background: var(--card-bg-color, #fff);
++            border: 0.0625rem solid var(--card-border-color, #ebebeb);
+             border-radius: 0.25rem;
+             word-break: break-word;
+             white-space: pre-wrap;
+@@ -157,20 +167,20 @@
+         }
+ 
+         &:nth-child(3n - 1) {
+-          border-right-color: #ebebeb;
++          border-right-color: var(--card-border-color, #ebebeb);
+ 
+           &:not(.analytics__chart-stats-item--inline):not(.analytics__chart-stats-item--has-total) {
+-            border-left-color: #ebebeb;
++            border-left-color: var(--card-border-color, #ebebeb);
+           }
+         }
+ 
+         &--has-total:nth-child(3n) {
+-          border-right-color: #ebebeb;
++          border-right-color: var(--card-border-color, #ebebeb);
+         }
+ 
+         &--inline {
+           flex: 1;
+-          border-right-color: #ebebeb;
++          border-right-color: var(--card-border-color, #ebebeb);
+ 
+           &:last-child {
+             border-right-color: transparent;
+@@ -197,7 +207,7 @@
+ 
+         &-label {
+           @include mixins.flex-row();
+-          @include mixins.font-style(0.875rem, #1e1e1e, 600);
++          @include mixins.font-style(0.875rem, var(--card-text-color, #1e1e1e), 600);
+ 
+           gap: 0.5rem;
+         }
+@@ -210,7 +220,7 @@
+         }
+ 
+         &-value {
+-          @include mixins.font-style(1.25rem, #1e1e1e, 600);
++          @include mixins.font-style(1.25rem, var(--card-text-color, #1e1e1e), 600);
+         }
+       }
+     }
+@@ -219,8 +229,9 @@
+       @include mixins.flex-column(initial, flex-start);
+       @include mixins.animation-use(tooltip-visibility, 200ms); //Fix for tooltip flickering
+ 
+-      background: #fff;
++      background: var(--card-bg-color, #fff);
+       box-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.2);
++      border-radius: 0.25rem;
+       padding: 1rem;
+       gap: 0.5rem;
+       max-width: 30rem;
+@@ -241,11 +252,11 @@
+         }
+ 
+         &-label {
+-          @include mixins.font-style(0.875rem, #1e1e1e);
++          @include mixins.font-style(0.875rem, var(--card-text-color, #1e1e1e));
+         }
+ 
+         &-value {
+-          @include mixins.font-style(0.875rem, #1e1e1e, 600);
++          @include mixins.font-style(0.875rem, var(--card-text-color, #1e1e1e), 600);
+ 
+           margin-left: auto;
+         }
+@@ -253,7 +264,7 @@
+     }
+ 
+     &-height {
+-      height: 25rem;
++      height: 18rem;
+ 
+       &-wrapper {
+         @include mixins.flex-column(initial, flex-start);
+@@ -275,11 +286,11 @@
+       gap: 0.5rem;
+ 
+       &-label {
+-        @include mixins.font-style(0.875rem, #787878);
++        @include mixins.font-style(0.875rem, var(--card-text-secondary-color, #787878));
+       }
+ 
+       &-value {
+-        @include mixins.font-style(1.5rem, #1e1e1e, 600);
++        @include mixins.font-style(1.5rem, var(--card-text-color, #1e1e1e), 600);
+       }
+     }
+   }
+diff --git a/src/pages/Organisation/Analytics/Analytics.tsx b/src/pages/Organisation/Analytics/Analytics.tsx
+index 1bdc1672..19298b1b 100644
+--- a/src/pages/Organisation/Analytics/Analytics.tsx
++++ b/src/pages/Organisation/Analytics/Analytics.tsx
+@@ -71,14 +71,14 @@ enum AnalyticsTabType {
+ }
+ 
+ export const COLORS = [
+-  '#33AAFF',
++  '#005E3F',
++  '#18AB42',
++  '#5BC4A0',
++  '#d4870e',
+   '#F471B6',
+-  '#00D7F3',
+-  '#FFDD33',
+-  '#7DBC60',
++  '#33AAFF',
++  '#9B59B6',
+   '#EC8A44',
+-  '#F45C5C',
+-  '#833DA4',
+   '#0077CC',
+   '#52DC8B',
+   '#F59E0B',
+@@ -591,13 +591,15 @@ export const Analytics: FunctionComponent = () => {
+ 
+   return (
+     <div className={classes['analytics']}>
+-      <div className={classes['analytics__header']}>{t('adminLayoutMenu.analytics')}</div>
+-      <Button
+-        className={classes['analytics__export']}
+-        label={t('common.export')}
+-        type={ButtonType.primary}
+-        onClick={exportTabCharts}
+-      />
++      <div className={classes['analytics__header-row']}>
++        <div className={classes['analytics__header']}>{t('adminLayoutMenu.analytics')}</div>
++        <Button
++          className={classes['analytics__export']}
++          label={t('common.export')}
++          type={ButtonType.secondary}
++          onClick={exportTabCharts}
++        />
++      </div>
+       <Tabs
+         items={tabItems}
+         selectedTabIndex={selectedTabIndex}
+diff --git a/src/pages/Organisation/Analytics/helpers/components/ChartWrapper/ChartWrapper.tsx b/src/pages/Organisation/Analytics/helpers/components/ChartWrapper/ChartWrapper.tsx
+index eee97ba2..7360f6e1 100644
+--- a/src/pages/Organisation/Analytics/helpers/components/ChartWrapper/ChartWrapper.tsx
++++ b/src/pages/Organisation/Analytics/helpers/components/ChartWrapper/ChartWrapper.tsx
+@@ -1,5 +1,5 @@
+ import { FunctionComponent, PropsWithChildren, memo } from 'react';
+-import { IconLabel } from '../../../../../../shared';
++import { getCssVar, IconLabel } from '../../../../../../shared';
+ import { useTranslation } from 'react-i18next';
+ 
+ import classes from '../../../Analytics.module.scss';
+@@ -18,7 +18,7 @@ export const ChartWrapper: FunctionComponent<PropsWithChildren<ChartWrapperProps
+       <div className={classes['analytics__chart']}>
+         <div className={classes['analytics__chart-header']}>
+           <span className={classes['analytics__chart-header-label']}>{t(typeLocaliseKey)}</span>
+-          <IconLabel iconId={'info'} iconSize={20} color={'#B3B3B3'} data={t(infoLocaliseKey)} />
++          <IconLabel iconId={'info'} iconSize={20} color={getCssVar('--icon-secondary-color') || '#B3B3B3'} data={t(infoLocaliseKey)} />
+           {component}
+         </div>
+         {children}
+diff --git a/src/pages/Organisation/Analytics/helpers/components/TableChart/TableChart.module.scss b/src/pages/Organisation/Analytics/helpers/components/TableChart/TableChart.module.scss
+index 68afcda5..85678894 100644
+--- a/src/pages/Organisation/Analytics/helpers/components/TableChart/TableChart.module.scss
++++ b/src/pages/Organisation/Analytics/helpers/components/TableChart/TableChart.module.scss
+@@ -95,7 +95,7 @@ $link-prefix: '--base-link';
+         height: 100%;
+         right: 0;
+         top: 0;
+-        background: #ebebeb;
++        background: var(--card-border-color, #ebebeb);
+       }
+     }
+ 
+@@ -105,7 +105,7 @@ $link-prefix: '--base-link';
+   }
+ 
+   &__tr:hover .table__td {
+-    background-color: #f9f9fa;
++    background-color: var(--card-hover-bg-color, #f9f9fa);
+   }
+ 
+   &__no-records {
+@@ -116,12 +116,12 @@ $link-prefix: '--base-link';
+   &__pagination {
+     @include mixins.flex-row(center, flex-end);
+ 
+-    border-top: 0.0625rem solid #f0f6ff;
++    border-top: 0.0625rem solid var(--card-border-color, #ebebeb);
+     padding: 0.5rem 1rem;
+     gap: 1rem;
+ 
+     &-label {
+-      @include mixins.font-style(1rem, #1e1e1e);
++      @include mixins.font-style(1rem, var(--card-text-color, #1e1e1e));
+     }
+   }
+ }

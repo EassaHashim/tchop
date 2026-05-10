@@ -1,0 +1,381 @@
+<template id="scene-2-template">
+  <div data-composition-id="scene-2" data-width="1920" data-height="1080" data-start="0" data-duration="6.7">
+    <div class="scene-content">
+      <div class="meta-row">
+        <span class="scene-tag">// scene 02 — the mismatch</span>
+        <span class="timestamp">t+00:05</span>
+      </div>
+
+      <div class="split">
+        <!-- LEFT: Legacy CMS -->
+        <div class="panel panel-left" id="s2-left">
+          <div class="panel-label">
+            <span class="panel-tag tag-human">built for humans</span>
+          </div>
+          <div class="cms-mock">
+            <div class="cms-toolbar">
+              <span class="tb-item tb-active">B</span>
+              <span class="tb-item">I</span>
+              <span class="tb-item">U</span>
+              <span class="tb-sep"></span>
+              <span class="tb-item">H1</span>
+              <span class="tb-item">H2</span>
+              <span class="tb-item">”</span>
+              <span class="tb-sep"></span>
+              <span class="tb-item">🔗</span>
+              <span class="tb-item">📷</span>
+            </div>
+            <div class="cms-body">
+              <div class="cms-title">Untitled article</div>
+              <div class="cms-line l1"></div>
+              <div class="cms-line l2"></div>
+              <div class="cms-line l3"></div>
+              <div class="cms-drag-row">
+                <div class="drag-handle">⋮⋮</div>
+                <div class="cms-block">Drag a block</div>
+              </div>
+              <div class="cms-line l4"></div>
+            </div>
+            <div class="cms-footer">
+              <button class="cms-save">Save draft</button>
+              <button class="cms-publish">Publish</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- DIVIDER -->
+        <div class="divider" id="s2-divider"></div>
+
+        <!-- RIGHT: Agent API terminal -->
+        <div class="panel panel-right" id="s2-right">
+          <div class="panel-label">
+            <span class="panel-tag tag-agent">built for agents</span>
+          </div>
+          <div class="terminal">
+            <div class="term-header">
+              <span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span>
+              <span class="term-title">agent.session</span>
+            </div>
+            <div class="term-body">
+              <div class="t-line"><span class="t-prompt">›</span> <span class="t-fn">tchop.cards.ingest</span>(<span class="t-str">"url.txt"</span>)</div>
+              <div class="t-line t-out">   → <span class="t-val">{ card_id: "c_9f3a2" }</span></div>
+              <div class="t-line"><span class="t-prompt">›</span> <span class="t-fn">tchop.cards.tag</span>(<span class="t-str">["bvb","transfer"]</span>)</div>
+              <div class="t-line t-out">   → <span class="t-ok">ok</span></div>
+              <div class="t-line"><span class="t-prompt">›</span> <span class="t-fn">tchop.channels.route</span>(<span class="t-str">"Transfermarkt"</span>)</div>
+              <div class="t-line t-out">   → <span class="t-ok">routed</span> <span class="t-dim">(p=0.94)</span></div>
+              <div class="t-line"><span class="t-prompt">›</span> <span class="t-fn">tchop.push.schedule</span>(<span class="t-str">at:</span> <span class="t-val">"08:00"</span>)</div>
+              <div class="t-line t-out">   → <span class="t-ok">scheduled</span></div>
+              <div class="t-cursor-line"><span class="t-prompt">›</span> <span class="t-cursor">█</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <style>
+      [data-composition-id="scene-2"] {
+        position: absolute;
+        inset: 0;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        color: #F1F1F3;
+        font-family: 'Basier Circle', 'Manrope', -apple-system, sans-serif;
+      }
+      [data-composition-id="scene-2"] .scene-content {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        height: 100%;
+        padding: 90px 120px;
+        gap: 36px;
+        box-sizing: border-box;
+        z-index: 10;
+      }
+      [data-composition-id="scene-2"] .meta-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 20px;
+        font-weight: 500;
+        color: #B8B8C7;
+        font-variant-numeric: tabular-nums;
+      }
+      [data-composition-id="scene-2"] .scene-tag { color: #FF8F72; }
+
+      [data-composition-id="scene-2"] .split {
+        flex: 1;
+        display: grid;
+        grid-template-columns: 1fr 1px 1fr;
+        gap: 56px;
+        align-items: stretch;
+      }
+      [data-composition-id="scene-2"] .panel {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+      }
+      [data-composition-id="scene-2"] .panel-left { transform-origin: center; }
+      [data-composition-id="scene-2"] .panel-right { transform-origin: center; }
+
+      [data-composition-id="scene-2"] .panel-label {
+        display: flex;
+        justify-content: flex-start;
+      }
+      [data-composition-id="scene-2"] .panel-tag {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 18px;
+        font-weight: 600;
+        padding: 8px 18px;
+        border-radius: 100px;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+      [data-composition-id="scene-2"] .tag-human {
+        background: rgba(184,184,199,0.14);
+        color: #D4D4DE;
+        border: 1px solid rgba(184,184,199,0.28);
+      }
+      [data-composition-id="scene-2"] .tag-agent {
+        background: rgba(246,112,77,0.14);
+        color: #F6704D;
+        border: 1px solid rgba(246,112,77,0.35);
+      }
+
+      [data-composition-id="scene-2"] .divider {
+        background: rgba(241,241,243,0.12);
+        width: 1px;
+      }
+
+      /* ========== CMS MOCK (LEFT) ========== */
+      [data-composition-id="scene-2"] .cms-mock {
+        flex: 1;
+        background: #F1F1F3;
+        border-radius: 16px;
+        padding: 22px 26px;
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+        color: #2D2D46;
+        box-shadow: 0 10px 36px rgba(0,0,0,0.35);
+        border: 1px solid rgba(0,0,0,0.1);
+      }
+      [data-composition-id="scene-2"] .cms-toolbar {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 10px;
+        background: #FFFFFF;
+        border-radius: 10px;
+        border: 1px solid rgba(0,0,0,0.08);
+      }
+      [data-composition-id="scene-2"] .tb-item {
+        font-family: 'Basier Circle', 'Manrope', sans-serif;
+        font-size: 18px;
+        font-weight: 600;
+        padding: 6px 12px;
+        border-radius: 6px;
+        color: #43445B;
+        background: transparent;
+      }
+      [data-composition-id="scene-2"] .tb-active {
+        background: #43445B;
+        color: #FFFFFF;
+      }
+      [data-composition-id="scene-2"] .tb-sep {
+        width: 1px;
+        height: 20px;
+        background: rgba(0,0,0,0.1);
+        margin: 0 4px;
+      }
+      [data-composition-id="scene-2"] .cms-body {
+        flex: 1;
+        background: #FFFFFF;
+        border-radius: 10px;
+        padding: 24px 28px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        border: 1px solid rgba(0,0,0,0.06);
+      }
+      [data-composition-id="scene-2"] .cms-title {
+        font-family: 'Basier Circle', 'Manrope', sans-serif;
+        font-size: 30px;
+        font-weight: 700;
+        color: #2D2D46;
+        letter-spacing: -0.02em;
+      }
+      [data-composition-id="scene-2"] .cms-line {
+        height: 14px;
+        background: rgba(45,45,70,0.15);
+        border-radius: 4px;
+      }
+      [data-composition-id="scene-2"] .l1 { width: 92%; }
+      [data-composition-id="scene-2"] .l2 { width: 84%; }
+      [data-composition-id="scene-2"] .l3 { width: 78%; }
+      [data-composition-id="scene-2"] .l4 { width: 68%; }
+      [data-composition-id="scene-2"] .cms-drag-row {
+        display: flex;
+        align-items: stretch;
+        gap: 10px;
+        margin: 8px 0;
+      }
+      [data-composition-id="scene-2"] .drag-handle {
+        font-size: 20px;
+        color: #B8B8C7;
+        padding: 10px 6px;
+        cursor: grab;
+      }
+      [data-composition-id="scene-2"] .cms-block {
+        flex: 1;
+        padding: 14px 20px;
+        background: #FAF7F7;
+        border: 1px dashed rgba(0,0,0,0.18);
+        border-radius: 8px;
+        color: #6B6B7B;
+        font-size: 18px;
+      }
+      [data-composition-id="scene-2"] .cms-footer {
+        display: flex;
+        gap: 12px;
+        justify-content: flex-end;
+      }
+      [data-composition-id="scene-2"] .cms-save {
+        font-family: 'Basier Circle', 'Manrope', sans-serif;
+        font-size: 16px;
+        font-weight: 600;
+        padding: 10px 22px;
+        border-radius: 100px;
+        background: transparent;
+        color: #43445B;
+        border: 1px solid rgba(0,0,0,0.15);
+        cursor: pointer;
+      }
+      [data-composition-id="scene-2"] .cms-publish {
+        font-family: 'Basier Circle', 'Manrope', sans-serif;
+        font-size: 16px;
+        font-weight: 600;
+        padding: 10px 26px;
+        border-radius: 100px;
+        background: #F6704D;
+        color: #FFFFFF;
+        border: none;
+        box-shadow: 0 3px 10px rgba(246,112,77,0.35);
+        cursor: pointer;
+      }
+
+      /* ========== TERMINAL (RIGHT) ========== */
+      [data-composition-id="scene-2"] .terminal {
+        flex: 1;
+        background: #1E2230;
+        border-radius: 16px;
+        border: 1px solid rgba(241,241,243,0.1);
+        box-shadow: 0 10px 36px rgba(0,0,0,0.4);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+      [data-composition-id="scene-2"] .term-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 14px 20px;
+        background: #141826;
+        border-bottom: 1px solid rgba(241,241,243,0.06);
+      }
+      [data-composition-id="scene-2"] .term-header .dot-r,
+      [data-composition-id="scene-2"] .term-header .dot-y,
+      [data-composition-id="scene-2"] .term-header .dot-g {
+        width: 11px; height: 11px; border-radius: 50%;
+      }
+      [data-composition-id="scene-2"] .term-header .dot-r { background: #E74C3C; }
+      [data-composition-id="scene-2"] .term-header .dot-y { background: #FFD138; }
+      [data-composition-id="scene-2"] .term-header .dot-g { background: #2ECC71; }
+      [data-composition-id="scene-2"] .term-title {
+        margin-left: 14px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 14px;
+        color: #B8B8C7;
+      }
+      [data-composition-id="scene-2"] .term-body {
+        flex: 1;
+        padding: 22px 24px;
+        font-family: 'JetBrains Mono', 'IBM Plex Mono', monospace;
+        font-size: 19px;
+        line-height: 1.6;
+        color: #F1F1F3;
+      }
+      [data-composition-id="scene-2"] .t-line { white-space: nowrap; }
+      [data-composition-id="scene-2"] .t-prompt { color: #FF8F72; font-weight: 700; }
+      [data-composition-id="scene-2"] .t-fn { color: #FFD138; font-weight: 700; }
+      [data-composition-id="scene-2"] .t-str { color: #7BACE3; }
+      [data-composition-id="scene-2"] .t-val { color: #F1F1F3; }
+      [data-composition-id="scene-2"] .t-ok { color: #4FD88A; font-weight: 700; }
+      [data-composition-id="scene-2"] .t-out { color: #D4D4DE; }
+      [data-composition-id="scene-2"] .t-dim { color: #A0A0B0; }
+      [data-composition-id="scene-2"] .t-cursor-line { margin-top: 6px; }
+      [data-composition-id="scene-2"] .t-cursor {
+        display: inline-block;
+        color: #FF8F72;
+        font-weight: 700;
+        margin-left: 4px;
+      }
+    </style>
+
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <script>
+      (function () {
+        window.__timelines = window.__timelines || {};
+        var tl = gsap.timeline({ paused: true });
+
+        var sel = function (s) { return '[data-composition-id="scene-2"] ' + s; };
+
+        // Meta row
+        tl.from(sel('.meta-row .scene-tag'),
+          { y: -20, opacity: 0, duration: 0.5, ease: "power3.out" }, 0.1);
+        tl.from(sel('.meta-row .timestamp'),
+          { y: -20, opacity: 0, duration: 0.5, ease: "power3.out" }, 0.22);
+
+        // Panels slide in from sides simultaneously
+        tl.from(sel('#s2-left'),
+          { x: -160, opacity: 0, filter: "blur(8px)", duration: 0.7, ease: "power3.out" }, 0.3);
+        tl.from(sel('#s2-right'),
+          { x: 160, opacity: 0, filter: "blur(8px)", duration: 0.7, ease: "power3.out" }, 0.3);
+
+        // Divider scales up vertically
+        tl.from(sel('#s2-divider'),
+          { scaleY: 0, opacity: 0, duration: 0.6, ease: "expo.out" }, 0.5);
+
+        // Panel labels pop in
+        tl.from(sel('#s2-left .panel-tag'),
+          { y: -16, opacity: 0, duration: 0.4, ease: "power3.out" }, 0.85);
+        tl.from(sel('#s2-right .panel-tag'),
+          { y: -16, opacity: 0, duration: 0.4, ease: "power3.out" }, 0.95);
+
+        // Terminal lines stagger in
+        tl.from(sel('.t-line'),
+          { x: -20, opacity: 0, duration: 0.28, stagger: 0.22, ease: "power2.out" }, 1.4);
+        tl.from(sel('.t-cursor-line'),
+          { opacity: 0, duration: 0.2, ease: "power2.out" }, 3.1);
+        tl.to(sel('.t-cursor'),
+          { opacity: 0.15, duration: 0.4, ease: "power1.inOut",
+            repeat: 4, yoyo: true }, 3.3);
+
+        // At ~3.2s — left panel "greys out" (desaturate + dim)
+        tl.to(sel('#s2-left'),
+          { filter: "saturate(0.15) brightness(0.55) blur(1px)",
+            opacity: 0.55, duration: 0.9, ease: "power2.inOut" }, 3.2);
+
+        // Subtle "obsolete" stamp appears over left panel? No — keep it calm, just grey out.
+        // Right panel gains a soft glow to emphasize it's the answer
+        tl.to(sel('#s2-right'),
+          { filter: "drop-shadow(0 0 24px rgba(246,112,77,0.25))",
+            duration: 0.8, ease: "power2.out" }, 3.4);
+
+        window.__timelines["scene-2"] = tl;
+      })();
+    </script>
+  </div>
+</template>

@@ -1,0 +1,201 @@
+<template id="scene-5-template">
+  <div data-composition-id="scene-5" data-width="1920" data-height="1080" data-start="0" data-duration="9.8">
+    <div class="scene-content" id="s5-root">
+      <div class="meta-row">
+        <span class="scene-tag">// scene 05 — ship it</span>
+        <span class="timestamp">t+00:20</span>
+      </div>
+
+      <div class="center-block">
+        <h1 class="message" id="s5-message">
+          Give your agents a CMS<br/>
+          <span class="accent">they can actually use.</span>
+        </h1>
+
+        <div class="cta-row" id="s5-cta-row">
+          <a class="cta-pill" id="s5-cta">
+            <span class="cta-arrow">→</span>
+            <span class="cta-text">tchop.io/agents</span>
+          </a>
+          <div class="cta-sub">private beta · April 2026</div>
+        </div>
+      </div>
+
+      <div class="footer-row" id="s5-footer">
+        <div class="wordmark-small">
+          <span>tchop</span><span class="dot-orange">.</span>
+        </div>
+        <div class="footer-meta">
+          <span>agent-native content platform</span>
+          <span class="footer-sep">·</span>
+          <span>since 2026</span>
+        </div>
+      </div>
+    </div>
+
+    <style>
+      [data-composition-id="scene-5"] {
+        position: absolute;
+        inset: 0;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        color: #F1F1F3;
+        font-family: 'Basier Circle', 'Manrope', -apple-system, sans-serif;
+      }
+      [data-composition-id="scene-5"] .scene-content {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        width: 100%;
+        height: 100%;
+        padding: 100px 160px;
+        box-sizing: border-box;
+        z-index: 10;
+      }
+      [data-composition-id="scene-5"] .meta-row {
+        display: flex;
+        justify-content: space-between;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 20px;
+        font-weight: 500;
+        color: #B8B8C7;
+        font-variant-numeric: tabular-nums;
+      }
+      [data-composition-id="scene-5"] .scene-tag { color: #FF8F72; }
+
+      [data-composition-id="scene-5"] .center-block {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 64px;
+        max-width: 1500px;
+      }
+      [data-composition-id="scene-5"] .message {
+        font-size: 108px;
+        font-weight: 700;
+        line-height: 1.08;
+        letter-spacing: -0.03em;
+        color: #F1F1F3;
+        margin: 0;
+      }
+      [data-composition-id="scene-5"] .message .accent { color: #F6704D; }
+
+      [data-composition-id="scene-5"] .cta-row {
+        display: flex;
+        align-items: center;
+        gap: 32px;
+      }
+      [data-composition-id="scene-5"] .cta-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 18px;
+        padding: 22px 40px;
+        background: #F6704D;
+        color: #1A1A33;
+        border-radius: 100px;
+        font-size: 38px;
+        font-weight: 700;
+        letter-spacing: -0.01em;
+        box-shadow: 0 6px 22px rgba(246,112,77,0.42);
+        text-decoration: none;
+        transform-origin: center left;
+      }
+      [data-composition-id="scene-5"] .cta-arrow {
+        font-size: 40px;
+        font-weight: 700;
+      }
+      [data-composition-id="scene-5"] .cta-sub {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 19px;
+        font-weight: 700;
+        color: #D4D4DE;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+      }
+
+      [data-composition-id="scene-5"] .footer-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 32px;
+        border-top: 1px solid rgba(241,241,243,0.1);
+      }
+      [data-composition-id="scene-5"] .wordmark-small {
+        font-size: 48px;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        color: #F1F1F3;
+      }
+      [data-composition-id="scene-5"] .dot-orange { color: #F6704D; }
+      [data-composition-id="scene-5"] .footer-meta {
+        display: flex;
+        gap: 14px;
+        align-items: center;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 18px;
+        color: #B8B8C7;
+      }
+      [data-composition-id="scene-5"] .footer-sep { color: #FF8F72; font-weight: 700; }
+      [data-composition-id="scene-5"] .footer-meta {
+        font-weight: 700;
+      }
+    </style>
+
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <script>
+      (function () {
+        window.__timelines = window.__timelines || {};
+        var tl = gsap.timeline({ paused: true });
+        var sel = function (s) { return '[data-composition-id="scene-5"] ' + s; };
+
+        // Duration of this scene is 7s (from root). Last scene MAY fade out.
+        // Entrance animations:
+
+        // Meta row
+        tl.from(sel('.meta-row .scene-tag'),
+          { y: -20, opacity: 0, duration: 0.4, ease: "power3.out" }, 0.1);
+        tl.from(sel('.meta-row .timestamp'),
+          { y: -20, opacity: 0, duration: 0.4, ease: "power3.out" }, 0.2);
+
+        // Message — slam in, word-stagger via line split (two lines via <br>)
+        // Since I used <br> in a display headline where the break is deliberate,
+        // split by line using spans.
+        tl.from(sel('#s5-message'),
+          { y: 70, opacity: 0, filter: "blur(14px)", duration: 0.75, ease: "power3.out" }, 0.3);
+        // Accent color pops after entrance
+        tl.fromTo(sel('#s5-message .accent'),
+          { color: "#F1F1F3" },
+          { color: "#F6704D", duration: 0.4, ease: "power1.inOut" }, 1.05);
+
+        // CTA pill scales in with glow
+        tl.from(sel('#s5-cta'),
+          { scale: 0.85, opacity: 0, filter: "blur(6px)", duration: 0.55, ease: "expo.out" }, 1.3);
+        tl.from(sel('#s5-cta .cta-arrow'),
+          { x: -20, opacity: 0, duration: 0.4, ease: "power3.out" }, 1.6);
+        tl.from(sel('.cta-sub'),
+          { y: 14, opacity: 0, duration: 0.4, ease: "power2.out" }, 1.8);
+
+        // Footer row fades up
+        tl.from(sel('.wordmark-small'),
+          { y: 24, opacity: 0, duration: 0.5, ease: "power3.out" }, 2.1);
+        tl.from(sel('.footer-meta > *'),
+          { y: 16, opacity: 0, duration: 0.4, stagger: 0.08, ease: "power2.out" }, 2.3);
+
+        // Subtle CTA glow breathe — finite
+        tl.to(sel('#s5-cta'),
+          { boxShadow: "0 10px 36px rgba(246,112,77,0.65)", duration: 0.9, ease: "sine.inOut",
+            repeat: 4, yoyo: true }, 2.5);
+
+        // FINAL SCENE: fade everything to black at the end
+        // Scene duration is 9.8s. Narration ends at ~5.2s (scene-local).
+        // CTA holds from 5.2 to 8.6, then fade over last 1.2s.
+        tl.to(sel('#s5-root'),
+          { opacity: 0, filter: "blur(10px)", duration: 1.2, ease: "power2.in" }, 8.6);
+
+        window.__timelines["scene-5"] = tl;
+      })();
+    </script>
+  </div>
+</template>

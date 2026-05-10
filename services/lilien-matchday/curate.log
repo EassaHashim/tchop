@@ -1,0 +1,178 @@
+2026-04-09 09:52:39,425 [INFO] In match window for TEST - LOCAL DRY RUN (kickoff 2026-04-09T08:00:00+00:00)
+2026-04-09 09:52:39,425 [INFO] Rate limit: 3 slot(s) available
+2026-04-09 09:52:50,466 [WARNING] x resolve failed for SVDNews_: HTTP 401 for https://api.twitter.com/2/users/by/username/SVDNews_?user.fields=profile_image_url,name: {
+  "title": "Unauthorized",
+  "type": "about:blank",
+  "status": 401,
+  "detail": "Unauthorized"
+}
+2026-04-09 09:52:50,755 [WARNING] x resolve failed for ScoutingD98: HTTP 401 for https://api.twitter.com/2/users/by/username/ScoutingD98?user.fields=profile_image_url,name: {
+  "title": "Unauthorized",
+  "type": "about:blank",
+  "status": 401,
+  "detail": "Unauthorized"
+}
+2026-04-09 09:52:51,070 [WARNING] x resolve failed for nedrise2: HTTP 401 for https://api.twitter.com/2/users/by/username/nedrise2?user.fields=profile_image_url,name: {
+  "title": "Unauthorized",
+  "type": "about:blank",
+  "status": 401,
+  "detail": "Unauthorized"
+}
+2026-04-09 09:52:51,071 [INFO] Fetched 157 total posts
+2026-04-09 09:52:51,071 [INFO] 0 new in-window candidates after dedup
+2026-04-09 09:53:43,431 [INFO] In match window for TEST - LOCAL DRY RUN (kickoff 2026-04-09T08:30:00+00:00)
+2026-04-09 09:53:43,432 [INFO] Rate limit: 3 slot(s) available
+2026-04-09 09:53:52,321 [WARNING] x resolve failed for SVDNews_: HTTP 401 for https://api.twitter.com/2/users/by/username/SVDNews_?user.fields=profile_image_url,name: {
+  "title": "Unauthorized",
+  "type": "about:blank",
+  "status": 401,
+  "detail": "Unauthorized"
+}
+2026-04-09 09:53:52,583 [WARNING] x resolve failed for ScoutingD98: HTTP 401 for https://api.twitter.com/2/users/by/username/ScoutingD98?user.fields=profile_image_url,name: {
+  "title": "Unauthorized",
+  "type": "about:blank",
+  "status": 401,
+  "detail": "Unauthorized"
+}
+2026-04-09 09:53:52,790 [WARNING] x resolve failed for nedrise2: HTTP 401 for https://api.twitter.com/2/users/by/username/nedrise2?user.fields=profile_image_url,name: {
+  "title": "Unauthorized",
+  "type": "about:blank",
+  "status": 401,
+  "detail": "Unauthorized"
+}
+2026-04-09 09:53:52,790 [INFO] Fetched 157 total posts
+2026-04-09 09:53:52,791 [INFO] 65 new in-window candidates after dedup
+2026-04-09 09:53:52,791 [ERROR] Fatal error: ANTHROPIC_API_KEY not set
+Traceback (most recent call last):
+  File "/Users/heiko_scherer/claude-projects/lilien-matchday/curate.py", line 557, in <module>
+    sys.exit(main())
+  File "/Users/heiko_scherer/claude-projects/lilien-matchday/curate.py", line 501, in main
+    rankings = curate_with_claude(new_candidates, config["curation_prompt"])
+  File "/Users/heiko_scherer/claude-projects/lilien-matchday/curate.py", line 342, in curate_with_claude
+    raise RuntimeError("ANTHROPIC_API_KEY not set")
+RuntimeError: ANTHROPIC_API_KEY not set
+2026-04-09 10:04:22,762 [INFO] In match window for TEST - LOCAL DRY RUN (kickoff 2026-04-09T08:30:00+00:00)
+2026-04-09 10:04:22,762 [INFO] Rate limit: 3 slot(s) available
+2026-04-09 10:04:36,882 [WARNING] x resolve failed for SVDNews_: HTTP 401 for https://api.twitter.com/2/users/by/username/SVDNews_?user.fields=profile_image_url,name: {
+  "title": "Unauthorized",
+  "type": "about:blank",
+  "status": 401,
+  "detail": "Unauthorized"
+}
+2026-04-09 10:04:37,094 [WARNING] x resolve failed for ScoutingD98: HTTP 401 for https://api.twitter.com/2/users/by/username/ScoutingD98?user.fields=profile_image_url,name: {
+  "title": "Unauthorized",
+  "type": "about:blank",
+  "status": 401,
+  "detail": "Unauthorized"
+}
+2026-04-09 10:04:37,325 [WARNING] x resolve failed for nedrise2: HTTP 401 for https://api.twitter.com/2/users/by/username/nedrise2?user.fields=profile_image_url,name: {
+  "title": "Unauthorized",
+  "type": "about:blank",
+  "status": 401,
+  "detail": "Unauthorized"
+}
+2026-04-09 10:04:37,325 [INFO] Fetched 157 total posts
+2026-04-09 10:04:37,325 [INFO] 65 new in-window candidates after dedup
+2026-04-09 10:05:00,590 [INFO] Claude included 6 of 20
+2026-04-09 10:05:03,687 [INFO] DRAFTED machstenocheins.de (score=8): https://bsky.app/profile/machstenocheins.de/post/3mivmpmnoc22w
+2026-04-09 10:05:07,324 [INFO] DRAFTED lilienhashtags.bsky.social (score=7): https://bsky.app/profile/lilienhashtags.bsky.social/post/3miypkwyisc2b
+2026-04-09 10:05:09,754 [INFO] DRAFTED andisvd.bsky.social (score=6): https://bsky.app/profile/andisvd.bsky.social/post/3mivqnhj6722p
+2026-04-09 10:05:09,756 [INFO] Done. Published 3 card(s).
+2026-04-09 18:03:27,450 [INFO] In match window for SMOKE-TEST (kickoff 2026-04-09T15:33:22.681653+00:00)
+2026-04-09 18:03:27,450 [INFO] Rate limit: 3 slot(s) available
+2026-04-09 18:03:37,683 [WARNING] x resolve failed for SVDNews_: HTTP 401 for https://api.twitter.com/2/users/by/username/SVDNews_?user.fields=profile_image_url,name: {
+  "title": "Unauthorized",
+  "type": "about:blank",
+  "status": 401,
+  "detail": "Unauthorized"
+}
+2026-04-09 18:03:38,137 [WARNING] x resolve failed for ScoutingD98: HTTP 401 for https://api.twitter.com/2/users/by/username/ScoutingD98?user.fields=profile_image_url,name: {
+  "title": "Unauthorized",
+  "type": "about:blank",
+  "status": 401,
+  "detail": "Unauthorized"
+}
+2026-04-09 18:03:38,549 [WARNING] x resolve failed for nedrise2: HTTP 401 for https://api.twitter.com/2/users/by/username/nedrise2?user.fields=profile_image_url,name: {
+  "title": "Unauthorized",
+  "type": "about:blank",
+  "status": 401,
+  "detail": "Unauthorized"
+}
+2026-04-09 18:03:38,549 [INFO] Fetched 157 total posts
+2026-04-09 18:03:38,550 [INFO] 1 new in-window candidates after dedup
+2026-04-09 18:03:41,382 [INFO] Claude included 0 of 1
+2026-04-09 18:03:41,384 [INFO] Done. Published 0 card(s).
+2026-04-09 18:03:58,550 [INFO] In match window for SMOKE-TEST (kickoff 2026-04-09T15:33:22.681653+00:00)
+2026-04-09 18:03:58,550 [INFO] Rate limit: 3 slot(s) available
+2026-04-09 18:04:01,480 [WARNING] x resolve failed for SVDNews_: HTTP 401 for https://api.twitter.com/2/users/by/username/SVDNews_?user.fields=profile_image_url,name: {
+  "title": "Unauthorized",
+  "type": "about:blank",
+  "status": 401,
+  "detail": "Unauthorized"
+}
+2026-04-09 18:04:01,694 [WARNING] x resolve failed for ScoutingD98: HTTP 401 for https://api.twitter.com/2/users/by/username/ScoutingD98?user.fields=profile_image_url,name: {
+  "title": "Unauthorized",
+  "type": "about:blank",
+  "status": 401,
+  "detail": "Unauthorized"
+}
+2026-04-09 18:04:01,907 [WARNING] x resolve failed for nedrise2: HTTP 401 for https://api.twitter.com/2/users/by/username/nedrise2?user.fields=profile_image_url,name: {
+  "title": "Unauthorized",
+  "type": "about:blank",
+  "status": 401,
+  "detail": "Unauthorized"
+}
+2026-04-09 18:04:01,907 [INFO] Fetched 157 total posts
+2026-04-09 18:04:01,908 [INFO] 1 new in-window candidates after dedup
+2026-04-09 18:04:05,073 [INFO] Claude included 0 of 1
+2026-04-09 18:04:05,073 [INFO] Done. Published 0 card(s).
+2026-04-09 18:04:34,654 [INFO] In match window for SMOKE-WIDE (kickoff 2026-04-09T04:04:34.463304+00:00)
+2026-04-09 18:04:34,654 [INFO] Rate limit: 3 slot(s) available
+2026-04-09 18:04:42,798 [WARNING] x resolve failed for SVDNews_: HTTP 401 for https://api.twitter.com/2/users/by/username/SVDNews_?user.fields=profile_image_url,name: {
+  "title": "Unauthorized",
+  "type": "about:blank",
+  "status": 401,
+  "detail": "Unauthorized"
+}
+2026-04-09 18:04:42,998 [WARNING] x resolve failed for ScoutingD98: HTTP 401 for https://api.twitter.com/2/users/by/username/ScoutingD98?user.fields=profile_image_url,name: {
+  "title": "Unauthorized",
+  "type": "about:blank",
+  "status": 401,
+  "detail": "Unauthorized"
+}
+2026-04-09 18:04:43,210 [WARNING] x resolve failed for nedrise2: HTTP 401 for https://api.twitter.com/2/users/by/username/nedrise2?user.fields=profile_image_url,name: {
+  "title": "Unauthorized",
+  "type": "about:blank",
+  "status": 401,
+  "detail": "Unauthorized"
+}
+2026-04-09 18:04:43,211 [INFO] Fetched 157 total posts
+2026-04-09 18:04:43,211 [INFO] 4 new in-window candidates after dedup
+2026-04-09 18:04:48,995 [INFO] Claude included 0 of 4
+2026-04-09 18:04:48,998 [INFO] Done. Published 0 card(s).
+2026-04-09 18:05:01,712 [INFO] In match window for SMOKE-WIDE (kickoff 2026-04-09T04:04:34.463304+00:00)
+2026-04-09 18:05:01,712 [INFO] Rate limit: 3 slot(s) available
+2026-04-09 18:05:04,704 [WARNING] x resolve failed for SVDNews_: HTTP 401 for https://api.twitter.com/2/users/by/username/SVDNews_?user.fields=profile_image_url,name: {
+  "title": "Unauthorized",
+  "type": "about:blank",
+  "status": 401,
+  "detail": "Unauthorized"
+}
+2026-04-09 18:05:04,920 [WARNING] x resolve failed for ScoutingD98: HTTP 401 for https://api.twitter.com/2/users/by/username/ScoutingD98?user.fields=profile_image_url,name: {
+  "title": "Unauthorized",
+  "type": "about:blank",
+  "status": 401,
+  "detail": "Unauthorized"
+}
+2026-04-09 18:05:05,127 [WARNING] x resolve failed for nedrise2: HTTP 401 for https://api.twitter.com/2/users/by/username/nedrise2?user.fields=profile_image_url,name: {
+  "title": "Unauthorized",
+  "type": "about:blank",
+  "status": 401,
+  "detail": "Unauthorized"
+}
+2026-04-09 18:05:05,127 [INFO] Fetched 157 total posts
+2026-04-09 18:05:05,127 [INFO] 4 new in-window candidates after dedup
+2026-04-09 18:05:07,271 [INFO] Claude included 2 of 2
+2026-04-09 18:05:11,055 [INFO] DRAFTED schappida.bsky.social (score=7, images=0): https://bsky.app/profile/schappida.bsky.social/post/3mj33fm7ge22a
+2026-04-09 18:05:14,024 [INFO] DRAFTED schappida.bsky.social (score=7, images=1): https://bsky.app/profile/schappida.bsky.social/post/3mj2jdiflmk2o
+2026-04-09 18:05:14,025 [INFO] Done. Published 2 card(s).

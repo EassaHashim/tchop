@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>tchop LinkedIn Carousel — Agentic World</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --orange: #F6704D;
+    --yellow: #FFD138;
+    --blue: #488ED8;
+    --indigo: #43445B;
+    --deep-indigo: #2D2D46;
+    --light-bg: #F1F1F3;
+    --white: #FFFFFF;
+  }
+
+  body {
+    font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    background: #e0e0e4;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 40px;
+    padding: 40px 20px;
+  }
+
+  .slide {
+    width: 1080px;
+    height: 1350px;
+    position: relative;
+    overflow: hidden;
+    background: var(--white);
+    flex-shrink: 0;
+  }
+
+  /* ─── Background gradient (every slide) ─── */
+  .bg-gradient {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.18;
+  }
+
+  .bg-gradient img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center bottom;
+  }
+
+  /* ─── Logo (every slide) ─── */
+  .logo {
+    position: absolute;
+    top: 56px;
+    left: 72px;
+    z-index: 10;
+    height: 52px;
+  }
+
+  .logo img {
+    height: 100%;
+    width: auto;
+    display: block;
+  }
+
+  /* ─── Slide number ─── */
+  .slide-num {
+    position: absolute;
+    bottom: 48px;
+    right: 60px;
+    font-size: 20px;
+    font-weight: 500;
+    color: rgba(67,68,91,0.25);
+    letter-spacing: 2px;
+    z-index: 10;
+  }
+
+  /* ─── Bottom accent bar ─── */
+  .bottom-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 6px;
+    background: linear-gradient(90deg, var(--orange), var(--yellow), var(--blue));
+    z-index: 10;
+  }
+
+  /* ─── SLIDE 1 ─── */
+  .slide-1 .content {
+    position: relative;
+    z-index: 2;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 100px 72px;
+  }
+
+  .slide-1 .label {
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--orange);
+    margin-bottom: 44px;
+  }
+
+  .slide-1 h1 {
+    font-size: 92px;
+    font-weight: 700;
+    line-height: 1.1;
+    color: var(--deep-indigo);
+  }
+
+  .slide-1 h1 .zero {
+    font-size: 156px;
+    font-weight: 700;
+    color: var(--orange);
+    display: inline-block;
+    line-height: 1;
+    position: relative;
+    top: 10px;
+  }
+
+  .slide-1 h1 .ui {
+    color: var(--indigo);
+  }
+
+  .slide-1 .subtext {
+    margin-top: 48px;
+    font-size: 40px;
+    color: rgba(45,45,70,0.5);
+    font-weight: 500;
+    line-height: 1.4;
+  }
+
+
+  /* ─── SLIDE 2 ─── */
+  .slide-2 .content {
+    position: relative;
+    z-index: 2;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 100px 72px;
+  }
+
+  .slide-2 .label {
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--blue);
+    margin-bottom: 44px;
+  }
+
+  .slide-2 h2 {
+    font-size: 92px;
+    font-weight: 700;
+    line-height: 1.12;
+    color: var(--deep-indigo);
+    margin-bottom: 72px;
+  }
+
+  .slide-2 .arrow-row {
+    display: flex;
+    align-items: center;
+    gap: 40px;
+  }
+
+  .slide-2 .from-box, .slide-2 .to-box {
+    padding: 36px 56px;
+    border-radius: 16px;
+    font-size: 52px;
+    font-weight: 700;
+  }
+
+  .slide-2 .from-box {
+    background: rgba(67,68,91,0.07);
+    color: rgba(45,45,70,0.35);
+    text-decoration: line-through;
+    text-decoration-color: rgba(45,45,70,0.2);
+  }
+
+  .slide-2 .arrow-icon {
+    font-size: 56px;
+    color: var(--orange);
+  }
+
+  .slide-2 .to-box {
+    background: rgba(246,112,77,0.1);
+    color: var(--orange);
+    border: 2px solid rgba(246,112,77,0.25);
+  }
+
+  /* ─── SLIDE 3 ─── */
+  .slide-3 .content {
+    position: relative;
+    z-index: 2;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 100px 72px;
+  }
+
+  .slide-3 .label {
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--indigo);
+    opacity: 0.5;
+    margin-bottom: 44px;
+  }
+
+  .slide-3 h2 {
+    font-size: 78px;
+    font-weight: 700;
+    line-height: 1.14;
+    color: var(--deep-indigo);
+    margin-bottom: 64px;
+  }
+
+  .slide-3 h2 .em {
+    color: var(--orange);
+  }
+
+  .slide-3 .consume-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .slide-3 .consume-item {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    padding: 34px 38px;
+    background: var(--white);
+    border-radius: 16px;
+    box-shadow: 0 2px 6px rgba(45,45,70,0.06);
+  }
+
+  .slide-3 .consume-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .slide-3 .consume-icon.c1 { background: rgba(246,112,77,0.1); }
+  .slide-3 .consume-icon.c2 { background: rgba(72,142,216,0.1); }
+  .slide-3 .consume-icon.c3 { background: rgba(255,209,56,0.15); }
+
+  .slide-3 .consume-text {
+    font-size: 40px;
+    font-weight: 600;
+    color: var(--deep-indigo);
+  }
+
+  /* ─── SLIDE 4 ─── */
+  .slide-4 .content {
+    position: relative;
+    z-index: 2;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 100px 72px;
+  }
+
+  .slide-4 .label {
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--orange);
+    margin-bottom: 44px;
+  }
+
+  .slide-4 h2 {
+    font-size: 78px;
+    font-weight: 700;
+    line-height: 1.14;
+    color: var(--deep-indigo);
+    margin-bottom: 72px;
+  }
+
+  .slide-4 .stack {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .slide-4 .layer {
+    padding: 48px;
+    text-align: center;
+  }
+
+  .slide-4 .layer-api {
+    background: var(--white);
+    border: 2px solid rgba(246,112,77,0.2);
+    border-radius: 16px 16px 0 0;
+  }
+
+  .slide-4 .layer-api .layer-title {
+    font-size: 48px;
+    font-weight: 700;
+    color: var(--orange);
+  }
+
+  .slide-4 .layer-desc {
+    font-size: 28px;
+    font-weight: 400;
+    color: rgba(45,45,70,0.45);
+    margin-top: 8px;
+  }
+
+  .slide-4 .layer-connector {
+    width: 3px;
+    height: 32px;
+    background: rgba(67,68,91,0.12);
+    margin: 0 auto;
+  }
+
+  .slide-4 .layer-mcp {
+    background: var(--white);
+    border: 2px solid rgba(72,142,216,0.2);
+    border-radius: 0 0 16px 16px;
+  }
+
+  .slide-4 .layer-mcp .layer-title {
+    font-size: 48px;
+    font-weight: 700;
+    color: var(--blue);
+  }
+
+  /* ─── SLIDE 5 ─── */
+  .slide-5 .content {
+    position: relative;
+    z-index: 2;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 100px 72px;
+  }
+
+  .slide-5 h2 {
+    font-size: 76px;
+    font-weight: 700;
+    line-height: 1.15;
+    color: var(--deep-indigo);
+    margin-bottom: 60px;
+  }
+
+  .slide-5 .principles {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    margin-bottom: 80px;
+  }
+
+  .slide-5 .principle {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    font-size: 52px;
+    font-weight: 700;
+  }
+
+  .slide-5 .principle .dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .slide-5 .principle .dot.o { background: var(--orange); }
+  .slide-5 .principle .dot.b { background: var(--blue); }
+
+  .slide-5 .principle.p1 { color: var(--orange); }
+  .slide-5 .principle.p2 { color: var(--blue); }
+
+  .slide-5 .url {
+    font-size: 32px;
+    color: rgba(45,45,70,0.35);
+    font-weight: 500;
+  }
+
+  /* ─── Person illustration ─── */
+  .person-illus {
+    position: absolute;
+    bottom: -20px;
+    left: -40px;
+    width: 600px;
+    height: auto;
+    opacity: 0.8;
+    z-index: 1;
+    pointer-events: none;
+    transform: scaleX(-1);
+  }
+
+  .slide-3 .person-illus {
+    left: -50px;
+    width: 560px;
+  }
+
+  .slide-5 .person-illus {
+    left: -30px;
+    width: 620px;
+  }
+
+  /* ─── Right-aligned content for slides with illustration ─── */
+  .slide-1 .content,
+  .slide-3 .content,
+  .slide-5 .content {
+    align-items: flex-end;
+    text-align: right;
+  }
+
+  .slide-3 .consume-list {
+    width: 55%;
+  }
+
+  .slide-3 .consume-item {
+    justify-content: flex-end;
+    flex-direction: row-reverse;
+  }
+
+  /* ─── Print ─── */
+  @media print {
+    body { background: none; gap: 0; padding: 0; }
+    .slide { page-break-after: always; page-break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+
+<!-- SLIDE 1 -->
+<div class="slide slide-1">
+  <div class="bg-gradient"><img src="tchop-assets/Gradient.svg" alt=""></div>
+  <div class="logo"><img src="frontend-slides/tchop-assets/master_tchop-logo.png_3.3x0.8.png" alt="tchop"></div>
+  <img class="person-illus" src="tchop-assets/Person4.svg" alt="">
+  <div class="content">
+    <h1>
+      Will most websites<br>
+      have <span class="zero">0</span> <span class="ui">UI</span>?
+    </h1>
+    <p class="subtext">Sounds crazy.<br>But maybe not for long.</p>
+  </div>
+  <div class="bottom-bar"></div>
+  <div class="slide-num">1 / 5</div>
+</div>
+
+<!-- SLIDE 2 -->
+<div class="slide slide-2">
+  <div class="bg-gradient"><img src="tchop-assets/Gradient.svg" alt=""></div>
+  <div class="logo"><img src="frontend-slides/tchop-assets/master_tchop-logo.png_3.3x0.8.png" alt="tchop"></div>
+  <div class="content">
+    <h2>From pages.<br>To agents.</h2>
+    <div class="arrow-row">
+      <div class="from-box">Clicks</div>
+      <div class="arrow-icon">&#10230;</div>
+      <div class="to-box">Actions</div>
+    </div>
+  </div>
+  <div class="bottom-bar"></div>
+  <div class="slide-num">2 / 5</div>
+</div>
+
+<!-- SLIDE 3 -->
+<div class="slide slide-3">
+  <div class="bg-gradient"><img src="tchop-assets/Gradient.svg" alt=""></div>
+  <div class="logo"><img src="frontend-slides/tchop-assets/master_tchop-logo.png_3.3x0.8.png" alt="tchop"></div>
+  <img class="person-illus" src="tchop-assets/Person4.svg" alt="">
+  <div class="content">
+    <h2>
+      Humans are no longer<br>
+      your <span class="em">only</span> interface.
+    </h2>
+    <div class="consume-list">
+      <div class="consume-item">
+        <div class="consume-icon c1">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#F6704D" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>
+        </div>
+        <span class="consume-text">Your content</span>
+      </div>
+      <div class="consume-item">
+        <div class="consume-icon c2">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#488ED8" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+        </div>
+        <span class="consume-text">Your community</span>
+      </div>
+      <div class="consume-item">
+        <div class="consume-icon c3">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#D4A017" stroke-width="2" stroke-linecap="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        </div>
+        <span class="consume-text">Your actions</span>
+      </div>
+    </div>
+  </div>
+  <div class="bottom-bar"></div>
+  <div class="slide-num">3 / 5</div>
+</div>
+
+<!-- SLIDE 4 -->
+<div class="slide slide-4">
+  <div class="bg-gradient"><img src="tchop-assets/Gradient.svg" alt=""></div>
+  <div class="logo"><img src="frontend-slides/tchop-assets/master_tchop-logo.png_3.3x0.8.png" alt="tchop"></div>
+  <div class="content">
+    <h2>APIs are no longer<br>just developer tools.</h2>
+    <div class="stack">
+      <div class="layer layer-api">
+        <div class="layer-title">APIs</div>
+        <div class="layer-desc">Your product layer</div>
+      </div>
+      <div class="layer-connector"></div>
+      <div class="layer layer-mcp">
+        <div class="layer-title">MCPs</div>
+        <div class="layer-desc">The agent access layer</div>
+      </div>
+    </div>
+  </div>
+  <div class="bottom-bar"></div>
+  <div class="slide-num">4 / 5</div>
+</div>
+
+<!-- SLIDE 5 -->
+<div class="slide slide-5">
+  <div class="bg-gradient"><img src="tchop-assets/Gradient.svg" alt=""></div>
+  <div class="logo"><img src="frontend-slides/tchop-assets/master_tchop-logo.png_3.3x0.8.png" alt="tchop"></div>
+  <img class="person-illus" src="tchop-assets/Person4.svg" alt="">
+  <div class="content">
+    <h2>The next winners<br>won't just be UI-first.</h2>
+    <div class="principles">
+      <div class="principle p1">
+        <div class="dot o"></div>
+        API-first.
+      </div>
+      <div class="principle p2">
+        <div class="dot b"></div>
+        Agent-ready.
+      </div>
+    </div>
+    <p class="url">tchop.io</p>
+  </div>
+  <div class="bottom-bar"></div>
+  <div class="slide-num">5 / 5</div>
+</div>
+
+</body>
+</html>

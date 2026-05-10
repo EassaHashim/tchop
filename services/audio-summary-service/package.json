@@ -1,0 +1,23 @@
+{
+  "name": "tchop-audio-summary-service",
+  "module": "src/index.ts",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "start": "bun run src/index.ts",
+    "dev": "bun --watch run src/index.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.39.0",
+    "@fastify/cors": "^11.2.0",
+    "@supabase/supabase-js": "^2.101.1",
+    "fastify": "^5.8.4"
+  }
+}

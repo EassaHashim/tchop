@@ -1,0 +1,226 @@
+<template id="captions-template">
+  <div data-composition-id="captions" data-width="1920" data-height="1080" data-start="0" data-duration="30">
+    <div class="cap-stage" id="cap-stage"></div>
+
+    <style>
+      [data-composition-id="captions"] {
+        position: absolute;
+        inset: 0;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        pointer-events: none;
+      }
+      [data-composition-id="captions"] .cap-stage {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 96px;
+        display: flex;
+        justify-content: center;
+        align-items: flex-end;
+        min-height: 110px;
+      }
+      [data-composition-id="captions"] .cap-group {
+        position: absolute;
+        display: inline-flex;
+        flex-wrap: nowrap;
+        align-items: baseline;
+        justify-content: center;
+        gap: 14px;
+        max-width: 1500px;
+        padding: 0 40px;
+        font-family: 'Basier Circle', 'Manrope', -apple-system, sans-serif;
+        font-size: 54px;
+        font-weight: 700;
+        line-height: 1.15;
+        letter-spacing: -0.01em;
+        color: #F1F1F3;
+        text-align: center;
+        opacity: 0;
+        text-shadow:
+          0 2px 14px rgba(0,0,0,0.9),
+          0 1px 3px rgba(0,0,0,0.95);
+        white-space: nowrap;
+      }
+      [data-composition-id="captions"] .cap-word {
+        display: inline-block;
+        will-change: transform, opacity;
+      }
+      [data-composition-id="captions"] .cap-word.accent { color: #FF8F72; }
+    </style>
+
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <script>
+      (function () {
+        // Caption groups — phrase-level with per-word stagger.
+        // Timings and words derived from narration.wav transcript.
+        // TTS misrecognitions corrected: "teach up" → "tchop", "teachup.io" → "tchop.io"
+        var GROUPS = [
+          // Scene 1 — The shift (narration 0.04-2.96)
+          { start: 0.04, end: 0.98, words: [
+            { t: "Your", s: 0.04, e: 0.26 },
+            { t: "content", s: 0.26, e: 0.73 },
+            { t: "team", s: 0.73, e: 0.97 }
+          ] },
+          { start: 1.02, end: 3.10, words: [
+            { t: "just", s: 1.02, e: 1.21 },
+            { t: "got", s: 1.29, e: 1.45 },
+            { t: "1,000", s: 1.50, e: 2.04, accent: true },
+            { t: "new", s: 2.04, e: 2.21 },
+            { t: "colleagues.", s: 2.29, e: 2.96 }
+          ] },
+
+          // Scene 2 — The problem (narration 3.00-9.93)
+          { start: 3.00, end: 5.50, words: [
+            { t: "Every", s: 3.00, e: 3.28 },
+            { t: "content", s: 3.28, e: 3.74 },
+            { t: "platform", s: 3.74, e: 4.26 },
+            { t: "was built for", s: 4.26, e: 4.96 },
+            { t: "humans.", s: 4.96, e: 5.40, accent: true }
+          ] },
+          { start: 5.44, end: 7.00, words: [
+            { t: "Agents", s: 5.44, e: 5.70, accent: true },
+            { t: "need", s: 5.70, e: 5.90 },
+            { t: "something", s: 5.90, e: 6.35 },
+            { t: "different.", s: 6.35, e: 6.90, accent: true }
+          ] },
+          { start: 6.91, end: 9.22, words: [
+            { t: "Structured.", s: 6.91, e: 7.52, accent: true },
+            { t: "Programmable.", s: 7.56, e: 8.20, accent: true },
+            { t: "Honest about state.", s: 8.20, e: 9.12 }
+          ] },
+          { start: 9.12, end: 10.05, words: [
+            { t: "tchop.", s: 9.12, e: 9.93, accent: true, emphasis: true }
+          ] },
+
+          // Scene 3 — The reveal (narration 10.22-14.52)
+          { start: 10.22, end: 11.40, words: [
+            { t: "The", s: 10.22, e: 10.28 },
+            { t: "first", s: 10.33, e: 10.54 },
+            { t: "content", s: 10.56, e: 10.90 },
+            { t: "platform", s: 10.90, e: 11.29 }
+          ] },
+          { start: 11.32, end: 12.25, words: [
+            { t: "built", s: 11.32, e: 11.54 },
+            { t: "for", s: 11.54, e: 11.74 },
+            { t: "agents.", s: 11.74, e: 12.16, accent: true }
+          ] },
+          { start: 12.20, end: 14.62, words: [
+            { t: "curate", s: 12.20, e: 12.64, accent: true },
+            { t: "·", s: 12.64, e: 12.66 },
+            { t: "structure", s: 12.64, e: 13.56, accent: true },
+            { t: "·", s: 13.56, e: 13.58 },
+            { t: "publish", s: 13.56, e: 14.12, accent: true },
+            { t: "·", s: 14.12, e: 14.14 },
+            { t: "govern.", s: 14.12, e: 14.52, accent: true }
+          ] },
+
+          // Scene 4 — Proof in motion (narration 14.56-20.60)
+          { start: 14.56, end: 16.05, words: [
+            { t: "An", s: 14.56, e: 14.68 },
+            { t: "agent", s: 14.68, e: 15.06, accent: true },
+            { t: "reads", s: 15.08, e: 15.46 },
+            { t: "a", s: 15.46, e: 15.49 },
+            { t: "URL.", s: 15.54, e: 15.96, accent: true }
+          ] },
+          { start: 15.96, end: 16.73, words: [
+            { t: "Tags", s: 15.96, e: 16.26 },
+            { t: "it.", s: 16.38, e: 16.63 }
+          ] },
+          { start: 16.63, end: 17.90, words: [
+            { t: "Slots", s: 16.63, e: 16.90 },
+            { t: "it", s: 16.90, e: 16.93 },
+            { t: "into", s: 16.93, e: 17.29 },
+            { t: "a", s: 17.29, e: 17.35 },
+            { t: "channel.", s: 17.49, e: 17.80, accent: true }
+          ] },
+          { start: 17.84, end: 19.36, words: [
+            { t: "Schedules", s: 17.84, e: 18.54 },
+            { t: "the", s: 18.54, e: 18.77 },
+            { t: "push.", s: 18.82, e: 19.26, accent: true }
+          ] },
+          { start: 19.26, end: 20.70, words: [
+            { t: "Updates", s: 19.26, e: 19.83 },
+            { t: "the", s: 19.83, e: 20.01 },
+            { t: "status.", s: 20.09, e: 20.60, accent: true }
+          ] },
+
+          // Scene 5 — Close (narration 20.64-25.36)
+          { start: 20.64, end: 23.05, words: [
+            { t: "Give", s: 20.64, e: 20.89 },
+            { t: "your", s: 20.89, e: 21.14 },
+            { t: "agents", s: 21.20, e: 21.57, accent: true },
+            { t: "a", s: 21.62, e: 21.68 },
+            { t: "CMS", s: 21.68, e: 21.92, accent: true },
+            { t: "they", s: 21.92, e: 22.15 },
+            { t: "can actually", s: 22.15, e: 22.78 },
+            { t: "use.", s: 22.78, e: 23.00, accent: true }
+          ] },
+          { start: 23.04, end: 25.50, words: [
+            { t: "tchop.io", s: 23.04, e: 24.16, accent: true },
+            { t: "/", s: 24.16, e: 24.65 },
+            { t: "agents", s: 24.65, e: 25.36, accent: true }
+          ] }
+        ];
+
+        var stage = document.getElementById("cap-stage");
+
+        window.__timelines = window.__timelines || {};
+        var tl = gsap.timeline({ paused: true });
+
+        GROUPS.forEach(function (group, gi) {
+          var el = document.createElement("div");
+          el.className = "cap-group";
+          el.id = "cg-" + gi;
+
+          group.words.forEach(function (w, wi) {
+            var span = document.createElement("span");
+            span.className = "cap-word" + (w.accent ? " accent" : "");
+            span.textContent = w.t;
+            span.dataset.idx = wi;
+            el.appendChild(span);
+          });
+
+          stage.appendChild(el);
+
+          // Group container fades in at group.start
+          tl.fromTo(el, { opacity: 0 }, { opacity: 1, duration: 0.12, ease: "power2.out" }, group.start);
+
+          // Per-word reveal using each word's own s timestamp
+          var wordEls = el.querySelectorAll(".cap-word");
+          group.words.forEach(function (w, wi) {
+            var wEl = wordEls[wi];
+            tl.fromTo(wEl,
+              { y: 16, opacity: 0, filter: "blur(3px)" },
+              { y: 0, opacity: 1, filter: "blur(0px)", duration: 0.22, ease: "power3.out" },
+              w.s
+            );
+          });
+
+          // Exit — fade out just before end, then hard kill
+          tl.to(el,
+            { opacity: 0, y: -4, duration: 0.16, ease: "power2.in" },
+            group.end - 0.16
+          );
+          tl.set(el, { opacity: 0, visibility: "hidden" }, group.end);
+          tl.set(el, { visibility: "visible" }, Math.max(0, group.start - 0.05));
+        });
+
+        // Self-lint: ensure no caption group is still visible after its end
+        GROUPS.forEach(function (group, gi) {
+          var el = document.getElementById("cg-" + gi);
+          if (!el) return;
+          tl.seek(group.end + 0.01);
+          var computed = window.getComputedStyle(el);
+          if (computed.opacity !== "0" && computed.visibility !== "hidden") {
+            console.warn("[caption-lint] group " + gi + " still visible at t=" + (group.end + 0.01).toFixed(2) + "s");
+          }
+        });
+        tl.seek(0);
+
+        window.__timelines["captions"] = tl;
+      })();
+    </script>
+  </div>
+</template>

@@ -1,0 +1,86 @@
+# Claude local overrides
+.claude/settings.local.json
+.claude/mcp.json
+.mcp.json
+
+# macOS
+.DS_Store
+
+# Credentials / env
+.env
+*.env
+.venv/
+node_modules/
+
+# Python caches
+__pycache__/
+*.pyc
+
+# Firecrawl local cache
+.firecrawl/
+
+# Generated / large directories
+data/
+archive/
+assets/
+content/
+.gstack/
+
+# gstack skill symlinks (created by bin/gstack-link.sh — see script header)
+.claude/skills/autoplan
+.claude/skills/benchmark
+.claude/skills/browse
+.claude/skills/canary
+.claude/skills/careful
+.claude/skills/checkpoint
+.claude/skills/codex
+.claude/skills/connect-chrome
+.claude/skills/cso
+.claude/skills/design-consultation
+.claude/skills/design-html
+.claude/skills/design-review
+.claude/skills/design-shotgun
+.claude/skills/devex-review
+.claude/skills/document-release
+.claude/skills/freeze
+.claude/skills/gstack-upgrade
+.claude/skills/guard
+.claude/skills/health
+.claude/skills/investigate
+.claude/skills/land-and-deploy
+.claude/skills/learn
+.claude/skills/office-hours
+.claude/skills/open-gstack-browser
+.claude/skills/pair-agent
+.claude/skills/plan-ceo-review
+.claude/skills/plan-design-review
+.claude/skills/plan-devex-review
+.claude/skills/plan-eng-review
+.claude/skills/qa
+.claude/skills/qa-only
+.claude/skills/retro
+.claude/skills/review
+.claude/skills/setup-browser-cookies
+.claude/skills/setup-deploy
+.claude/skills/ship
+.claude/skills/unfreeze
+
+# Large binaries
+*.mp4
+lightpanda
+
+# Top-level scratch files
+/*.html
+/*.md
+!CLAUDE.md
+!README.md
+!/.impeccable.md
+!/.impeccable-inventory.md
+
+# Backup files
+*.bak
+
+# Heavy media folders
+/tchop-launch-video/
+/tchop-status-tags-video/
+/magazines/

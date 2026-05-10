@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Audio Summary - Integration Setup</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f5; color: #1a1a1a; padding: 24px; max-width: 860px; margin: 0 auto; }
+  h1 { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
+  .subtitle { color: #666; font-size: 13px; margin-bottom: 24px; }
+  .card { background: #fff; border-radius: 8px; padding: 20px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+  .card h2 { font-size: 15px; font-weight: 600; margin-bottom: 16px; }
+  label { display: block; font-size: 12px; font-weight: 500; color: #666; margin-bottom: 4px; margin-top: 12px; }
+  input, select, textarea { width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; font-family: inherit; }
+  textarea { resize: vertical; min-height: 60px; }
+  input:focus, select:focus, textarea:focus { outline: none; border-color: #4a7fff; box-shadow: 0 0 0 2px rgba(74,127,255,0.15); }
+  .row { display: flex; gap: 12px; }
+  .row > * { flex: 1; }
+  .row-3 > * { flex: 1; min-width: 0; }
+  .row-4 > * { flex: 1; min-width: 0; }
+  .btn { padding: 8px 16px; border: none; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.15s; }
+  .btn-primary { background: #4a7fff; color: #fff; }
+  .btn-primary:hover { background: #3a6fee; }
+  .btn-primary:disabled { background: #a0b8e8; cursor: not-allowed; }
+  .btn-secondary { background: #e8e8e8; color: #333; }
+  .btn-secondary:hover { background: #ddd; }
+  .btn-success { background: #22c55e; color: #fff; }
+  .btn-success:hover { background: #16a34a; }
+  .btn-danger { background: #ef4444; color: #fff; font-size: 12px; padding: 4px 10px; }
+  .btn-danger:hover { background: #dc2626; }
+  .actions { display: flex; gap: 8px; margin-top: 16px; justify-content: flex-end; }
+  .config-bar { display: flex; gap: 12px; align-items: flex-end; margin-bottom: 20px; flex-wrap: wrap; }
+  .config-bar label { margin-top: 0; }
+  .config-bar input { width: 280px; }
+  .status { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }
+  .status-ok { background: #22c55e; }
+  .status-error { background: #ef4444; }
+  .status-inactive { background: #d1d5db; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { text-align: left; padding: 8px 10px; border-bottom: 2px solid #eee; font-weight: 600; color: #666; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
+  td { padding: 8px 10px; border-bottom: 1px solid #f0f0f0; }
+  tr:hover td { background: #fafafa; }
+  .tabs { display: flex; gap: 0; margin-bottom: 20px; background: #e8e8e8; border-radius: 6px; padding: 2px; }
+  .tab { flex: 1; padding: 8px 16px; text-align: center; border-radius: 5px; cursor: pointer; font-size: 13px; font-weight: 500; color: #666; transition: all 0.15s; user-select: none; }
+  .tab.active { background: #fff; color: #1a1a1a; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+  .section-divider { border-top: 1px solid #eee; margin: 16px 0; padding-top: 16px; }
+  .section-divider h3 { font-size: 13px; font-weight: 600; color: #999; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+  .hint { font-size: 11px; color: #999; margin-top: 2px; }
+  .toggle-row { display: flex; gap: 20px; margin-top: 12px; flex-wrap: wrap; }
+  .toggle { display: flex; align-items: center; gap: 6px; font-size: 13px; cursor: pointer; }
+  .toggle input { width: auto; }
+  .hidden { display: none; }
+  .error-msg { background: #fef2f2; color: #dc2626; padding: 10px 14px; border-radius: 6px; font-size: 13px; margin-top: 12px; }
+  .success-msg { background: #f0fdf4; color: #16a34a; padding: 10px 14px; border-radius: 6px; font-size: 13px; margin-top: 12px; }
+  .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid #fff; border-top-color: transparent; border-radius: 50%; animation: spin 0.6s linear infinite; margin-right: 6px; vertical-align: middle; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .empty { text-align: center; padding: 40px; color: #999; font-size: 14px; }
+  .voice-option { display: flex; align-items: center; gap: 8px; }
+  .voice-gender { font-size: 10px; color: #999; text-transform: uppercase; letter-spacing: 0.5px; }
+  .dialogue-fields { transition: opacity 0.2s; }
+  .preview-script { background: #f8f8f8; border: 1px solid #eee; border-radius: 6px; padding: 16px; margin-top: 12px; font-size: 13px; line-height: 1.6; white-space: pre-wrap; max-height: 400px; overflow-y: auto; }
+  .preview-script .speaker-a { color: #4a7fff; font-weight: 600; }
+  .preview-script .speaker-b { color: #e67e22; font-weight: 600; }
+</style>
+</head>
+<body>
+
+<h1>Audio Summary</h1>
+<p class="subtitle">Configure automated audio briefings for your tchop community</p>
+
+<!-- Connection -->
+<div class="config-bar">
+  <div>
+    <label>Worker URL</label>
+    <input type="text" id="workerUrl" value="">
+  </div>
+  <div>
+    <label>API Token</label>
+    <input type="password" id="apiToken" placeholder="x-api-key for worker auth">
+  </div>
+  <button class="btn btn-secondary" onclick="checkHealth()">Check Health</button>
+  <span id="healthStatus"></span>
+</div>
+
+<!-- New Integration -->
+<div class="card">
+  <h2>New Audio Summary Integration</h2>
+
+  <label>Name</label>
+  <input type="text" id="intName" placeholder="e.g. Lilien News Daily Briefing">
+
+  <!-- Source: What to summarize -->
+  <div class="section-divider">
+    <h3>Source -- What to Summarize</h3>
+  </div>
+
+  <div class="row row-3">
+    <div>
+      <label>Org</label>
+      <input type="text" id="orgId" value="lilien">
+    </div>
+    <div>
+      <label>Scope</label>
+      <select id="sourceScope" onchange="toggleSourceScope()">
+        <option value="one_channel">One Channel</option>
+        <option value="one_mix">One Mix</option>
+      </select>
+    </div>
+    <div>
+      <label>Channel ID</label>
+      <input type="number" id="sourceChannelId" placeholder="e.g. 1730">
+    </div>
+  </div>
+
+  <div id="sourceMixRow">
+    <label>Source Mix ID</label>
+    <input type="number" id="sourceMixId" placeholder="Only for 'One Mix' scope">
+  </div>
+
+  <div class="row row-3">
+    <div>
+      <label>Summary Period</label>
+      <select id="summaryPeriod">
+        <option value="12h">Last 12 hours</option>
+        <option value="24h" selected>Last 24 hours</option>
+        <option value="48h">Last 48 hours</option>
+        <option value="7d">Last 7 days</option>
+        <option value="14d">Last 14 days</option>
+        <option value="30d">Last 30 days</option>
+      </select>
+    </div>
+    <div>
+      <label>Content Focus</label>
+      <select id="contentFocus">
+        <option value="balanced" selected>Balanced</option>
+        <option value="discussions">Discussions (comments-heavy)</option>
+        <option value="new_content">New Content (cards-heavy)</option>
+        <option value="engagement">Engagement (trending)</option>
+      </select>
+    </div>
+    <div>
+      <label>Min Activity</label>
+      <input type="number" id="minActivity" value="0" min="0">
+      <p class="hint">Min cards+comments to generate. 0 = always.</p>
+    </div>
+  </div>
+
+  <!-- Audio Format -->
+  <div class="section-divider">
+    <h3>Audio Format</h3>
+  </div>
+
+  <div class="tabs" id="formatTabs">
+    <div class="tab active" onclick="setFormat('monologue')">Monologue</div>
+    <div class="tab" onclick="setFormat('dialogue')">Dialogue (two hosts)</div>
+  </div>
+
+  <div class="row row-3">
+    <div>
+      <label>Language</label>
+      <select id="language">
+        <option value="de" selected>Deutsch</option>
+        <option value="en">English</option>
+      </select>
+    </div>
+    <div>
+      <label>Target Length</label>
+      <select id="targetLength">
+        <option value="1min">1 minute</option>
+        <option value="2min">2 minutes</option>
+        <option value="3min" selected>3 minutes</option>
+        <option value="5min">5 minutes</option>
+        <option value="10min">10 minutes</option>
+      </select>
+    </div>
+    <div>
+      <label>Tone</label>
+      <select id="tone">
+        <option value="neutral" selected>Neutral</option>
+        <option value="enthusiastic">Enthusiastic</option>
+        <option value="formal">Formal</option>
+        <option value="casual">Casual</option>
+        <option value="analytical">Analytical</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Voice Selection -->
+  <div class="row" id="voiceRow">
+    <div>
+      <label id="voiceALabel">Voice</label>
+      <select id="voiceId"></select>
+    </div>
+    <div id="voiceBWrapper" class="dialogue-fields hidden">
+      <label>Voice B (Host B)</label>
+      <select id="voiceIdB"></select>
+    </div>
+  </div>
+  <div class="row" style="margin-top:4px">
+    <div>
+      <label class="toggle" style="margin-top:4px"><input type="checkbox" id="customVoiceToggle" onchange="toggleCustomVoice()"> Custom voice ID</label>
+      <input type="text" id="customVoiceId" class="hidden" placeholder="ElevenLabs voice ID" style="margin-top:4px">
+    </div>
+    <div id="customVoiceBWrapper" class="dialogue-fields hidden">
+      <label class="toggle" style="margin-top:4px"><input type="checkbox" id="customVoiceBToggle" onchange="toggleCustomVoiceB()"> Custom voice ID</label>
+      <input type="text" id="customVoiceIdB" class="hidden" placeholder="ElevenLabs voice ID" style="margin-top:4px">
+    </div>
+  </div>
+
+  <!-- Script Customization -->
+  <div class="section-divider">
+    <h3>Script Customization</h3>
+  </div>
+
+  <label>Brand Context Card ID (optional)</label>
+  <input type="number" id="contextCardId" placeholder="Long Post card ID with brand/tone context">
+  <p class="hint">Create a Long Post card with your brand voice, audience info, and vocabulary. The worker reads it fresh each run.</p>
+
+  <label>Additional Prompt (optional)</label>
+  <textarea id="additionalPrompt" placeholder="e.g. Always mention the next matchday. Use informal 'du' address. Refer to the team as 'die Lilien'."></textarea>
+  <p class="hint">Custom instructions injected into the script generation prompt.</p>
+
+  <!-- Target: Where to Publish -->
+  <div class="section-divider">
+    <h3>Target -- Where to Publish</h3>
+  </div>
+
+  <div class="row row-3">
+    <div>
+      <label>Target Channel ID</label>
+      <input type="number" id="targetChannelId" placeholder="e.g. 1730">
+    </div>
+    <div>
+      <label>Target Mix ID</label>
+      <input type="number" id="targetMixId" placeholder="e.g. 60962">
+    </div>
+    <div>
+      <label>Card Title Template</label>
+      <input type="text" id="cardTitleTemplate" value="{type} -- {date}">
+      <p class="hint">{date}, {period}, {type}, {org}</p>
+    </div>
+  </div>
+
+  <label>Cover Image URL (optional)</label>
+  <input type="url" id="cardImageUrl" placeholder="https://...">
+  <p class="hint">Branded artwork displayed on the audio card.</p>
+
+  <label>Push Notification Text (optional)</label>
+  <input type="text" id="pushText" placeholder="e.g. Dein tägliches Community-Briefing ist da!">
+  <p class="hint">Leave empty to skip push notification.</p>
+
+  <div class="toggle-row">
+    <label class="toggle"><input type="checkbox" id="autoPublish" checked> Auto-publish</label>
+  </div>
+
+  <!-- Schedule -->
+  <div class="section-divider">
+    <h3>Schedule</h3>
+  </div>
+
+  <div class="row row-3">
+    <div>
+      <label>Schedule Type</label>
+      <select id="scheduleType" onchange="toggleScheduleFields()">
+        <option value="daily" selected>Daily</option>
+        <option value="weekly">Weekly</option>
+        <option value="interval">Interval</option>
+      </select>
+    </div>
+    <div id="scheduleTimeWrapper">
+      <label>Time</label>
+      <input type="time" id="scheduleTime" value="08:00">
+    </div>
+    <div id="scheduleDayWrapper" class="hidden">
+      <label>Day</label>
+      <select id="scheduleDay">
+        <option value="mon">Monday</option>
+        <option value="tue">Tuesday</option>
+        <option value="wed">Wednesday</option>
+        <option value="thu">Thursday</option>
+        <option value="fri">Friday</option>
+        <option value="sat">Saturday</option>
+        <option value="sun">Sunday</option>
+      </select>
+    </div>
+    <div id="scheduleIntervalWrapper" class="hidden">
+      <label>Every N hours</label>
+      <input type="number" id="scheduleIntervalH" value="12" min="1" max="168">
+    </div>
+    <div>
+      <label>Timezone</label>
+      <select id="timezone">
+        <option value="Europe/Berlin" selected>Europe/Berlin</option>
+        <option value="Europe/London">Europe/London</option>
+        <option value="Europe/Paris">Europe/Paris</option>
+        <option value="America/New_York">America/New_York</option>
+        <option value="America/Los_Angeles">America/Los_Angeles</option>
+        <option value="Asia/Tokyo">Asia/Tokyo</option>
+        <option value="UTC">UTC</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Actions -->
+  <div class="actions">
+    <button class="btn btn-primary" id="previewBtn" onclick="runPreview()">Preview Script</button>
+    <button class="btn btn-success" id="saveBtn" onclick="saveIntegration()">Save Integration</button>
+  </div>
+
+  <div id="previewError" class="error-msg hidden"></div>
+  <div id="previewSuccess" class="success-msg hidden"></div>
+  <div id="previewScript" class="preview-script hidden"></div>
+</div>
+
+<!-- Integration Status -->
+<div class="card">
+  <h2>Integration Status</h2>
+  <button class="btn btn-secondary" onclick="loadStatus()" style="margin-bottom: 12px;">Refresh</button>
+
+  <div id="statusEmpty" class="empty">Click Refresh to load integration statuses</div>
+  <div id="statusError" class="error-msg hidden"></div>
+
+  <table id="statusTable" class="hidden">
+    <thead>
+      <tr>
+        <th>Status</th>
+        <th>Name</th>
+        <th>Format</th>
+        <th>Schedule</th>
+        <th>Last Run</th>
+        <th>Runs</th>
+        <th>Error</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody id="statusBody"></tbody>
+  </table>
+</div>
+
+<!-- Recent Runs -->
+<div class="card">
+  <h2>Recent Runs</h2>
+  <button class="btn btn-secondary" onclick="loadRuns()" style="margin-bottom: 12px;">Refresh</button>
+
+  <div id="runsEmpty" class="empty">Click Refresh to load recent runs</div>
+  <div id="runsError" class="error-msg hidden"></div>
+
+  <table id="runsTable" class="hidden">
+    <thead>
+      <tr>
+        <th>Integration</th>
+        <th>Status</th>
+        <th>Started</th>
+        <th>Words</th>
+        <th>Duration</th>
+        <th>Claude Tokens</th>
+        <th>11Labs Chars</th>
+        <th>Error</th>
+      </tr>
+    </thead>
+    <tbody id="runsBody"></tbody>
+  </table>
+</div>
+
+<script>
+const VOICES = [
+  { id: 'onwK4e9ZLuTAKqWW03F9', label: 'Daniel', gender: 'Male', style: 'Steady Broadcaster' },
+  { id: 'JBFqnCBsd6RMkjVDRZzb', label: 'George', gender: 'Male', style: 'Warm Storyteller' },
+  { id: 'nPczCjzI2devNBz1zQrb', label: 'Brian', gender: 'Male', style: 'Deep, Resonant' },
+  { id: 'IKne3meq5aSn9XLyUdCD', label: 'Charlie', gender: 'Male', style: 'Confident, Energetic' },
+  { id: 'EXAVITQu4vr4xnSDxMaL', label: 'Sarah', gender: 'Female', style: 'Mature, Reassuring' },
+  { id: 'Xb7hH8MSUJpSbSDYk0k2', label: 'Alice', gender: 'Female', style: 'Clear Educator' },
+  { id: 'pFZP5JQG7iQjIQuC4Bku', label: 'Lily', gender: 'Female', style: 'Warm, Professional' },
+  { id: 'SAz9YHcvj6GT2YYXdXww', label: 'River', gender: 'Neutral', style: 'Relaxed, Informative' },
+];
+
+let currentFormat = 'monologue';
+
+// Init
+const savedUrl = localStorage.getItem('audio_worker_url');
+const savedToken = localStorage.getItem('audio_api_token');
+document.getElementById('workerUrl').value = savedUrl || window.location.origin || 'http://localhost:3001';
+if (savedToken) document.getElementById('apiToken').value = savedToken;
+
+function populateVoices() {
+  ['voiceId', 'voiceIdB'].forEach(id => {
+    const sel = document.getElementById(id);
+    sel.innerHTML = '';
+    VOICES.forEach(v => {
+      const opt = document.createElement('option');
+      opt.value = v.id;
+      opt.textContent = v.label + ' (' + v.gender + ') -- ' + v.style;
+      sel.appendChild(opt);
+    });
+  });
+  // Default: Daniel for A, Sarah for B
+  document.getElementById('voiceId').value = 'onwK4e9ZLuTAKqWW03F9';
+  document.getElementById('voiceIdB').value = 'EXAVITQu4vr4xnSDxMaL';
+}
+populateVoices();
+
+function saveConfig() {
+  localStorage.setItem('audio_worker_url', document.getElementById('workerUrl').value);
+  localStorage.setItem('audio_api_token', document.getElementById('apiToken').value);
+}
+document.getElementById('workerUrl').addEventListener('change', saveConfig);
+document.getElementById('apiToken').addEventListener('change', saveConfig);
+
+function getHeaders() {
+  return { 'Content-Type': 'application/json', 'x-api-key': document.getElementById('apiToken').value };
+}
+
+function baseUrl() {
+  return document.getElementById('workerUrl').value.replace(/\/$/, '');
+}
+
+function setFormat(fmt) {
+  currentFormat = fmt;
+  document.querySelectorAll('#formatTabs .tab').forEach((t, i) => {
+    t.classList.toggle('active', (fmt === 'monologue' && i === 0) || (fmt === 'dialogue' && i === 1));
+  });
+  const isDialogue = fmt === 'dialogue';
+  document.querySelectorAll('.dialogue-fields').forEach(el => {
+    el.classList.toggle('hidden', !isDialogue);
+  });
+  document.getElementById('voiceALabel').textContent = isDialogue ? 'Voice A (Host A)' : 'Voice';
+}
+
+function toggleSourceScope() {
+  const scope = document.getElementById('sourceScope').value;
+  const mixRow = document.getElementById('sourceMixRow');
+  mixRow.style.display = scope === 'one_mix' ? 'block' : 'none';
+}
+toggleSourceScope();
+
+function toggleScheduleFields() {
+  const type = document.getElementById('scheduleType').value;
+  document.getElementById('scheduleTimeWrapper').classList.toggle('hidden', type === 'interval');
+  document.getElementById('scheduleDayWrapper').classList.toggle('hidden', type !== 'weekly');
+  document.getElementById('scheduleIntervalWrapper').classList.toggle('hidden', type !== 'interval');
+}
+
+function toggleCustomVoice() {
+  document.getElementById('customVoiceId').classList.toggle('hidden', !document.getElementById('customVoiceToggle').checked);
+}
+
+function toggleCustomVoiceB() {
+  document.getElementById('customVoiceIdB').classList.toggle('hidden', !document.getElementById('customVoiceBToggle').checked);
+}
+
+function buildSchedule() {
+  const type = document.getElementById('scheduleType').value;
+  if (type === 'daily') {
+    const time = document.getElementById('scheduleTime').value.replace(':', '');
+    return 'daily_' + time;
+  }
+  if (type === 'weekly') {
+    const day = document.getElementById('scheduleDay').value;
+    const time = document.getElementById('scheduleTime').value.replace(':', '');
+    return 'weekly_' + day + '_' + time;
+  }
+  return 'interval_' + document.getElementById('scheduleIntervalH').value + 'h';
+}
+
+function getVoiceId(which) {
+  if (which === 'a') {
+    if (document.getElementById('customVoiceToggle').checked) {
+      return document.getElementById('customVoiceId').value;
+    }
+    return document.getElementById('voiceId').value;
+  }
+  if (document.getElementById('customVoiceBToggle').checked) {
+    return document.getElementById('customVoiceIdB').value;
+  }
+  return document.getElementById('voiceIdB').value;
+}
+
+function buildPayload() {
+  return {
+    name: document.getElementById('intName').value,
+    org_id: document.getElementById('orgId').value,
+    source_scope: document.getElementById('sourceScope').value,
+    source_channel_id: parseInt(document.getElementById('sourceChannelId').value) || null,
+    source_mix_id: parseInt(document.getElementById('sourceMixId').value) || null,
+    target_channel_id: parseInt(document.getElementById('targetChannelId').value) || null,
+    target_mix_id: parseInt(document.getElementById('targetMixId').value) || null,
+    format: currentFormat,
+    voice_id: getVoiceId('a'),
+    voice_id_b: currentFormat === 'dialogue' ? getVoiceId('b') : null,
+    language: document.getElementById('language').value,
+    target_length: document.getElementById('targetLength').value,
+    summary_period: document.getElementById('summaryPeriod').value,
+    tone: document.getElementById('tone').value,
+    content_focus: document.getElementById('contentFocus').value,
+    min_activity_threshold: parseInt(document.getElementById('minActivity').value) || 0,
+    context_card_id: parseInt(document.getElementById('contextCardId').value) || null,
+    additional_prompt: document.getElementById('additionalPrompt').value || null,
+    card_title_template: document.getElementById('cardTitleTemplate').value || '{type} -- {date}',
+    card_image_url: document.getElementById('cardImageUrl').value || null,
+    push_notification_text: document.getElementById('pushText').value || null,
+    auto_publish: document.getElementById('autoPublish').checked,
+    schedule: buildSchedule(),
+    timezone: document.getElementById('timezone').value,
+    is_active: true,
+  };
+}
+
+async function checkHealth() {
+  const el = document.getElementById('healthStatus');
+  try {
+    const res = await fetch(baseUrl() + '/health');
+    const data = await res.json();
+    el.innerHTML = data.status === 'ok'
+      ? '<span class="status status-ok"></span>OK (' + (data.integrations || 0) + ' integrations, uptime ' + Math.round(data.uptime || 0) + 's)'
+      : '<span class="status status-error"></span>Unhealthy';
+  } catch (e) {
+    el.innerHTML = '<span class="status status-error"></span>Unreachable';
+  }
+}
+
+async function runPreview() {
+  const btn = document.getElementById('previewBtn');
+  const errEl = document.getElementById('previewError');
+  const succEl = document.getElementById('previewSuccess');
+  const scriptEl = document.getElementById('previewScript');
+
+  errEl.classList.add('hidden');
+  succEl.classList.add('hidden');
+  scriptEl.classList.add('hidden');
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Generating...';
+
+  try {
+    const res = await fetch(baseUrl() + '/preview', {
+      method: 'POST', headers: getHeaders(), body: JSON.stringify(buildPayload()),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ error: res.statusText }));
+      throw new Error(err.error || 'Request failed');
+    }
+    const data = await res.json();
+    renderScript(data, scriptEl);
+    scriptEl.classList.remove('hidden');
+  } catch (e) {
+    errEl.textContent = e.message;
+    errEl.classList.remove('hidden');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = 'Preview Script';
+  }
+}
+
+function renderScript(data, el) {
+  if (data.format === 'dialogue' && Array.isArray(data.script)) {
+    el.innerHTML = data.script.map(turn => {
+      const cls = turn.speaker === 'A' ? 'speaker-a' : 'speaker-b';
+      const label = turn.speaker === 'A' ? 'Host A' : 'Host B';
+      return '<span class="' + cls + '">' + label + ':</span> ' + escHtml(turn.text);
+    }).join('\n\n');
+  } else {
+    el.textContent = data.script || data.script_text || 'No script generated';
+  }
+  if (data.word_count) {
+    el.innerHTML += '\n\n---\n' + data.word_count + ' words | ~' + data.estimated_duration + '';
+  }
+}
+
+async function saveIntegration() {
+  const errEl = document.getElementById('previewError');
+  const succEl = document.getElementById('previewSuccess');
+  errEl.classList.add('hidden');
+  succEl.classList.add('hidden');
+
+  const payload = buildPayload();
+  if (!payload.name || !payload.org_id || !payload.source_channel_id) {
+    errEl.textContent = 'Name, Org, and Source Channel ID are required';
+    errEl.classList.remove('hidden');
+    return;
+  }
+  if (!payload.target_channel_id || !payload.target_mix_id) {
+    errEl.textContent = 'Target Channel ID and Target Mix ID are required';
+    errEl.classList.remove('hidden');
+    return;
+  }
+
+  try {
+    const res = await fetch(baseUrl() + '/integrations', {
+      method: 'POST', headers: getHeaders(), body: JSON.stringify(payload),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ error: res.statusText }));
+      throw new Error(err.error || 'Save failed');
+    }
+    const data = await res.json();
+    const id = Array.isArray(data) ? data[0].id : data.id;
+    succEl.textContent = 'Integration saved (id: ' + id + '). Worker will pick it up on next poll cycle.';
+    succEl.classList.remove('hidden');
+    loadStatus();
+  } catch (e) {
+    errEl.textContent = 'Save failed: ' + e.message;
+    errEl.classList.remove('hidden');
+  }
+}
+
+async function toggleIntegration(id, active) {
+  await fetch(baseUrl() + '/integrations/' + id, {
+    method: 'PATCH', headers: getHeaders(), body: JSON.stringify({ is_active: !active }),
+  });
+  loadStatus();
+}
+
+async function deleteIntegration(id) {
+  if (!confirm('Delete integration ' + id + '?')) return;
+  await fetch(baseUrl() + '/integrations/' + id, { method: 'DELETE', headers: getHeaders() });
+  loadStatus();
+}
+
+async function loadStatus() {
+  const emptyEl = document.getElementById('statusEmpty');
+  const errEl = document.getElementById('statusError');
+  const tableEl = document.getElementById('statusTable');
+  const bodyEl = document.getElementById('statusBody');
+
+  emptyEl.classList.add('hidden');
+  errEl.classList.add('hidden');
+  tableEl.classList.add('hidden');
+
+  try {
+    const res = await fetch(baseUrl() + '/integrations/status', { headers: getHeaders() });
+    if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || 'Request failed');
+
+    const data = await res.json();
+    bodyEl.innerHTML = '';
+
+    const items = data.integrations || data;
+    if (!items || items.length === 0) {
+      emptyEl.textContent = 'No integrations configured';
+      emptyEl.classList.remove('hidden');
+      return;
+    }
+
+    items.forEach(i => {
+      const sc = !i.is_active ? 'status-inactive' : (i.last_error ? 'status-error' : 'status-ok');
+      const lastRun = i.last_run_at ? new Date(i.last_run_at).toLocaleString() : 'Never';
+      const tr = document.createElement('tr');
+      tr.innerHTML =
+        '<td><span class="status ' + sc + '"></span>' + (i.is_active ? 'Active' : 'Paused') + '</td>' +
+        '<td>' + escHtml(i.name) + '</td>' +
+        '<td>' + escHtml(i.format || 'monologue') + '</td>' +
+        '<td>' + escHtml(i.schedule) + '</td>' +
+        '<td>' + lastRun + '</td>' +
+        '<td>' + (i.runs_completed || 0) + '</td>' +
+        '<td style="color:#dc2626;font-size:12px" title="' + escHtml(i.last_error || '') + '">' + escHtml(trunc(i.last_error || '', 30)) + '</td>' +
+        '<td style="white-space:nowrap">' +
+          '<button class="btn ' + (i.is_active ? 'btn-secondary' : 'btn-primary') + '" style="font-size:12px;padding:4px 10px;margin-right:4px" onclick="toggleIntegration(' + i.id + ',' + i.is_active + ')">' + (i.is_active ? 'Pause' : 'Resume') + '</button>' +
+          '<button class="btn btn-danger" onclick="deleteIntegration(' + i.id + ')">Delete</button>' +
+        '</td>';
+      bodyEl.appendChild(tr);
+    });
+    tableEl.classList.remove('hidden');
+  } catch (e) {
+    errEl.textContent = e.message;
+    errEl.classList.remove('hidden');
+  }
+}
+
+async function loadRuns() {
+  const emptyEl = document.getElementById('runsEmpty');
+  const errEl = document.getElementById('runsError');
+  const tableEl = document.getElementById('runsTable');
+  const bodyEl = document.getElementById('runsBody');
+
+  emptyEl.classList.add('hidden');
+  errEl.classList.add('hidden');
+  tableEl.classList.add('hidden');
+
+  try {
+    const res = await fetch(baseUrl() + '/runs/recent', { headers: getHeaders() });
+    if (!res.ok) throw new Error('Request failed');
+
+    const data = await res.json();
+    bodyEl.innerHTML = '';
+
+    const items = data.runs || data;
+    if (!items || items.length === 0) {
+      emptyEl.textContent = 'No runs yet';
+      emptyEl.classList.remove('hidden');
+      return;
+    }
+
+    items.forEach(r => {
+      const tr = document.createElement('tr');
+      const statusColor = r.status === 'completed' ? '#22c55e' : r.status === 'failed' ? '#dc2626' : r.status === 'skipped_no_content' ? '#999' : '#4a7fff';
+      tr.innerHTML =
+        '<td>' + escHtml(r.integration_name || r.integration_id) + '</td>' +
+        '<td style="color:' + statusColor + '">' + escHtml(r.status) + '</td>' +
+        '<td>' + (r.started_at ? new Date(r.started_at).toLocaleString() : '-') + '</td>' +
+        '<td>' + (r.script_word_count || '-') + '</td>' +
+        '<td>' + (r.audio_duration_seconds ? r.audio_duration_seconds + 's' : '-') + '</td>' +
+        '<td>' + (r.claude_input_tokens ? r.claude_input_tokens + '/' + r.claude_output_tokens : '-') + '</td>' +
+        '<td>' + (r.elevenlabs_characters || '-') + '</td>' +
+        '<td style="color:#dc2626;font-size:12px" title="' + escHtml(r.error || '') + '">' + escHtml(trunc(r.error || '', 30)) + '</td>';
+      bodyEl.appendChild(tr);
+    });
+    tableEl.classList.remove('hidden');
+  } catch (e) {
+    errEl.textContent = e.message;
+    errEl.classList.remove('hidden');
+  }
+}
+
+function escHtml(s) {
+  const d = document.createElement('div');
+  d.textContent = s || '';
+  return d.innerHTML;
+}
+
+function trunc(s, n) {
+  return s && s.length > n ? s.slice(0, n) + '...' : s || '';
+}
+</script>
+</body>
+</html>

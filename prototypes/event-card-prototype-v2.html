@@ -1,0 +1,1135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>tchop Event Card v2 — Figma Benchmark + New Features</title>
+<style>
+  :root {
+    /* tchop CMS palette (from Figma) */
+    --sidebar-bg: #43445B;
+    --sidebar-active: #5A5B73;
+    --sidebar-text: rgba(255,255,255,0.7);
+    --sidebar-text-active: #FFFFFF;
+    --header-bg: #FFFFFF;
+    --content-bg: #EBEBEB;
+    --card-bg: #FFFFFF;
+    --border: #DEDEDE;
+    --border-light: #F0F0F0;
+    --text-primary: #212121;
+    --text-secondary: #666666;
+    --text-muted: #999999;
+    --text-link: #1A73E8;
+    --primary-blue: #1A73E8;
+    --primary-blue-hover: #1565C0;
+    --accent-orange: #F6704D;
+    --success: #34A853;
+    --warning: #FBBC04;
+    --danger: #EA4335;
+    --waitlist-purple: #8B5CF6;
+    --date-badge-bg: #1A73E8;
+    --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    --radius: 4px;
+    --radius-md: 8px;
+    --shadow-card: 0 1px 3px rgba(0,0,0,0.08);
+    --shadow-modal: 0 8px 32px rgba(0,0,0,0.18);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--font);
+    background: #F5F5F5;
+    color: var(--text-primary);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ─── PROTOTYPE LAYOUT ─── */
+  .proto-wrap { max-width: 1280px; margin: 0 auto; padding: 2rem; }
+
+  .proto-header { margin-bottom: 2rem; }
+  .proto-header h1 { font-size: 1.5rem; font-weight: 700; }
+  .proto-header p { font-size: 0.875rem; color: var(--text-secondary); margin-top: 0.25rem; }
+
+  .proto-section { margin-bottom: 3rem; }
+  .proto-label {
+    font-size: 0.65rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.1em; color: var(--accent-orange); margin-bottom: 0.75rem;
+  }
+  .proto-title { font-size: 1.25rem; font-weight: 700; margin-bottom: 0.25rem; }
+  .proto-desc { font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 1rem; max-width: 640px; }
+
+  .divider { height: 1px; background: var(--border); margin: 2.5rem 0; }
+
+  /* State labels */
+  .state { display: inline-block; font-size: 0.6rem; font-weight: 700; padding: 0.15rem 0.45rem;
+    border-radius: 3px; color: #fff; margin-bottom: 0.5rem; letter-spacing: 0.03em; }
+  .state--blue { background: var(--primary-blue); }
+  .state--green { background: var(--success); }
+  .state--purple { background: var(--waitlist-purple); }
+  .state--grey { background: var(--text-muted); }
+  .state--orange { background: var(--accent-orange); }
+  .state--new { background: #E91E63; }
+
+  /* Feature tag */
+  .ftag { display: inline-block; font-size: 0.55rem; font-weight: 600; padding: 0.1rem 0.35rem;
+    border-radius: 2px; margin-right: 0.2rem; margin-bottom: 0.2rem; }
+  .ftag--uc { background: rgba(246,112,77,0.1); color: var(--accent-orange); }
+  .ftag--f { background: rgba(26,115,232,0.08); color: var(--primary-blue); }
+  .ftag--new { background: rgba(233,30,99,0.08); color: #E91E63; }
+
+  /* UC Reference box */
+  .uc-box {
+    background: #fff; border: 1px solid var(--border); border-left: 3px solid var(--accent-orange);
+    border-radius: var(--radius); padding: 0.75rem 1rem; margin-bottom: 1.25rem;
+    font-size: 0.75rem; line-height: 1.6; color: var(--text-secondary);
+  }
+  .uc-box strong { color: var(--text-primary); }
+  .uc-box a { color: var(--text-link); text-decoration: none; }
+  .uc-box a:hover { text-decoration: underline; }
+  .uc-box__title { font-weight: 700; color: var(--text-primary); margin-bottom: 0.25rem; font-size: 0.78rem; }
+  .uc-box__tags { display: flex; flex-wrap: wrap; gap: 0.2rem; margin-top: 0.4rem; }
+
+  /* Grid layouts */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; align-items: start; }
+  .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 1.25rem; align-items: start; }
+
+  @media (max-width: 768px) {
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+  }
+
+  /* ═══════════════════════════════════════ */
+  /* CMS EVENT CARD (matches Figma pattern) */
+  /* ═══════════════════════════════════════ */
+  .cms-card {
+    background: var(--card-bg); border: 1px solid var(--border);
+    border-radius: var(--radius); overflow: hidden;
+  }
+
+  .cms-card__header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0.5rem 0.75rem; border-bottom: 1px solid var(--border-light);
+    font-size: 0.7rem; color: var(--text-muted);
+  }
+
+  .cms-card__type { font-weight: 600; color: var(--text-secondary); }
+  .cms-card__actions { display: flex; gap: 0.5rem; align-items: center; }
+  .cms-card__actions a { color: var(--text-muted); font-size: 0.7rem; text-decoration: none; }
+  .cms-card__actions a:hover { color: var(--text-primary); }
+
+  .cms-card__cover { position: relative; width: 100%; aspect-ratio: 16/9; background: var(--content-bg); overflow: hidden; }
+  .cms-card__cover img { width: 100%; height: 100%; object-fit: cover; }
+  .cms-card__cover--past img { filter: grayscale(0.65) brightness(0.85); }
+
+  /* Date badge (matches Figma: blue label + white number) */
+  .date-badge {
+    position: absolute; top: 0.5rem; left: 0.5rem;
+    display: flex; flex-direction: column; align-items: center;
+    background: #fff; border-radius: var(--radius); overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.15); min-width: 36px;
+  }
+  .date-badge__month {
+    background: var(--date-badge-bg); color: #fff; font-size: 0.5rem;
+    font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
+    padding: 0.1rem 0.4rem; width: 100%; text-align: center;
+  }
+  .date-badge__day {
+    font-size: 1rem; font-weight: 700; color: var(--text-primary);
+    padding: 0.1rem 0.4rem; line-height: 1.2;
+  }
+
+  /* Past event badge */
+  .ended-badge {
+    position: absolute; top: 0.5rem; right: 0.5rem;
+    background: rgba(0,0,0,0.6); color: #fff; font-size: 0.55rem;
+    font-weight: 600; padding: 0.15rem 0.45rem; border-radius: 2px;
+  }
+
+  .cms-card__body { padding: 0.75rem; }
+
+  .cms-card__date { font-size: 0.7rem; color: var(--text-muted); margin-bottom: 0.25rem; }
+
+  .cms-card__title {
+    font-size: 0.9rem; font-weight: 700; color: var(--text-primary);
+    margin-bottom: 0.35rem; line-height: 1.3;
+  }
+
+  .cms-card__desc {
+    font-size: 0.75rem; color: var(--text-secondary); line-height: 1.5;
+    margin-bottom: 0.5rem;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  }
+
+  .cms-card__location { margin-bottom: 0.5rem; }
+  .cms-card__location-name { font-size: 0.75rem; font-weight: 600; color: var(--text-primary); }
+  .cms-card__location-addr { font-size: 0.7rem; color: var(--text-link); cursor: pointer; }
+  .cms-card__location-addr:hover { text-decoration: underline; }
+
+  /* NEW: Capacity + Attend section */
+  .cms-card__rsvp {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0.5rem 0; margin-top: 0.25rem;
+    border-top: 1px solid var(--border-light);
+  }
+
+  .avatar-row { display: flex; align-items: center; gap: 0.4rem; }
+  .avatar-row__stack { display: flex; }
+  .avatar-row__item {
+    width: 24px; height: 24px; border-radius: 50%; border: 2px solid #fff;
+    margin-left: -6px; background: var(--content-bg); overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.5rem; font-weight: 600; color: var(--text-secondary);
+  }
+  .avatar-row__item:first-child { margin-left: 0; }
+  .avatar-row__item--more { background: var(--sidebar-bg); color: #fff; }
+  .avatar-row__count { font-size: 0.7rem; color: var(--text-link); cursor: pointer; }
+  .avatar-row__count:hover { text-decoration: underline; }
+
+  /* NEW: Capacity indicator */
+  .capacity { display: flex; align-items: center; gap: 0.35rem; font-size: 0.7rem; color: var(--text-secondary); }
+  .capacity strong { color: var(--text-primary); font-weight: 600; }
+  .capacity-bar { width: 48px; height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; }
+  .capacity-bar__fill { height: 100%; border-radius: 2px; }
+  .capacity-bar__fill--ok { background: var(--success); }
+  .capacity-bar__fill--warn { background: var(--warning); }
+  .capacity-bar__fill--full { background: var(--danger); }
+
+  /* Buttons (match Figma style) */
+  .btn {
+    display: inline-flex; align-items: center; gap: 0.3rem;
+    padding: 0.35rem 0.75rem; border-radius: var(--radius);
+    font-family: var(--font); font-size: 0.7rem; font-weight: 600;
+    border: none; cursor: pointer; transition: all 120ms ease; white-space: nowrap;
+  }
+  .btn svg { width: 12px; height: 12px; }
+
+  .btn--attend { background: var(--primary-blue); color: #fff; }
+  .btn--attend:hover { background: var(--primary-blue-hover); }
+  .btn--attending { background: var(--success); color: #fff; }
+  .btn--attending:hover { background: #2d9249; }
+  .btn--waitlist { background: var(--waitlist-purple); color: #fff; }
+  .btn--waitlisted { background: rgba(139,92,246,0.1); color: var(--waitlist-purple); border: 1px solid rgba(139,92,246,0.2); }
+  .btn--disabled { background: var(--content-bg); color: var(--text-muted); cursor: not-allowed; }
+  .btn--outline { background: transparent; color: var(--text-secondary); border: 1px solid var(--border); }
+  .btn--outline:hover { border-color: var(--text-secondary); }
+  .btn--publish { background: var(--primary-blue); color: #fff; }
+  .btn--schedule { background: transparent; color: var(--text-secondary); border: 1px solid var(--border); }
+  .btn--danger { background: var(--danger); color: #fff; }
+  .btn--secondary { background: var(--content-bg); color: var(--text-secondary); }
+
+  /* Card footer (matches Figma: author + unpublish) */
+  .cms-card__footer {
+    padding: 0.5rem 0.75rem; border-top: 1px dashed var(--border);
+    font-size: 0.65rem; color: var(--text-muted);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .cms-card__author { display: flex; align-items: center; gap: 0.35rem; }
+  .cms-card__author-name { font-weight: 600; color: var(--text-primary); }
+  .cms-card__unpublish { color: var(--text-link); cursor: pointer; font-weight: 600; font-size: 0.65rem; }
+
+  /* ═══════════════════════════════ */
+  /* CMS SHELL (sidebar + header)   */
+  /* ═══════════════════════════════ */
+  .cms-shell {
+    display: grid; grid-template-columns: 200px 1fr;
+    background: var(--content-bg); border-radius: var(--radius-md);
+    overflow: hidden; box-shadow: var(--shadow-card); min-height: 560px;
+  }
+
+  .cms-sidebar {
+    background: var(--sidebar-bg); padding: 1rem 0;
+    display: flex; flex-direction: column;
+  }
+
+  .cms-sidebar__logo {
+    padding: 0 1rem 0.75rem; font-size: 0.85rem; font-weight: 700; color: #fff;
+    border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 0.5rem;
+  }
+  .cms-sidebar__logo small { display: block; font-size: 0.6rem; font-weight: 400; color: var(--sidebar-text); }
+
+  .cms-sidebar__section {
+    padding: 0.5rem 1rem 0.25rem; font-size: 0.55rem; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.08em; color: rgba(255,255,255,0.35);
+  }
+
+  .cms-sidebar__item {
+    display: flex; align-items: center; gap: 0.5rem;
+    padding: 0.4rem 1rem; font-size: 0.72rem; color: var(--sidebar-text);
+    cursor: pointer; transition: all 100ms ease; text-decoration: none;
+  }
+  .cms-sidebar__item:hover { background: rgba(255,255,255,0.06); color: var(--sidebar-text-active); }
+  .cms-sidebar__item--active {
+    background: var(--sidebar-active); color: var(--sidebar-text-active); font-weight: 600;
+  }
+
+  .cms-main { display: flex; flex-direction: column; }
+
+  .cms-topbar {
+    background: var(--header-bg); border-bottom: 1px solid var(--border);
+    padding: 0.65rem 1rem; display: flex; align-items: center; justify-content: space-between;
+  }
+
+  .cms-topbar__title { font-size: 0.9rem; font-weight: 700; }
+
+  .cms-topbar__actions { display: flex; align-items: center; gap: 0.5rem; }
+
+  .cms-topbar__search {
+    display: flex; align-items: center; gap: 0.3rem; padding: 0.3rem 0.6rem;
+    border: 1px solid var(--border); border-radius: var(--radius);
+    font-size: 0.7rem; color: var(--text-muted); cursor: pointer;
+  }
+
+  .cms-content { flex: 1; padding: 1rem; overflow-y: auto; }
+
+  /* Filters bar (matches Figma) */
+  .filters-bar {
+    display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;
+    flex-wrap: wrap;
+  }
+  .filter-select {
+    padding: 0.3rem 0.5rem; border: 1px solid var(--border); border-radius: var(--radius);
+    font-family: var(--font); font-size: 0.7rem; color: var(--text-secondary);
+    background: #fff; cursor: pointer;
+  }
+  .filter-link {
+    font-size: 0.7rem; color: var(--text-muted); cursor: pointer; text-decoration: none;
+  }
+  .filter-link:hover { color: var(--text-primary); }
+
+  /* Tabs (matches Figma) */
+  .tabs {
+    display: flex; gap: 0; border-bottom: 1px solid var(--border);
+    margin-bottom: 0.75rem;
+  }
+  .tab {
+    padding: 0.4rem 0.75rem; font-size: 0.7rem; color: var(--text-muted);
+    cursor: pointer; border-bottom: 2px solid transparent; font-weight: 500;
+    transition: all 100ms ease;
+  }
+  .tab:hover { color: var(--text-secondary); }
+  .tab--active { color: var(--primary-blue); border-bottom-color: var(--primary-blue); font-weight: 600; }
+  .tab sup { font-size: 0.55rem; color: var(--text-muted); margin-left: 0.15rem; }
+
+  /* ═══════════════════════════════════ */
+  /* GUESTS MODAL (matches Figma)       */
+  /* ═══════════════════════════════════ */
+  .modal-overlay {
+    background: rgba(0,0,0,0.3); border-radius: var(--radius-md);
+    display: flex; align-items: flex-start; justify-content: center;
+    padding: 2rem;
+  }
+  .modal {
+    background: #fff; border-radius: var(--radius-md); box-shadow: var(--shadow-modal);
+    width: 100%; max-width: 420px; overflow: hidden;
+  }
+  .modal__header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0.75rem 1rem; border-bottom: 1px solid var(--border);
+  }
+  .modal__title { font-size: 0.9rem; font-weight: 700; }
+  .modal__close { color: var(--text-muted); cursor: pointer; font-size: 1rem; background: none; border: none; }
+
+  .modal__tabs { display: flex; border-bottom: 1px solid var(--border); }
+  .modal__tab {
+    padding: 0.4rem 0.75rem; font-size: 0.7rem; color: var(--text-muted);
+    cursor: pointer; border-bottom: 2px solid transparent; font-weight: 500;
+  }
+  .modal__tab--active { color: var(--primary-blue); border-bottom-color: var(--primary-blue); font-weight: 600; }
+
+  .modal__body { padding: 0; max-height: 300px; overflow-y: auto; }
+
+  .guest-row {
+    display: flex; align-items: center; gap: 0.6rem;
+    padding: 0.5rem 1rem; border-bottom: 1px solid var(--border-light);
+  }
+  .guest-row:last-child { border-bottom: none; }
+  .guest-row__avatar {
+    width: 28px; height: 28px; border-radius: 50%; background: var(--content-bg);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.5rem; font-weight: 600; color: var(--text-secondary); flex-shrink: 0;
+  }
+  .guest-row__info { flex: 1; min-width: 0; }
+  .guest-row__name { font-size: 0.75rem; font-weight: 600; color: var(--text-primary); }
+  .guest-row__email { font-size: 0.65rem; color: var(--text-muted); }
+  /* NEW: Status badge in guest list */
+  .guest-row__status {
+    font-size: 0.55rem; font-weight: 600; padding: 0.1rem 0.35rem;
+    border-radius: 2px; flex-shrink: 0;
+  }
+  .guest-row__status--attending { background: rgba(52,168,83,0.1); color: var(--success); }
+  .guest-row__status--waitlisted { background: rgba(139,92,246,0.1); color: var(--waitlist-purple); }
+
+  .modal__footer {
+    padding: 0.75rem 1rem; border-top: 1px solid var(--border);
+    text-align: center;
+  }
+  .modal__export-btn {
+    width: 100%; padding: 0.5rem; border: 1px solid var(--primary-blue);
+    border-radius: var(--radius); background: #fff; color: var(--primary-blue);
+    font-family: var(--font); font-size: 0.75rem; font-weight: 600; cursor: pointer;
+  }
+  .modal__export-btn:hover { background: rgba(26,115,232,0.04); }
+
+  /* ═══════════════════════════ */
+  /* ADD EVENT FORM (Figma)     */
+  /* ═══════════════════════════ */
+  .event-form {
+    background: #fff; border-radius: var(--radius-md); box-shadow: var(--shadow-modal);
+    width: 100%; max-width: 440px; overflow: hidden;
+  }
+  .event-form__header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0.75rem 1rem; border-bottom: 1px solid var(--border);
+  }
+  .event-form__title { font-size: 0.85rem; font-weight: 700; }
+  .event-form__body { padding: 1rem; display: flex; flex-direction: column; gap: 0.75rem; }
+
+  .ef-group { display: flex; flex-direction: column; gap: 0.2rem; }
+  .ef-label { font-size: 0.65rem; color: var(--text-muted); }
+  .ef-label span { color: var(--danger); }
+  .ef-input {
+    padding: 0.4rem 0.6rem; border: 1px solid var(--border); border-radius: var(--radius);
+    font-family: var(--font); font-size: 0.75rem; color: var(--text-primary); outline: none;
+  }
+  .ef-input:focus { border-color: var(--primary-blue); }
+  .ef-input::placeholder { color: var(--text-muted); }
+  .ef-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+  .ef-hint { font-size: 0.6rem; color: var(--text-muted); }
+  .ef-toggle { display: flex; align-items: center; justify-content: space-between; padding: 0.25rem 0; }
+  .ef-toggle-label { font-size: 0.72rem; color: var(--text-primary); }
+  .ef-toggle-label small { display: block; font-size: 0.6rem; color: var(--text-muted); }
+  .ef-link { font-size: 0.7rem; color: var(--text-link); cursor: pointer; }
+
+  .toggle { width: 32px; height: 18px; background: var(--border); border-radius: 9px; position: relative; cursor: pointer; }
+  .toggle--on { background: var(--success); }
+  .toggle__knob { width: 14px; height: 14px; background: #fff; border-radius: 50%; position: absolute; top: 2px; left: 2px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+  .toggle--on .toggle__knob { left: 16px; }
+
+  .event-form__footer {
+    padding: 0.65rem 1rem; border-top: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: flex-end; gap: 0.4rem;
+  }
+
+  /* Upload area (matches Figma) */
+  .upload-area {
+    border: 1px dashed var(--border); border-radius: var(--radius);
+    padding: 1.5rem; text-align: center; color: var(--text-muted); font-size: 0.7rem;
+    cursor: pointer;
+  }
+
+  /* ═══════════════════════════════════════ */
+  /* NEW FEATURES (not in Figma)            */
+  /* ═══════════════════════════════════════ */
+
+  /* Cancel confirmation (inline sheet) */
+  .cancel-sheet {
+    background: #fff; border: 1px solid var(--border); border-radius: var(--radius-md);
+    padding: 1rem; max-width: 320px; box-shadow: var(--shadow-modal);
+  }
+  .cancel-sheet__icon {
+    width: 32px; height: 32px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; margin-bottom: 0.6rem;
+  }
+  .cancel-sheet__icon--danger { background: rgba(234,67,53,0.08); }
+  .cancel-sheet__icon--purple { background: rgba(139,92,246,0.08); }
+  .cancel-sheet__title { font-size: 0.85rem; font-weight: 700; margin-bottom: 0.25rem; }
+  .cancel-sheet__text { font-size: 0.72rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 0.75rem; }
+  .cancel-sheet__warning {
+    font-size: 0.65rem; color: #B45309; background: rgba(251,188,4,0.1);
+    padding: 0.4rem 0.5rem; border-radius: var(--radius); margin-bottom: 0.75rem; line-height: 1.4;
+  }
+  .cancel-sheet__actions { display: flex; gap: 0.4rem; }
+  .cancel-sheet__actions .btn { flex: 1; justify-content: center; }
+
+  /* "My Events" list */
+  .my-events-card {
+    background: #fff; border: 1px solid var(--border); border-radius: var(--radius);
+    overflow: hidden; max-width: 400px;
+  }
+  .my-events-card__header {
+    padding: 0.6rem 0.75rem; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .my-events-card__title { font-size: 0.82rem; font-weight: 700; }
+  .me-tabs { display: flex; gap: 0; background: var(--content-bg); border-radius: var(--radius); padding: 2px; }
+  .me-tab {
+    padding: 0.2rem 0.45rem; font-size: 0.6rem; font-weight: 600;
+    border: none; background: transparent; color: var(--text-muted);
+    border-radius: 3px; cursor: pointer; font-family: var(--font);
+  }
+  .me-tab--active { background: #fff; color: var(--text-primary); box-shadow: 0 1px 2px rgba(0,0,0,0.06); }
+
+  .me-item {
+    display: flex; align-items: center; gap: 0.6rem;
+    padding: 0.5rem 0.75rem; border-bottom: 1px solid var(--border-light); cursor: pointer;
+  }
+  .me-item:last-child { border-bottom: none; }
+  .me-item:hover { background: rgba(0,0,0,0.015); }
+  .me-item--past { opacity: 0.5; }
+
+  .me-date {
+    width: 36px; height: 36px; border-radius: var(--radius);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    background: var(--content-bg); flex-shrink: 0;
+  }
+  .me-date--upcoming { background: rgba(26,115,232,0.08); }
+  .me-date__day { font-size: 0.85rem; font-weight: 700; line-height: 1; }
+  .me-date__month { font-size: 0.45rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; }
+  .me-info { flex: 1; min-width: 0; }
+  .me-info__title { font-size: 0.72rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .me-info__meta { font-size: 0.6rem; color: var(--text-muted); }
+  .me-status { font-size: 0.55rem; font-weight: 600; padding: 0.12rem 0.35rem; border-radius: 2px; flex-shrink: 0; }
+  .me-status--attending { background: rgba(52,168,83,0.1); color: var(--success); }
+  .me-status--waitlisted { background: rgba(139,92,246,0.1); color: var(--waitlist-purple); }
+
+  /* Calendar mini (for reference) */
+  .cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 1px; padding: 0.5rem; }
+  .cal-dayname { text-align: center; font-size: 0.55rem; font-weight: 600; color: var(--text-muted); padding: 0.3rem 0; }
+  .cal-cell {
+    aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    font-size: 0.65rem; color: var(--text-secondary); border-radius: var(--radius); position: relative;
+  }
+  .cal-cell--today { font-weight: 700; }
+  .cal-cell--today::after {
+    content: ''; width: 22px; height: 22px; border-radius: 50%; background: var(--accent-orange);
+    position: absolute; z-index: 0; opacity: 0.15;
+  }
+  .cal-cell--event { cursor: pointer; }
+  .cal-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--primary-blue); margin-top: 2px; }
+  .cal-dot--past { background: var(--text-muted); }
+
+  /* Benchmark image reference */
+  .benchmark {
+    background: #fff; border: 1px solid var(--border); border-radius: var(--radius);
+    overflow: hidden; position: relative;
+  }
+  .benchmark img { width: 100%; display: block; }
+  .benchmark__label {
+    position: absolute; top: 0.5rem; left: 0.5rem;
+    background: rgba(0,0,0,0.7); color: #fff; font-size: 0.55rem; font-weight: 600;
+    padding: 0.15rem 0.4rem; border-radius: 2px;
+  }
+
+  /* Comparison layout */
+  .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; align-items: start; }
+  .compare__col-label {
+    font-size: 0.6rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.08em; margin-bottom: 0.5rem; text-align: center;
+  }
+  .compare__col-label--old { color: var(--text-muted); }
+  .compare__col-label--new { color: #E91E63; }
+
+  /* Inline error state */
+  .inline-error {
+    display: flex; align-items: center; gap: 0.4rem;
+    padding: 0.4rem 0.6rem; background: rgba(234,67,53,0.05);
+    border: 1px solid rgba(234,67,53,0.15); border-radius: var(--radius);
+    font-size: 0.7rem; color: var(--danger);
+  }
+
+  /* NEW badge */
+  .new-badge {
+    display: inline-block; font-size: 0.5rem; font-weight: 700;
+    background: #E91E63; color: #fff; padding: 0.08rem 0.3rem;
+    border-radius: 2px; vertical-align: middle; margin-left: 0.3rem;
+  }
+
+  html { scroll-behavior: smooth; }
+  [id] { scroll-margin-top: 1rem; }
+</style>
+</head>
+<body>
+
+<div class="proto-wrap">
+
+  <div class="proto-header">
+    <h1>Event Card v2 — Figma Benchmark + New Features</h1>
+    <p>Side-by-side: existing Figma designs (Nov 2024) vs. extended prototype with v1 spec features. Pink <span class="new-badge">NEW</span> badges mark additions not in Figma.</p>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════ -->
+  <!-- 1. EVENT CARD IN CMS: Figma vs Extended        -->
+  <!-- ═══════════════════════════════════════════════ -->
+  <div class="proto-section" id="s-cards">
+    <div class="proto-label">Section 1 — UC-2 / UC-3 / UC-4 / UC-10</div>
+    <div class="proto-title">Event Card in CMS</div>
+    <div class="proto-desc">Left: existing Figma card pattern. Right: extended with attend/waitlist, capacity bar, and past state.</div>
+
+    <div class="uc-box">
+      <div class="uc-box__title">Figma benchmark + new features</div>
+      Existing pattern: date badge (blue month + number), cover image, title, description, location (name + blue address), avatar row with "+N Guests", author footer with unpublish.<br>
+      <strong>New in v1:</strong> Attend/Unattend button, capacity indicator with bar, waitlist position, past event greyed state, registration badge.
+      <div class="uc-box__tags">
+        <span class="ftag ftag--uc">UC-2 Discover</span><span class="ftag ftag--uc">UC-3 Attend</span>
+        <span class="ftag ftag--uc">UC-4 Cancel</span><span class="ftag ftag--uc">UC-10 Past</span>
+        <span class="ftag ftag--new">NEW: F2 Attend</span><span class="ftag ftag--new">NEW: F3 Waitlist</span>
+        <span class="ftag ftag--new">NEW: F10 Past State</span>
+      </div>
+    </div>
+
+    <!-- Side-by-side comparison -->
+    <div class="compare">
+      <div>
+        <div class="compare__col-label compare__col-label--old">Figma Benchmark (existing)</div>
+        <div class="benchmark">
+          <div class="benchmark__label">Figma: event-card-with-image</div>
+          <img src="figma-benchmarks/event-card-with-image.png" alt="Figma event card">
+        </div>
+      </div>
+      <div>
+        <div class="compare__col-label compare__col-label--new">Extended with v1 Features</div>
+        <!-- Extended card: open, spots available -->
+        <div class="state state--orange">Open — spots available</div>
+        <div class="cms-card">
+          <div class="cms-card__header">
+            <span class="cms-card__type">Event &middot; EN</span>
+            <div class="cms-card__actions">
+              <a href="#">Edit</a>
+              <a href="#">...</a>
+            </div>
+          </div>
+          <div class="cms-card__cover">
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='640' height='360'%3E%3Crect fill='%2343445B' width='640' height='360'/%3E%3Ctext x='320' y='185' text-anchor='middle' fill='%236B6B80' font-family='sans-serif' font-size='13'%3Ecover image%3C/text%3E%3C/svg%3E" alt="">
+            <div class="date-badge">
+              <div class="date-badge__month">Apr</div>
+              <div class="date-badge__day">10</div>
+            </div>
+          </div>
+          <div class="cms-card__body">
+            <div class="cms-card__date">10 Apr 2026, 14:00 – 19:00</div>
+            <div class="cms-card__title">Summer Team Event — BBQ & Activities</div>
+            <div class="cms-card__desc">Freut euch auf einen entspannten Nachmittag mit dem gesamten Team im Schlosspark.</div>
+            <div class="cms-card__location">
+              <div class="cms-card__location-name">Schlosspark Dresden</div>
+              <div class="cms-card__location-addr">Hauptallee 12, 01067 Dresden</div>
+            </div>
+            <!-- NEW: RSVP section -->
+            <div class="cms-card__rsvp">
+              <div class="avatar-row">
+                <div class="avatar-row__stack">
+                  <div class="avatar-row__item">SL</div>
+                  <div class="avatar-row__item">PW</div>
+                  <div class="avatar-row__item">KM</div>
+                  <div class="avatar-row__item avatar-row__item--more">+9</div>
+                </div>
+                <span class="avatar-row__count">+12 Guests</span>
+              </div>
+              <div style="display:flex; align-items:center; gap:0.5rem;">
+                <div class="capacity">
+                  <strong>12</strong>/50
+                  <div class="capacity-bar"><div class="capacity-bar__fill capacity-bar__fill--ok" style="width:24%"></div></div>
+                </div>
+                <button class="btn btn--attend">Attend<span class="new-badge">NEW</span></button>
+              </div>
+            </div>
+          </div>
+          <div class="cms-card__footer">
+            <div class="cms-card__author">
+              <span class="cms-card__author-name">Sarah Lindner</span>
+              &middot; Created 26 Mar 2026, 09:15
+            </div>
+            <span class="cms-card__unpublish">Unpublish</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Additional states (new, not in Figma) -->
+    <div style="margin-top: 1.5rem;">
+      <div class="proto-desc"><strong>Additional states</strong> <span class="new-badge">NEW</span> — not in existing Figma. All extend the same card pattern above.</div>
+      <div class="grid-3">
+        <!-- Attending -->
+        <div>
+          <div class="state state--green">User attending</div>
+          <div class="cms-card">
+            <div class="cms-card__header"><span class="cms-card__type">Event</span><div class="cms-card__actions"><a href="#">Edit</a></div></div>
+            <div class="cms-card__cover">
+              <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='640' height='360'%3E%3Crect fill='%2343445B' width='640' height='360'/%3E%3C/svg%3E" alt="">
+              <div class="date-badge"><div class="date-badge__month">Apr</div><div class="date-badge__day">14</div></div>
+            </div>
+            <div class="cms-card__body">
+              <div class="cms-card__date">14 Apr 2026, 09:00 – 17:00</div>
+              <div class="cms-card__title">Gesundheitswoche: Ergonomie am Arbeitsplatz</div>
+              <div class="cms-card__location">
+                <div class="cms-card__location-name">AOK Plus Zentrale</div>
+                <div class="cms-card__location-addr">Raum 4.02</div>
+              </div>
+              <div class="cms-card__rsvp">
+                <div class="capacity"><strong>32</strong>/40 <div class="capacity-bar"><div class="capacity-bar__fill capacity-bar__fill--warn" style="width:80%"></div></div></div>
+                <button class="btn btn--attending"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8.5l3.5 3.5 6.5-7"/></svg> Attending</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Waitlist -->
+        <div>
+          <div class="state state--purple">Full — waitlist</div>
+          <div class="cms-card">
+            <div class="cms-card__header"><span class="cms-card__type">Event</span><div class="cms-card__actions"><a href="#">Edit</a></div></div>
+            <div class="cms-card__cover" style="aspect-ratio:auto;">
+              <div style="background:linear-gradient(135deg,var(--primary-blue),#1558b0);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1.5rem;color:#fff;">
+                <span style="font-size:1.75rem;font-weight:700;line-height:1;">18</span>
+                <span style="font-size:0.6rem;font-weight:600;text-transform:uppercase;letter-spacing:0.12em;">Apr</span>
+              </div>
+            </div>
+            <div class="cms-card__body">
+              <div class="cms-card__date">18 Apr 2026, 10:00 – 12:00</div>
+              <div class="cms-card__title">Erste Hilfe Auffrischungskurs</div>
+              <div class="cms-card__location">
+                <div class="cms-card__location-name">Schulungszentrum</div>
+                <div class="cms-card__location-addr">EG Saal 1</div>
+              </div>
+              <div class="cms-card__rsvp">
+                <div class="capacity"><strong>20</strong>/20 &middot; 3 waitlisted <div class="capacity-bar"><div class="capacity-bar__fill capacity-bar__fill--full" style="width:100%"></div></div></div>
+                <button class="btn btn--waitlist">Join Waitlist</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Past -->
+        <div>
+          <div class="state state--grey">Past event (UC-10)</div>
+          <div class="cms-card">
+            <div class="cms-card__header"><span class="cms-card__type">Event</span><div class="cms-card__actions"><a href="#">Edit</a></div></div>
+            <div class="cms-card__cover cms-card__cover--past">
+              <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='640' height='360'%3E%3Crect fill='%2343445B' width='640' height='360'/%3E%3C/svg%3E" alt="">
+              <div class="date-badge" style="opacity:0.6;"><div class="date-badge__month" style="background:var(--text-muted);">Mar</div><div class="date-badge__day">17</div></div>
+              <div class="ended-badge">Event ended</div>
+            </div>
+            <div class="cms-card__body">
+              <div class="cms-card__date" style="color:var(--text-muted);">17 Mar 2026, 09:00</div>
+              <div class="cms-card__title" style="color:var(--text-secondary);">Neuer Mitarbeitenden-Tag Q1</div>
+              <div class="cms-card__rsvp">
+                <div class="capacity"><strong>38</strong> attended</div>
+                <!-- No button for past events -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ═══════════════════════════════════════════════ -->
+  <!-- 2. EVENTS PAGE: Figma vs Extended              -->
+  <!-- ═══════════════════════════════════════════════ -->
+  <div class="proto-section" id="s-events-page">
+    <div class="proto-label">Section 2 — UC-1 / UC-7</div>
+    <div class="proto-title">Events Page (CMS Dashboard)</div>
+    <div class="proto-desc">Matches Figma layout: sidebar nav with "Events" active, top filters, status tabs. New: capacity column, status indicators.</div>
+
+    <div class="compare">
+      <div>
+        <div class="compare__col-label compare__col-label--old">Figma Benchmark</div>
+        <div class="benchmark">
+          <div class="benchmark__label">Figma: events-page</div>
+          <img src="figma-benchmarks/events-page.png" alt="Figma events page">
+        </div>
+      </div>
+      <div>
+        <div class="compare__col-label compare__col-label--new">Extended Layout</div>
+        <div class="cms-shell" style="min-height: 480px;">
+          <div class="cms-sidebar">
+            <div class="cms-sidebar__logo">tchop<small>your org name</small></div>
+            <div class="cms-sidebar__section">Content</div>
+            <a class="cms-sidebar__item" href="#">Mixes</a>
+            <a class="cms-sidebar__item" href="#">News Feed</a>
+            <a class="cms-sidebar__item" href="#">Posts</a>
+            <a class="cms-sidebar__item cms-sidebar__item--active" href="#">Events</a>
+            <div class="cms-sidebar__section">Settings</div>
+            <a class="cms-sidebar__item" href="#">Integrations</a>
+            <a class="cms-sidebar__item" href="#">Notifications</a>
+            <a class="cms-sidebar__item" href="#">Chats</a>
+            <a class="cms-sidebar__item" href="#">Curators</a>
+            <a class="cms-sidebar__item" href="#">Readers</a>
+          </div>
+          <div class="cms-main">
+            <div class="cms-topbar">
+              <span class="cms-topbar__title">Events</span>
+              <div class="cms-topbar__actions">
+                <div class="cms-topbar__search">Search</div>
+                <button class="btn btn--attend" style="padding:0.35rem 0.85rem;">+ New event</button>
+              </div>
+            </div>
+            <div class="cms-content">
+              <div class="filters-bar">
+                <select class="filter-select"><option>All mixes</option></select>
+                <select class="filter-select"><option>All authors</option></select>
+                <a class="filter-link" href="#">Only my events</a>
+              </div>
+              <div class="tabs">
+                <div class="tab tab--active">All<sup>24</sup></div>
+                <div class="tab">Published<sup>20</sup></div>
+                <div class="tab">Unpublished<sup>4</sup></div>
+                <div class="tab">Draft<sup>0</sup></div>
+                <div class="tab">Scheduled<sup>0</sup></div>
+              </div>
+              <!-- Event list items (compact) -->
+              <div style="display:flex;flex-direction:column;gap:0.5rem;">
+                <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:0.5rem 0.65rem;display:flex;align-items:center;gap:0.65rem;">
+                  <div class="date-badge" style="position:static;"><div class="date-badge__month">Apr</div><div class="date-badge__day">10</div></div>
+                  <div style="flex:1;min-width:0;">
+                    <div style="font-size:0.72rem;font-weight:600;">Summer Team Event</div>
+                    <div style="font-size:0.6rem;color:var(--text-muted);">14:00 &middot; Schlosspark Dresden</div>
+                  </div>
+                  <div class="capacity" style="font-size:0.6rem;"><strong>12</strong>/50 <div class="capacity-bar"><div class="capacity-bar__fill capacity-bar__fill--ok" style="width:24%"></div></div></div>
+                  <span style="font-size:0.55rem;font-weight:600;color:var(--success);background:rgba(52,168,83,0.08);padding:0.1rem 0.3rem;border-radius:2px;">Published</span>
+                </div>
+                <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:0.5rem 0.65rem;display:flex;align-items:center;gap:0.65rem;">
+                  <div class="date-badge" style="position:static;"><div class="date-badge__month">Apr</div><div class="date-badge__day">14</div></div>
+                  <div style="flex:1;min-width:0;">
+                    <div style="font-size:0.72rem;font-weight:600;">Gesundheitswoche</div>
+                    <div style="font-size:0.6rem;color:var(--text-muted);">09:00 – 17:00 &middot; Zentrale</div>
+                  </div>
+                  <div class="capacity" style="font-size:0.6rem;"><strong>32</strong>/40 <div class="capacity-bar"><div class="capacity-bar__fill capacity-bar__fill--warn" style="width:80%"></div></div></div>
+                  <span style="font-size:0.55rem;font-weight:600;color:var(--success);background:rgba(52,168,83,0.08);padding:0.1rem 0.3rem;border-radius:2px;">Published</span>
+                </div>
+                <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:0.5rem 0.65rem;display:flex;align-items:center;gap:0.65rem;opacity:0.55;">
+                  <div class="date-badge" style="position:static;"><div class="date-badge__month" style="background:var(--text-muted);">Mar</div><div class="date-badge__day">17</div></div>
+                  <div style="flex:1;min-width:0;">
+                    <div style="font-size:0.72rem;font-weight:600;">Neuer Mitarbeitenden-Tag</div>
+                    <div style="font-size:0.6rem;color:var(--text-muted);">09:00 &middot; Zentrale</div>
+                  </div>
+                  <div class="capacity" style="font-size:0.6rem;"><strong>38</strong> attended</div>
+                  <span style="font-size:0.55rem;font-weight:600;color:var(--text-muted);background:var(--content-bg);padding:0.1rem 0.3rem;border-radius:2px;">Ended</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ═══════════════════════════════════════════════ -->
+  <!-- 3. ADD EVENT FORM: Figma vs Extended           -->
+  <!-- ═══════════════════════════════════════════════ -->
+  <div class="proto-section" id="s-form">
+    <div class="proto-label">Section 3 — UC-1</div>
+    <div class="proto-title">Add New Event Form</div>
+    <div class="proto-desc">Matches Figma modal pattern. New: capacity field, registration deadline, show-attendees toggle.</div>
+
+    <div class="compare">
+      <div>
+        <div class="compare__col-label compare__col-label--old">Figma Benchmark</div>
+        <div class="benchmark">
+          <div class="benchmark__label">Figma: add-event-filled</div>
+          <img src="figma-benchmarks/add-event-filled.png" alt="Figma add event form">
+        </div>
+      </div>
+      <div>
+        <div class="compare__col-label compare__col-label--new">Extended Form</div>
+        <div class="event-form">
+          <div class="event-form__header">
+            <span class="event-form__title">Add new event</span>
+            <button class="modal__close">&times;</button>
+          </div>
+          <div class="event-form__body">
+            <div class="upload-area">Drag and drop, paste url or upload image<br><span style="font-size:0.6rem;">Cover photo</span></div>
+            <div class="ef-group">
+              <label class="ef-label">Event name <span>*</span></label>
+              <input class="ef-input" value="Summer Team Event — BBQ & Activities">
+            </div>
+            <div class="ef-row">
+              <div class="ef-group">
+                <label class="ef-label">Start date <span>*</span></label>
+                <input class="ef-input" value="10 Apr 2026">
+              </div>
+              <div class="ef-group">
+                <label class="ef-label">Start time <span>*</span></label>
+                <input class="ef-input" value="14:00">
+              </div>
+            </div>
+            <div class="ef-link">+ End date & time</div>
+            <div class="ef-group">
+              <label class="ef-label">Event location <span>*</span></label>
+              <input class="ef-input" value="Schlosspark Dresden, Hauptallee 12">
+            </div>
+            <div class="ef-group">
+              <label class="ef-label">Link (e.g. for tickets)</label>
+              <input class="ef-input" placeholder="https://...">
+            </div>
+            <div class="ef-group">
+              <label class="ef-label">Details of the event</label>
+              <textarea class="ef-input" rows="2" style="resize:vertical;">Freut euch auf einen entspannten Nachmittag...</textarea>
+            </div>
+            <div class="ef-link">+ Add co-hosts</div>
+
+            <!-- NEW FIELDS -->
+            <div style="border-top:1px solid var(--border);padding-top:0.6rem;margin-top:0.25rem;">
+              <div style="font-size:0.6rem;font-weight:700;color:#E91E63;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.5rem;">New in v1</div>
+              <div class="ef-row">
+                <div class="ef-group">
+                  <label class="ef-label">Capacity<span class="new-badge">NEW</span></label>
+                  <input class="ef-input" type="number" value="50" placeholder="Leave empty for unlimited">
+                  <span class="ef-hint">Max attendees. Empty = unlimited.</span>
+                </div>
+                <div class="ef-group">
+                  <label class="ef-label">Registration deadline<span class="new-badge">NEW</span></label>
+                  <input class="ef-input" value="8 Apr 2026, 23:59">
+                  <span class="ef-hint">Defaults to event start if not set.</span>
+                </div>
+              </div>
+              <div class="ef-toggle" style="margin-top:0.35rem;">
+                <div class="ef-toggle-label">
+                  Show attendees on card<span class="new-badge">NEW</span>
+                  <small>Display attendee avatars on card teaser</small>
+                </div>
+                <div class="toggle toggle--on"><div class="toggle__knob"></div></div>
+              </div>
+            </div>
+
+            <div class="ef-group">
+              <label class="ef-label">Repeat Event</label>
+              <select class="ef-input"><option>Never</option></select>
+            </div>
+            <div class="ef-link">Preferences</div>
+          </div>
+          <div class="event-form__footer">
+            <button class="btn btn--schedule">Schedule</button>
+            <button class="btn btn--publish">Publish</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ═══════════════════════════════════════════════ -->
+  <!-- 4. GUESTS MODAL: Figma vs Extended             -->
+  <!-- ═══════════════════════════════════════════════ -->
+  <div class="proto-section" id="s-guests">
+    <div class="proto-label">Section 4 — UC-6</div>
+    <div class="proto-title">Guests / Attendee Management</div>
+    <div class="proto-desc">Matches Figma modal. New: "Waitlisted" tab replaces "Interested", status badges per row, RSVP timestamp.</div>
+
+    <div class="compare">
+      <div>
+        <div class="compare__col-label compare__col-label--old">Figma Benchmark</div>
+        <div class="benchmark">
+          <div class="benchmark__label">Figma: guests-export</div>
+          <img src="figma-benchmarks/guests-export.png" alt="Figma guests modal">
+        </div>
+      </div>
+      <div>
+        <div class="compare__col-label compare__col-label--new">Extended Modal</div>
+        <div class="modal" style="max-width:400px;">
+          <div class="modal__header">
+            <span class="modal__title">Guests</span>
+            <button class="modal__close">&times;</button>
+          </div>
+          <div class="modal__tabs">
+            <div class="modal__tab modal__tab--active">Attending (12)</div>
+            <div class="modal__tab">Waitlisted (3)<span class="new-badge">NEW</span></div>
+          </div>
+          <div class="modal__body">
+            <div class="guest-row">
+              <div class="guest-row__avatar">SL</div>
+              <div class="guest-row__info"><div class="guest-row__name">Sarah Lindner</div><div class="guest-row__email">s.lindner@aok-plus.de</div></div>
+              <span class="guest-row__status guest-row__status--attending">Attending</span>
+            </div>
+            <div class="guest-row">
+              <div class="guest-row__avatar">PW</div>
+              <div class="guest-row__info"><div class="guest-row__name">Peter Weber</div><div class="guest-row__email">p.weber@aok-plus.de</div></div>
+              <span class="guest-row__status guest-row__status--attending">Attending</span>
+            </div>
+            <div class="guest-row">
+              <div class="guest-row__avatar">KM</div>
+              <div class="guest-row__info"><div class="guest-row__name">Katrin Meier</div><div class="guest-row__email">k.meier@aok-plus.de</div></div>
+              <span class="guest-row__status guest-row__status--attending">Attending</span>
+            </div>
+            <div class="guest-row">
+              <div class="guest-row__avatar">FG</div>
+              <div class="guest-row__info"><div class="guest-row__name">Frank Gruber</div><div class="guest-row__email">f.gruber@aok-plus.de</div></div>
+              <span class="guest-row__status guest-row__status--waitlisted">Waitlisted #1</span>
+            </div>
+            <div class="guest-row">
+              <div class="guest-row__avatar">DM</div>
+              <div class="guest-row__info"><div class="guest-row__name">Diana Mohr</div><div class="guest-row__email">d.mohr@aok-plus.de</div></div>
+              <span class="guest-row__status guest-row__status--waitlisted">Waitlisted #2</span>
+            </div>
+          </div>
+          <div class="modal__footer">
+            <button class="modal__export-btn">Export guests' list</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ═══════════════════════════════════════════════ -->
+  <!-- 5. CALENDAR: Figma vs Extended                 -->
+  <!-- ═══════════════════════════════════════════════ -->
+  <div class="proto-section" id="s-calendar">
+    <div class="proto-label">Section 5 — UC-7 / UC-8</div>
+    <div class="proto-title">Calendar View + My Events</div>
+    <div class="proto-desc">Calendar matches Figma pattern (month grid with colored event blocks). "My Events" is entirely new.</div>
+
+    <div class="compare">
+      <div>
+        <div class="compare__col-label compare__col-label--old">Figma Benchmark</div>
+        <div class="benchmark">
+          <div class="benchmark__label">Figma: calendar-view</div>
+          <img src="figma-benchmarks/calendar-view-1.png" alt="Figma calendar view">
+        </div>
+        <div style="margin-top:0.75rem;">
+          <div class="benchmark">
+            <div class="benchmark__label">Figma: calendar-event-popup</div>
+            <img src="figma-benchmarks/calendar-event-popup.png" alt="Figma calendar popup">
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="compare__col-label compare__col-label--new">New: "My Events" View</div>
+        <div style="font-size:0.7rem;color:var(--text-secondary);margin-bottom:0.75rem;">
+          Calendar view follows existing Figma pattern — no changes needed except adding capacity indicators to event blocks.<br>
+          <strong>"My Events"</strong> is entirely new (UC-8). Cross-channel, user-scoped.
+        </div>
+        <div class="my-events-card">
+          <div class="my-events-card__header">
+            <span class="my-events-card__title">My Events<span class="new-badge">NEW</span></span>
+            <div class="me-tabs">
+              <button class="me-tab me-tab--active">Upcoming</button>
+              <button class="me-tab">Past</button>
+            </div>
+          </div>
+          <div class="me-item">
+            <div class="me-date me-date--upcoming"><span class="me-date__day">10</span><span class="me-date__month">Apr</span></div>
+            <div class="me-info"><div class="me-info__title">Summer Team Event</div><div class="me-info__meta">14:00 &middot; Schlosspark Dresden</div></div>
+            <span class="me-status me-status--attending">Attending</span>
+          </div>
+          <div class="me-item">
+            <div class="me-date me-date--upcoming"><span class="me-date__day">14</span><span class="me-date__month">Apr</span></div>
+            <div class="me-info"><div class="me-info__title">Gesundheitswoche</div><div class="me-info__meta">09:00 – 17:00 &middot; Zentrale</div></div>
+            <span class="me-status me-status--attending">Attending</span>
+          </div>
+          <div class="me-item">
+            <div class="me-date me-date--upcoming"><span class="me-date__day">18</span><span class="me-date__month">Apr</span></div>
+            <div class="me-info"><div class="me-info__title">Erste Hilfe Kurs</div><div class="me-info__meta">10:00 &middot; Schulungszentrum</div></div>
+            <span class="me-status me-status--waitlisted">Waitlist #4</span>
+          </div>
+          <div class="me-item me-item--past">
+            <div class="me-date"><span class="me-date__day">17</span><span class="me-date__month">Mar</span></div>
+            <div class="me-info"><div class="me-info__title">Neuer Mitarbeitenden-Tag</div><div class="me-info__meta">09:00 &middot; Zentrale</div></div>
+            <span class="me-status me-status--attending" style="opacity:0.5;">Attended</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ═══════════════════════════════════════════════ -->
+  <!-- 6. CANCEL FLOW (entirely new)                  -->
+  <!-- ═══════════════════════════════════════════════ -->
+  <div class="proto-section" id="s-cancel">
+    <div class="proto-label">Section 6 — UC-4 <span class="new-badge">NEW</span></div>
+    <div class="proto-title">Cancel Attendance Flow</div>
+    <div class="proto-desc">Not in Figma. Confirmation prevents accidental cancellation — especially important when waitlist exists (spot given away immediately).</div>
+
+    <div class="grid-3">
+      <div>
+        <div class="state state--green">Cancel with waitlist</div>
+        <div class="cancel-sheet">
+          <div class="cancel-sheet__icon cancel-sheet__icon--danger">
+            <svg viewBox="0 0 16 16" fill="none" stroke="#EA4335" stroke-width="1.5" style="width:16px;height:16px"><circle cx="8" cy="8" r="6.5"/><path d="M8 5v3.5M8 10.5v.5"/></svg>
+          </div>
+          <div class="cancel-sheet__title">Cancel attendance?</div>
+          <div class="cancel-sheet__text">You will lose your spot at "Summer Team Event". If the event is full, you may end up on the waitlist when re-registering.</div>
+          <div class="cancel-sheet__warning">3 people are on the waitlist. Your spot will be given to the next person immediately.</div>
+          <div class="cancel-sheet__actions">
+            <button class="btn btn--danger">Yes, cancel</button>
+            <button class="btn btn--secondary">Keep spot</button>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="state state--purple">Leave waitlist</div>
+        <div class="cancel-sheet">
+          <div class="cancel-sheet__icon cancel-sheet__icon--purple">
+            <svg viewBox="0 0 16 16" fill="none" stroke="#8B5CF6" stroke-width="1.5" style="width:16px;height:16px"><circle cx="8" cy="8" r="6.5"/><path d="M8 5v3.5M8 10.5v.5"/></svg>
+          </div>
+          <div class="cancel-sheet__title">Leave waitlist?</div>
+          <div class="cancel-sheet__text">You will lose position #4. If you rejoin, you'll be placed at the end of the waitlist.</div>
+          <div class="cancel-sheet__actions">
+            <button class="btn btn--waitlist">Yes, leave</button>
+            <button class="btn btn--secondary">Keep position</button>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="state state--grey">Blocked (after deadline)</div>
+        <div class="inline-error">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" style="width:14px;height:14px;flex-shrink:0"><circle cx="8" cy="8" r="6.5"/><path d="M8 5v3.5M8 10.5v.5"/></svg>
+          Registration closed. Contact the event organizer to cancel.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ═══════════════════════════════════════════════ -->
+  <!-- 7. BUTTON STATE MATRIX                         -->
+  <!-- ═══════════════════════════════════════════════ -->
+  <div class="proto-section" id="s-states">
+    <div class="proto-label">Reference</div>
+    <div class="proto-title">Button States + Feature Delta</div>
+
+    <div class="grid-2">
+      <div>
+        <div style="font-size:0.78rem;font-weight:700;margin-bottom:0.5rem;">Button State Matrix</div>
+        <table style="width:100%;border-collapse:collapse;font-size:0.7rem;">
+          <thead><tr style="background:var(--content-bg);"><th style="text-align:left;padding:0.4rem 0.5rem;font-size:0.6rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);">Condition</th><th style="padding:0.4rem 0.5rem;">Button</th><th style="padding:0.4rem 0.5rem;">Action</th></tr></thead>
+          <tbody>
+            <tr style="border-bottom:1px solid var(--border-light);"><td style="padding:0.4rem 0.5rem;">Open, not attending</td><td style="padding:0.4rem 0.5rem;"><button class="btn btn--attend" style="font-size:0.6rem;padding:0.2rem 0.4rem;">Attend</button></td><td style="padding:0.4rem 0.5rem;color:var(--text-secondary);">RSVP</td></tr>
+            <tr style="border-bottom:1px solid var(--border-light);"><td style="padding:0.4rem 0.5rem;">Attending</td><td style="padding:0.4rem 0.5rem;"><button class="btn btn--attending" style="font-size:0.6rem;padding:0.2rem 0.4rem;">Attending</button></td><td style="padding:0.4rem 0.5rem;color:var(--text-secondary);">Cancel</td></tr>
+            <tr style="border-bottom:1px solid var(--border-light);"><td style="padding:0.4rem 0.5rem;">Full, not on list</td><td style="padding:0.4rem 0.5rem;"><button class="btn btn--waitlist" style="font-size:0.6rem;padding:0.2rem 0.4rem;">Join Waitlist</button></td><td style="padding:0.4rem 0.5rem;color:var(--text-secondary);">Join waitlist</td></tr>
+            <tr style="border-bottom:1px solid var(--border-light);"><td style="padding:0.4rem 0.5rem;">On waitlist</td><td style="padding:0.4rem 0.5rem;"><button class="btn btn--waitlisted" style="font-size:0.6rem;padding:0.2rem 0.4rem;">Waitlist #4</button></td><td style="padding:0.4rem 0.5rem;color:var(--text-secondary);">Leave</td></tr>
+            <tr><td style="padding:0.4rem 0.5rem;">Closed / past</td><td style="padding:0.4rem 0.5rem;"><button class="btn btn--disabled" style="font-size:0.6rem;padding:0.2rem 0.4rem;">Closed</button></td><td style="padding:0.4rem 0.5rem;color:var(--text-secondary);">None</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div>
+        <div style="font-size:0.78rem;font-weight:700;margin-bottom:0.5rem;">Feature Delta: Figma vs v1 Spec</div>
+        <table style="width:100%;border-collapse:collapse;font-size:0.65rem;">
+          <thead><tr style="background:var(--content-bg);"><th style="text-align:left;padding:0.35rem 0.5rem;font-size:0.55rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);">Feature</th><th style="padding:0.35rem;text-align:center;">Figma</th><th style="padding:0.35rem;text-align:center;">v1 Spec</th></tr></thead>
+          <tbody>
+            <tr style="border-bottom:1px solid var(--border-light);"><td style="padding:0.3rem 0.5rem;">Event card type</td><td style="padding:0.3rem;text-align:center;">Yes</td><td style="padding:0.3rem;text-align:center;">Yes</td></tr>
+            <tr style="border-bottom:1px solid var(--border-light);"><td style="padding:0.3rem 0.5rem;">Cover image + date badge</td><td style="padding:0.3rem;text-align:center;">Yes</td><td style="padding:0.3rem;text-align:center;">Yes</td></tr>
+            <tr style="border-bottom:1px solid var(--border-light);"><td style="padding:0.3rem 0.5rem;">Location (name + map link)</td><td style="padding:0.3rem;text-align:center;">Yes</td><td style="padding:0.3rem;text-align:center;">Yes</td></tr>
+            <tr style="border-bottom:1px solid var(--border-light);"><td style="padding:0.3rem 0.5rem;">Co-hosts</td><td style="padding:0.3rem;text-align:center;">Yes</td><td style="padding:0.3rem;text-align:center;">Deferred</td></tr>
+            <tr style="border-bottom:1px solid var(--border-light);"><td style="padding:0.3rem 0.5rem;">Repeat events</td><td style="padding:0.3rem;text-align:center;">Yes</td><td style="padding:0.3rem;text-align:center;">Deferred</td></tr>
+            <tr style="border-bottom:1px solid var(--border-light);"><td style="padding:0.3rem 0.5rem;">Going/Not going/Interested</td><td style="padding:0.3rem;text-align:center;">Yes</td><td style="padding:0.3rem;text-align:center;">Replaced</td></tr>
+            <tr style="border-bottom:1px solid var(--border-light);background:rgba(233,30,99,0.03);"><td style="padding:0.3rem 0.5rem;font-weight:600;">Attend/Unattend button</td><td style="padding:0.3rem;text-align:center;">--</td><td style="padding:0.3rem;text-align:center;color:#E91E63;font-weight:700;">NEW</td></tr>
+            <tr style="border-bottom:1px solid var(--border-light);background:rgba(233,30,99,0.03);"><td style="padding:0.3rem 0.5rem;font-weight:600;">Waitlist + auto-promotion</td><td style="padding:0.3rem;text-align:center;">--</td><td style="padding:0.3rem;text-align:center;color:#E91E63;font-weight:700;">NEW</td></tr>
+            <tr style="border-bottom:1px solid var(--border-light);background:rgba(233,30,99,0.03);"><td style="padding:0.3rem 0.5rem;font-weight:600;">Capacity bar</td><td style="padding:0.3rem;text-align:center;">--</td><td style="padding:0.3rem;text-align:center;color:#E91E63;font-weight:700;">NEW</td></tr>
+            <tr style="border-bottom:1px solid var(--border-light);background:rgba(233,30,99,0.03);"><td style="padding:0.3rem 0.5rem;font-weight:600;">Registration deadline</td><td style="padding:0.3rem;text-align:center;">--</td><td style="padding:0.3rem;text-align:center;color:#E91E63;font-weight:700;">NEW</td></tr>
+            <tr style="border-bottom:1px solid var(--border-light);background:rgba(233,30,99,0.03);"><td style="padding:0.3rem 0.5rem;font-weight:600;">Past event state</td><td style="padding:0.3rem;text-align:center;">--</td><td style="padding:0.3rem;text-align:center;color:#E91E63;font-weight:700;">NEW</td></tr>
+            <tr style="border-bottom:1px solid var(--border-light);background:rgba(233,30,99,0.03);"><td style="padding:0.3rem 0.5rem;font-weight:600;">.ics download</td><td style="padding:0.3rem;text-align:center;">--</td><td style="padding:0.3rem;text-align:center;color:#E91E63;font-weight:700;">NEW</td></tr>
+            <tr style="border-bottom:1px solid var(--border-light);background:rgba(233,30,99,0.03);"><td style="padding:0.3rem 0.5rem;font-weight:600;">"My Events" view</td><td style="padding:0.3rem;text-align:center;">--</td><td style="padding:0.3rem;text-align:center;color:#E91E63;font-weight:700;">NEW</td></tr>
+            <tr style="background:rgba(233,30,99,0.03);"><td style="padding:0.3rem 0.5rem;font-weight:600;">Cancel confirmation</td><td style="padding:0.3rem;text-align:center;">--</td><td style="padding:0.3rem;text-align:center;color:#E91E63;font-weight:700;">NEW</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div style="text-align:center;padding:2rem 0 1rem;color:var(--text-muted);font-size:0.65rem;">
+    tchop.io Event Card v2 &middot; Figma benchmark (Nov 2024) + v1 spec extensions (Mar 2026)
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>IT Störung Widget — Status Icons + Widget Prototype</title>
+<link rel="icon" href="https://mxz-assets.tchop.it/img/app-icons/aok/dialog_onlinefavicon.ico" />
+<style>
+  @font-face {
+    font-family: 'AOKBuenosAires';
+    src: url('https://mxz-assets.tchop.it/font/aok/AOKBuenosAiresText-Regular.woff2') format('woff2');
+    font-style: normal; font-weight: 400; font-display: swap;
+  }
+  @font-face {
+    font-family: 'AOKBuenosAires';
+    src: url('https://mxz-assets.tchop.it/font/aok/AOKBuenosAiresText-SemiBold.woff2') format('woff2');
+    font-style: normal; font-weight: 600; font-display: swap;
+  }
+  @font-face {
+    font-family: 'AOKBuenosAires';
+    src: url('https://mxz-assets.tchop.it/font/aok/AOKBuenosAiresText-Bold.woff2') format('woff2');
+    font-style: normal; font-weight: 700; font-display: swap;
+  }
+
+  :root {
+    --primary:       #005E3F;
+    --secondary:     #18AB42;
+    --tint:          #E8F4F2;
+    --txt-base:      #293033;
+    --txt-secondary: #6D767C;
+    --txt-disabled:  #98A1A6;
+    --bg-base:       #FFFFFF;
+    --bg-secondary:  #F8F8F8;
+    --border-card:   #EBEBEB;
+    --border-divider:#DFE3E6;
+
+    /* Status colors — all use org primary (green) for brand consistency.
+       Shape alone distinguishes the three states, not color. */
+    --status-icon:      #005E3F;  /* primary — same for all three */
+    --status-tag-color: #005E3F;
+    --status-tag-bg:    #E8F4F2;  /* tint */
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { font-size: 16px; }
+  body {
+    font-family: 'AOKBuenosAires', sans-serif;
+    background: var(--bg-secondary);
+    color: var(--txt-base);
+    font-size: 1rem;
+    line-height: 1.5rem;
+    -webkit-font-smoothing: antialiased;
+    padding: 2rem;
+  }
+
+  h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 0.25rem;
+  }
+  .subtitle {
+    font-size: 0.875rem;
+    color: var(--txt-secondary);
+    margin-bottom: 2rem;
+    max-width: 36rem;
+  }
+
+  /* ============================================================
+     Section 1: Icon showcase at multiple sizes
+     ============================================================ */
+  .icon-showcase {
+    display: flex;
+    gap: 3rem;
+    margin-bottom: 3rem;
+    flex-wrap: wrap;
+  }
+  .icon-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.5rem 2rem;
+    background: #fff;
+    border: 0.0625rem solid var(--border-card);
+    border-radius: 0.25rem;
+    min-width: 12rem;
+  }
+  .icon-card-label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--txt-base);
+  }
+  .icon-card-tag {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.15rem;
+  }
+  .icon-card-tag.new, .icon-card-tag.progress, .icon-card-tag.solved {
+    color: var(--status-tag-color);
+    background: var(--status-tag-bg);
+  }
+
+  .icon-sizes {
+    display: flex;
+    gap: 1.5rem;
+    align-items: flex-end;
+  }
+  .icon-size {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.375rem;
+  }
+  .icon-size-label {
+    font-size: 0.6875rem;
+    color: var(--txt-disabled);
+  }
+
+  .icon-desc {
+    font-size: 0.75rem;
+    color: var(--txt-secondary);
+    text-align: center;
+    line-height: 1rem;
+    max-width: 10rem;
+  }
+
+  /* ============================================================
+     Section 2: Widget prototype (right rail)
+     ============================================================ */
+  .section-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin-top: 3rem;
+    margin-bottom: 0.25rem;
+  }
+  .section-sub {
+    font-size: 0.875rem;
+    color: var(--txt-secondary);
+    margin-bottom: 1.5rem;
+  }
+
+  .widget-container {
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+  }
+
+  .widget {
+    width: 20rem;
+    background: #fff;
+    border: 0.0625rem solid var(--border-card);
+    border-radius: 0.25rem;
+    overflow: hidden;
+  }
+  .widget-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.875rem 1rem;
+    border-bottom: 0.0625rem solid var(--border-card);
+  }
+  .widget-title {
+    font-size: 0.9375rem;
+    font-weight: 700;
+    color: var(--txt-base);
+  }
+  .widget-link {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--secondary);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    text-decoration: none;
+  }
+  .widget-link:hover { color: var(--primary); }
+  .widget-link svg { width: 0.875rem; height: 0.875rem; }
+
+  .widget-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    border-bottom: 0.0625rem solid var(--border-card);
+    cursor: pointer;
+    transition: 0.15s;
+  }
+  .widget-item:last-child { border-bottom: none; }
+  .widget-item:hover { background: var(--bg-secondary); }
+
+  .widget-item-body {
+    flex: 1;
+    min-width: 0;
+  }
+  .widget-item-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--txt-base);
+    line-height: 1.25rem;
+    margin-bottom: 0.125rem;
+  }
+  .widget-item-meta {
+    font-size: 0.75rem;
+    color: var(--txt-secondary);
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+  }
+  .widget-item-tag {
+    font-size: 0.625rem;
+    font-weight: 600;
+    padding: 0.125rem 0.375rem;
+    border-radius: 0.15rem;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+  }
+  .widget-item-tag.new, .widget-item-tag.progress, .widget-item-tag.solved {
+    color: var(--status-tag-color);
+    background: var(--status-tag-bg);
+  }
+
+  .widget-item-icon {
+    flex-shrink: 0;
+    margin-top: 0.125rem;
+  }
+
+  /* Widget variant labels */
+  .variant-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--txt-disabled);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 0.5rem;
+  }
+
+  /* ============================================================
+     Section 3: Config reference
+     ============================================================ */
+  .config-block {
+    background: #fff;
+    border: 0.0625rem solid var(--border-card);
+    border-radius: 0.25rem;
+    padding: 1.25rem;
+    margin-top: 1.5rem;
+    max-width: 36rem;
+  }
+  .config-block pre {
+    font-family: 'AOKBuenosAires', ui-monospace, monospace;
+    font-size: 0.8125rem;
+    color: var(--txt-base);
+    line-height: 1.375rem;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .config-block .key { color: var(--primary); font-weight: 600; }
+  .config-block .str { color: var(--status-progress); }
+  .config-block .comment { color: var(--txt-disabled); }
+</style>
+</head>
+<body>
+
+<h1>IT Störung — Status Icons + Widget</h1>
+<p class="subtitle">Drei Statusicons für IT-Störungskarten in tchop. Zeigen auf einen Blick, ob ein Problem neu, in Bearbeitung oder gelöst ist. Darunter: Widget-Prototyp für die rechte Seitenleiste.</p>
+
+<!-- ================================================================
+     ICON SHOWCASE
+     ================================================================ -->
+
+<div class="icon-showcase">
+
+  <!-- NEU -->
+  <div class="icon-card">
+    <span class="icon-card-tag new">Neu</span>
+    <div class="icon-sizes">
+      <div class="icon-size">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="11" fill="#005E3F"/>
+          <path d="M12 7v5M12 15.5v.5" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+        <span class="icon-size-label">16</span>
+      </div>
+      <div class="icon-size">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="11" fill="#005E3F"/>
+          <path d="M12 7v5M12 15.5v.5" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+        <span class="icon-size-label">24</span>
+      </div>
+      <div class="icon-size">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="11" fill="#005E3F"/>
+          <path d="M12 7v5M12 15.5v.5" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+        <span class="icon-size-label">32</span>
+      </div>
+    </div>
+    <div class="icon-desc">Sofort sichtbar. Erfordert Aufmerksamkeit.</div>
+    <div class="icon-card-label">Filled circle + Ausrufezeichen</div>
+  </div>
+
+  <!-- IN BEARBEITUNG -->
+  <div class="icon-card">
+    <span class="icon-card-tag progress">In Bearbeitung</span>
+    <div class="icon-sizes">
+      <div class="icon-size">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="11" fill="#005E3F"/>
+          <circle cx="12" cy="12" r="6" stroke="#fff" stroke-width="2" fill="none"/>
+          <path d="M12 9.5V12l2 1.5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span class="icon-size-label">16</span>
+      </div>
+      <div class="icon-size">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="11" fill="#005E3F"/>
+          <circle cx="12" cy="12" r="6" stroke="#fff" stroke-width="2" fill="none"/>
+          <path d="M12 9.5V12l2 1.5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span class="icon-size-label">24</span>
+      </div>
+      <div class="icon-size">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="11" fill="#005E3F"/>
+          <circle cx="12" cy="12" r="6" stroke="#fff" stroke-width="2" fill="none"/>
+          <path d="M12 9.5V12l2 1.5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span class="icon-size-label">32</span>
+      </div>
+    </div>
+    <div class="icon-desc">Wird bearbeitet. Kein sofortiger Handlungsbedarf.</div>
+    <div class="icon-card-label">Filled circle + Uhr</div>
+  </div>
+
+  <!-- IN PLANUNG -->
+  <div class="icon-card">
+    <span class="icon-card-tag progress">In Planung</span>
+    <div class="icon-sizes">
+      <div class="icon-size">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="11" fill="#005E3F"/>
+          <rect x="7" y="6" width="10" height="11" rx="1" stroke="#fff" stroke-width="1.8" fill="none"/>
+          <path d="M7 10h10" stroke="#fff" stroke-width="1.8"/>
+          <path d="M10 4v4M14 4v4" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+        <span class="icon-size-label">16</span>
+      </div>
+      <div class="icon-size">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="11" fill="#005E3F"/>
+          <rect x="7" y="6" width="10" height="11" rx="1" stroke="#fff" stroke-width="1.8" fill="none"/>
+          <path d="M7 10h10" stroke="#fff" stroke-width="1.8"/>
+          <path d="M10 4v4M14 4v4" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+        <span class="icon-size-label">24</span>
+      </div>
+      <div class="icon-size">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="11" fill="#005E3F"/>
+          <rect x="7" y="6" width="10" height="11" rx="1" stroke="#fff" stroke-width="1.8" fill="none"/>
+          <path d="M7 10h10" stroke="#fff" stroke-width="1.8"/>
+          <path d="M10 4v4M14 4v4" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+        <span class="icon-size-label">32</span>
+      </div>
+    </div>
+    <div class="icon-desc">Geplante Wartung. Noch nicht aktiv.</div>
+    <div class="icon-card-label">Filled circle + Kalender</div>
+  </div>
+
+  <!-- GELÖST -->
+  <div class="icon-card">
+    <span class="icon-card-tag solved">Gelöst</span>
+    <div class="icon-sizes">
+      <div class="icon-size">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="11" fill="#005E3F"/>
+          <path d="M8 12.5l2.5 2.5L16 9.5" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span class="icon-size-label">16</span>
+      </div>
+      <div class="icon-size">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="11" fill="#005E3F"/>
+          <path d="M8 12.5l2.5 2.5L16 9.5" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span class="icon-size-label">24</span>
+      </div>
+      <div class="icon-size">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="11" fill="#005E3F"/>
+          <path d="M8 12.5l2.5 2.5L16 9.5" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span class="icon-size-label">32</span>
+      </div>
+    </div>
+    <div class="icon-desc">Erledigt. Problem behoben.</div>
+    <div class="icon-card-label">Filled circle + Haken</div>
+  </div>
+
+</div>
+
+<!-- ================================================================
+     WIDGET PROTOTYPES
+     ================================================================ -->
+
+<h2 class="section-title">Widget-Prototyp</h2>
+<p class="section-sub">Rechte Seitenleiste, basierend auf dem <code>latestStoryCards</code>-Layout. Liest aus dem konfigurierten <code>connectedMixId</code>. Statusicons per Config-Map.</p>
+
+<div class="widget-container">
+
+  <!-- Variant A: Mixed statuses -->
+  <div>
+    <div class="variant-label">Gemischte Status</div>
+    <div class="widget">
+      <div class="widget-header">
+        <span class="widget-title">IT Meldungen</span>
+        <a class="widget-link" href="#">
+          Alle
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+        </a>
+      </div>
+
+      <div class="widget-item">
+        <div class="widget-item-body">
+          <div class="widget-item-title">E-Mail-Server nicht erreichbar (Update 18:30 Uhr)</div>
+          <div class="widget-item-meta">
+            <span class="widget-item-tag new">Neu</span>
+            Heute, 17:45
+          </div>
+        </div>
+        <div class="widget-item-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="11" fill="#005E3F"/>
+            <path d="M12 7v5M12 15.5v.5" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="widget-item">
+        <div class="widget-item-body">
+          <div class="widget-item-title">SAP Zeiterfassung eingeschränkt</div>
+          <div class="widget-item-meta">
+            <span class="widget-item-tag progress">In Bearbeitung</span>
+            Heute, 14:20
+          </div>
+        </div>
+        <div class="widget-item-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="11" fill="#005E3F"/>
+            <circle cx="12" cy="12" r="6" stroke="#fff" stroke-width="2" fill="none"/>
+            <path d="M12 9.5V12l2 1.5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="widget-item">
+        <div class="widget-item-body">
+          <div class="widget-item-title">Wartung SAP-System am 20. April</div>
+          <div class="widget-item-meta">
+            <span class="widget-item-tag progress">In Planung</span>
+            Heute, 10:00
+          </div>
+        </div>
+        <div class="widget-item-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="11" fill="#005E3F"/>
+            <rect x="7" y="6" width="10" height="11" rx="1" stroke="#fff" stroke-width="1.8" fill="none"/>
+            <path d="M7 10h10" stroke="#fff" stroke-width="1.8"/>
+            <path d="M10 4v4M14 4v4" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="widget-item">
+        <div class="widget-item-body">
+          <div class="widget-item-title">VPN-Störung Außenstelle Hannover</div>
+          <div class="widget-item-meta">
+            <span class="widget-item-tag solved">Gelöst</span>
+            Gestern, 09:15
+          </div>
+        </div>
+        <div class="widget-item-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="11" fill="#005E3F"/>
+            <path d="M8 12.5l2.5 2.5L16 9.5" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="widget-item">
+        <div class="widget-item-body">
+          <div class="widget-item-title">Drucker 3. OG wieder verfügbar</div>
+          <div class="widget-item-meta">
+            <span class="widget-item-tag solved">Gelöst</span>
+            15. Apr, 08:30
+          </div>
+        </div>
+        <div class="widget-item-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="11" fill="#005E3F"/>
+            <path d="M8 12.5l2.5 2.5L16 9.5" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Variant B: All clear -->
+  <div>
+    <div class="variant-label">Alles gelöst</div>
+    <div class="widget">
+      <div class="widget-header">
+        <span class="widget-title">IT Meldungen</span>
+        <a class="widget-link" href="#">
+          Alle
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+        </a>
+      </div>
+
+      <div class="widget-item">
+        <div class="widget-item-body">
+          <div class="widget-item-title">E-Mail-Server wieder erreichbar</div>
+          <div class="widget-item-meta">
+            <span class="widget-item-tag solved">Gelöst</span>
+            Heute, 18:50
+          </div>
+        </div>
+        <div class="widget-item-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="11" fill="#005E3F"/>
+            <path d="M8 12.5l2.5 2.5L16 9.5" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="widget-item">
+        <div class="widget-item-body">
+          <div class="widget-item-title">SAP Zeiterfassung wieder verfügbar</div>
+          <div class="widget-item-meta">
+            <span class="widget-item-tag solved">Gelöst</span>
+            Heute, 16:00
+          </div>
+        </div>
+        <div class="widget-item-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="11" fill="#005E3F"/>
+            <path d="M8 12.5l2.5 2.5L16 9.5" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Variant C: Active incident, urgent -->
+  <div>
+    <div class="variant-label">Akuter Vorfall</div>
+    <div class="widget">
+      <div class="widget-header">
+        <span class="widget-title">IT Meldungen</span>
+        <a class="widget-link" href="#">
+          Alle
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+        </a>
+      </div>
+
+      <div class="widget-item">
+        <div class="widget-item-body">
+          <div class="widget-item-title">Komplettausfall Telefonanlage</div>
+          <div class="widget-item-meta">
+            <span class="widget-item-tag new">Neu</span>
+            Gerade eben
+          </div>
+        </div>
+        <div class="widget-item-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="11" fill="#005E3F"/>
+            <path d="M12 7v5M12 15.5v.5" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="widget-item">
+        <div class="widget-item-body">
+          <div class="widget-item-title">SAP Zeiterfassung eingeschränkt</div>
+          <div class="widget-item-meta">
+            <span class="widget-item-tag progress">In Bearbeitung</span>
+            Heute, 14:20
+          </div>
+        </div>
+        <div class="widget-item-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="11" fill="#005E3F"/>
+            <circle cx="12" cy="12" r="6" stroke="#fff" stroke-width="2" fill="none"/>
+            <path d="M12 9.5V12l2 1.5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="widget-item">
+        <div class="widget-item-body">
+          <div class="widget-item-title">VPN Außenstelle behoben</div>
+          <div class="widget-item-meta">
+            <span class="widget-item-tag solved">Gelöst</span>
+            Gestern
+          </div>
+        </div>
+        <div class="widget-item-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="11" fill="#005E3F"/>
+            <path d="M8 12.5l2.5 2.5L16 9.5" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ================================================================
+     CONFIG REFERENCE
+     ================================================================ -->
+
+<h2 class="section-title">Config-Referenz</h2>
+<p class="section-sub">Auszug aus dem tchop Theme-JSON. <code>statusIcons</code> mappt Status-Tag-Namen auf Icons.</p>
+
+<div class="config-block">
+<pre><span class="comment">// elements.itWidget</span>
+{
+  <span class="key">"enabled"</span>: true,
+  <span class="key">"title"</span>: <span class="str">"IT Meldungen"</span>,
+  <span class="key">"connectedMixId"</span>: 4217,
+  <span class="key">"statusIcons"</span>: {
+    <span class="str">"Neu"</span>:             <span class="str">"alert-circle-filled"</span>,   <span class="comment">// filled circle + exclamation</span>
+    <span class="str">"In Bearbeitung"</span>:  <span class="str">"clock-circle-filled"</span>,   <span class="comment">// filled circle + clock</span>
+    <span class="str">"In Planung"</span>:       <span class="str">"calendar-circle-filled"</span>,  <span class="comment">// filled circle + calendar</span>
+    <span class="str">"Gelöst"</span>:           <span class="str">"check-circle-filled"</span>    <span class="comment">// filled circle + checkmark</span>
+  },
+  <span class="key">"statusColors"</span>: {
+    <span class="comment">// All statuses use the org's primary color.</span>
+    <span class="comment">// Shape alone distinguishes state.</span>
+    <span class="str">"Neu"</span>:             { <span class="key">"icon"</span>: <span class="str">"colors.primary"</span>, <span class="key">"bg"</span>: <span class="str">"#E8F4F2"</span>, <span class="key">"text"</span>: <span class="str">"colors.primary"</span> },
+    <span class="str">"In Bearbeitung"</span>:  { <span class="key">"icon"</span>: <span class="str">"colors.primary"</span>, <span class="key">"bg"</span>: <span class="str">"#E8F4F2"</span>, <span class="key">"text"</span>: <span class="str">"colors.primary"</span> },
+    <span class="str">"In Planung"</span>:      { <span class="key">"icon"</span>: <span class="str">"colors.primary"</span>, <span class="key">"bg"</span>: <span class="str">"#E8F4F2"</span>, <span class="key">"text"</span>: <span class="str">"colors.primary"</span> },
+    <span class="str">"Gelöst"</span>:           { <span class="key">"icon"</span>: <span class="str">"colors.primary"</span>, <span class="key">"bg"</span>: <span class="str">"#E8F4F2"</span>, <span class="key">"text"</span>: <span class="str">"colors.primary"</span> }
+  }
+}</pre>
+</div>
+
+<!-- ================================================================
+     SVG EXPORT REFERENCE
+     ================================================================ -->
+
+<h2 class="section-title" style="margin-top: 3rem;">SVG-Export</h2>
+<p class="section-sub">Kopierbare SVGs (24x24 viewBox). Farbe ist hartkodiert im Fill — im Produkt wird die Farbe per Config-Map gesetzt.</p>
+
+<div style="display: flex; gap: 2rem; flex-wrap: wrap; margin-top: 1rem;">
+  <div class="config-block" style="flex: 1; min-width: 14rem;">
+    <div style="font-weight: 600; color: var(--status-icon); margin-bottom: 0.5rem;">Neu (alert-circle-filled)</div>
+<pre>&lt;svg viewBox="0 0 24 24" fill="none"&gt;
+  &lt;circle cx="12" cy="12" r="11" fill="#005E3F"/&gt;
+  &lt;path d="M12 7v5M12 15.5v.5"
+    stroke="#fff" stroke-width="2.5"
+    stroke-linecap="round"/&gt;
+&lt;/svg&gt;</pre>
+  </div>
+  <div class="config-block" style="flex: 1; min-width: 14rem;">
+    <div style="font-weight: 600; color: var(--status-icon); margin-bottom: 0.5rem;">In Bearbeitung (clock-circle-filled)</div>
+<pre>&lt;svg viewBox="0 0 24 24" fill="none"&gt;
+  &lt;circle cx="12" cy="12" r="11" fill="#005E3F"/&gt;
+  &lt;circle cx="12" cy="12" r="6"
+    stroke="#fff" stroke-width="2"
+    fill="none"/&gt;
+  &lt;path d="M12 9.5V12l2 1.5"
+    stroke="#fff" stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"/&gt;
+&lt;/svg&gt;</pre>
+  </div>
+  <div class="config-block" style="flex: 1; min-width: 14rem;">
+    <div style="font-weight: 600; color: var(--status-icon); margin-bottom: 0.5rem;">In Planung (calendar-circle-filled)</div>
+<pre>&lt;svg viewBox="0 0 24 24" fill="none"&gt;
+  &lt;circle cx="12" cy="12" r="11" fill="#005E3F"/&gt;
+  &lt;rect x="7" y="6" width="10" height="11" rx="1"
+    stroke="#fff" stroke-width="1.8"
+    fill="none"/&gt;
+  &lt;path d="M7 10h10"
+    stroke="#fff" stroke-width="1.8"/&gt;
+  &lt;path d="M10 4v4M14 4v4"
+    stroke="#fff" stroke-width="1.8"
+    stroke-linecap="round"/&gt;
+&lt;/svg&gt;</pre>
+  </div>
+  <div class="config-block" style="flex: 1; min-width: 14rem;">
+    <div style="font-weight: 600; color: var(--status-icon); margin-bottom: 0.5rem;">Gelöst (check-circle-filled)</div>
+<pre>&lt;svg viewBox="0 0 24 24" fill="none"&gt;
+  &lt;circle cx="12" cy="12" r="11" fill="#005E3F"/&gt;
+  &lt;path d="M8 12.5l2.5 2.5L16 9.5"
+    stroke="#fff" stroke-width="2.5"
+    stroke-linecap="round"
+    stroke-linejoin="round"/&gt;
+&lt;/svg&gt;</pre>
+  </div>
+</div>
+
+</body>
+</html>

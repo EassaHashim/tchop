@@ -1,0 +1,33 @@
+{
+  "posted_urls": {
+    "https://bsky.app/profile/machstenocheins.de/post/3mivmpmnoc22w": "2026-04-09T08:04:22.762551+00:00",
+    "https://bsky.app/profile/lilienhashtags.bsky.social/post/3miypkwyisc2b": "2026-04-09T08:04:22.762551+00:00",
+    "https://bsky.app/profile/andisvd.bsky.social/post/3mivqnhj6722p": "2026-04-09T08:04:22.762551+00:00"
+  },
+  "publish_log": [
+    {
+      "url": "https://bsky.app/profile/machstenocheins.de/post/3mivmpmnoc22w",
+      "published_at": "2026-04-09T08:04:22.762551+00:00",
+      "score": 8,
+      "reason": "Personal fan content about the member jersey with original opinion and photo",
+      "mode": "DRAFTED",
+      "card_id": 46917020
+    },
+    {
+      "url": "https://bsky.app/profile/lilienhashtags.bsky.social/post/3miypkwyisc2b",
+      "published_at": "2026-04-09T08:04:22.762551+00:00",
+      "score": 7,
+      "reason": "Helpful ticket alert for upcoming match SVD vs H96",
+      "mode": "DRAFTED",
+      "card_id": 46917021
+    },
+    {
+      "url": "https://bsky.app/profile/andisvd.bsky.social/post/3mivqnhj6722p",
+      "published_at": "2026-04-09T08:04:22.762551+00:00",
+      "score": 6,
+      "reason": "Fan looking for ticket for Saturday's match - community relevant",
+      "mode": "DRAFTED",
+      "card_id": 46917022
+    }
+  ]
+}

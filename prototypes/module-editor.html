@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module Layout Editor</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --orange: #F6704D;
+    --yellow: #FFD138;
+    --blue: #488ED8;
+    --bg-light: #F1F1F3;
+    --bg-dark: #43445B;
+    --bg-footer: #2D2D46;
+    --white: #FFFFFF;
+    --radius: 10px;
+    --shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    background: var(--bg-light);
+    color: #333;
+    min-height: 100vh;
+  }
+
+  /* Top bar */
+  .topbar {
+    background: var(--bg-dark);
+    color: var(--white);
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .topbar-left { display: flex; align-items: center; gap: 16px; }
+  .topbar-logo {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--orange);
+    letter-spacing: -0.5px;
+  }
+  .topbar-nav { display: flex; gap: 8px; }
+  .topbar-nav button {
+    background: rgba(255,255,255,0.1);
+    border: none;
+    color: var(--white);
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .topbar-nav button:hover { background: rgba(255,255,255,0.2); }
+  .topbar-nav button.active { background: var(--orange); }
+
+  /* Edit mode banner */
+  .edit-banner {
+    background: var(--orange);
+    color: var(--white);
+    text-align: center;
+    padding: 10px 24px;
+    font-size: 14px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+  }
+  .edit-banner.hidden { display: none; }
+  .edit-banner button {
+    background: var(--white);
+    color: var(--orange);
+    border: none;
+    padding: 6px 16px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  .edit-banner button.btn-cancel {
+    background: transparent;
+    color: var(--white);
+    border: 1px solid rgba(255,255,255,0.5);
+  }
+
+  /* Layout */
+  .page { max-width: 1200px; margin: 0 auto; padding: 24px; display: flex; gap: 24px; }
+  .main { flex: 1; min-width: 0; }
+  .sidebar { width: 340px; flex-shrink: 0; }
+
+  /* Cards in main feed */
+  .feed-card {
+    background: var(--white);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    margin-bottom: 16px;
+    overflow: hidden;
+  }
+  .feed-card-image {
+    height: 180px;
+    background: linear-gradient(135deg, var(--bg-dark) 0%, #5a5b78 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255,255,255,0.3);
+    font-size: 14px;
+  }
+  .feed-card-body { padding: 16px; }
+  .feed-card-meta { font-size: 12px; color: #999; margin-bottom: 6px; }
+  .feed-card-title { font-size: 16px; font-weight: 600; margin-bottom: 8px; line-height: 1.3; }
+  .feed-card-text { font-size: 14px; color: #666; line-height: 1.5; }
+  .feed-card-small { display: flex; gap: 12px; }
+  .feed-card-small .feed-card-image { width: 120px; height: auto; min-height: 90px; flex-shrink: 0; }
+  .feed-card-small .feed-card-body { padding: 12px; }
+
+  /* Sidebar modules */
+  .sidebar-module {
+    background: var(--white);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    margin-bottom: 16px;
+    overflow: hidden;
+    position: relative;
+    transition: outline 0.15s;
+  }
+  .sidebar-module.editable {
+    outline: 2px dashed transparent;
+    cursor: pointer;
+  }
+  .sidebar-module.editable:hover {
+    outline-color: var(--orange);
+  }
+  .module-header {
+    padding: 14px 16px 10px;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #888;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .module-body { padding: 0 16px 16px; }
+
+  /* Edit overlay per module */
+  .module-edit-overlay {
+    display: none;
+    position: absolute;
+    inset: 0;
+    background: rgba(255,255,255,0.95);
+    z-index: 10;
+    padding: 16px;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .module-edit-overlay.active { display: flex; }
+  .module-edit-overlay label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .module-edit-overlay select {
+    width: 100%;
+    padding: 8px 12px;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    background: var(--white);
+    cursor: pointer;
+  }
+  .module-edit-overlay select:focus {
+    border-color: var(--orange);
+    outline: none;
+  }
+  .module-edit-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: auto;
+  }
+  .module-edit-actions button {
+    flex: 1;
+    padding: 8px;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .btn-apply { background: var(--orange); color: var(--white); }
+  .btn-remove { background: #eee; color: #999; }
+
+  /* Module: Horizontal Mix (carousel) */
+  .carousel { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 4px; }
+  .carousel::-webkit-scrollbar { height: 4px; }
+  .carousel::-webkit-scrollbar-thumb { background: #ccc; border-radius: 2px; }
+  .carousel-item {
+    min-width: 140px;
+    border-radius: 8px;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+  .carousel-item-img {
+    height: 90px;
+    background: linear-gradient(135deg, var(--blue) 0%, var(--bg-dark) 100%);
+  }
+  .carousel-item-label { font-size: 12px; padding: 8px; font-weight: 500; }
+
+  /* Module: Chat groups */
+  .chat-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  .chat-item:last-child { border-bottom: none; }
+  .chat-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--blue);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--white);
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .chat-avatar.orange { background: var(--orange); }
+  .chat-avatar.yellow { background: var(--yellow); color: var(--bg-dark); }
+  .chat-name { font-size: 14px; font-weight: 500; }
+  .chat-preview { font-size: 12px; color: #999; }
+  .chat-badge {
+    margin-left: auto;
+    background: var(--orange);
+    color: var(--white);
+    font-size: 11px;
+    font-weight: 700;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Module: Events */
+  .event-item { padding: 10px 0; border-bottom: 1px solid #f0f0f0; }
+  .event-item:last-child { border-bottom: none; }
+  .event-date { font-size: 11px; color: var(--orange); font-weight: 700; text-transform: uppercase; }
+  .event-title { font-size: 14px; font-weight: 500; margin-top: 2px; }
+  .event-meta { font-size: 12px; color: #999; margin-top: 2px; }
+
+  /* Module: Pinned */
+  .pinned-item {
+    display: flex;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  .pinned-item:last-child { border-bottom: none; }
+  .pinned-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    background: var(--bg-light);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+  }
+  .pinned-title { font-size: 14px; font-weight: 500; }
+  .pinned-desc { font-size: 12px; color: #999; }
+
+  /* Module: Poll */
+  .poll-question { font-size: 14px; font-weight: 600; margin-bottom: 12px; }
+  .poll-option {
+    background: var(--bg-light);
+    border-radius: 6px;
+    padding: 10px 12px;
+    margin-bottom: 6px;
+    font-size: 13px;
+    position: relative;
+    overflow: hidden;
+  }
+  .poll-bar {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    background: rgba(72, 142, 216, 0.15);
+    border-radius: 6px;
+  }
+  .poll-option span { position: relative; z-index: 1; }
+  .poll-pct { float: right; font-weight: 600; color: var(--blue); }
+
+  /* Module: Navigation list */
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 14px;
+    font-weight: 500;
+  }
+  .nav-item:last-child { border-bottom: none; }
+  .nav-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .nav-count { margin-left: auto; font-size: 12px; color: #999; }
+
+  /* Add module slot */
+  .add-module-slot {
+    border: 2px dashed #ccc;
+    border-radius: var(--radius);
+    padding: 24px;
+    text-align: center;
+    color: #999;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: none;
+  }
+  .add-module-slot.visible { display: block; }
+  .add-module-slot:hover { border-color: var(--orange); color: var(--orange); }
+  .add-module-slot .plus { font-size: 28px; font-weight: 300; }
+  .add-module-slot .label { font-size: 13px; margin-top: 4px; }
+
+  /* JSON panel */
+  .json-panel {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--bg-footer);
+    color: #ccc;
+    max-height: 40vh;
+    overflow-y: auto;
+    z-index: 200;
+    padding: 16px 24px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 13px;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.3);
+  }
+  .json-panel.visible { display: block; }
+  .json-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .json-panel-header h3 { color: var(--white); font-size: 14px; }
+  .json-panel-header button {
+    background: rgba(255,255,255,0.1);
+    border: none;
+    color: var(--white);
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    cursor: pointer;
+  }
+  .json-panel pre { white-space: pre-wrap; word-break: break-all; line-height: 1.6; }
+  .json-key { color: var(--blue); }
+  .json-str { color: var(--yellow); }
+  .json-num { color: var(--orange); }
+  .json-bool { color: #a78bfa; }
+
+  /* Drag handle */
+  .drag-handle {
+    display: none;
+    cursor: grab;
+    padding: 2px 4px;
+    color: #ccc;
+    font-size: 16px;
+  }
+  .drag-handle:active { cursor: grabbing; }
+  .editing .drag-handle { display: block; }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: var(--bg-dark);
+    color: var(--white);
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    transition: transform 0.3s ease;
+    z-index: 300;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  .sidebar-module.dragging { opacity: 0.4; }
+  .sidebar-module.drag-over { outline: 2px solid var(--orange) !important; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="topbar-logo">tchop</div>
+    <div class="topbar-nav">
+      <button class="active">Feed</button>
+      <button>Channels</button>
+      <button>Chat</button>
+    </div>
+  </div>
+  <div>
+    <button id="toggleEdit" style="background:var(--orange);border:none;color:#fff;padding:8px 16px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer">
+      Edit Layout
+    </button>
+  </div>
+</div>
+
+<div class="edit-banner hidden" id="editBanner">
+  <span>Layout Editor -- click a sidebar module to change it, drag to reorder</span>
+  <button id="btnSave">Save Config</button>
+  <button id="btnShowJson">Show JSON</button>
+  <button class="btn-cancel" id="btnCancel">Cancel</button>
+</div>
+
+<div class="page">
+  <!-- Main feed (left) -->
+  <div class="main">
+    <div class="feed-card">
+      <div class="feed-card-image">820 x 180</div>
+      <div class="feed-card-body">
+        <div class="feed-card-meta">Company News -- 2 hours ago</div>
+        <div class="feed-card-title">Q1 All-Hands: Key Takeaways and What's Next</div>
+        <div class="feed-card-text">A summary of the quarterly all-hands meeting including product updates, hiring plans, and the roadmap for Q2.</div>
+      </div>
+    </div>
+    <div class="feed-card feed-card-small">
+      <div class="feed-card-image"></div>
+      <div class="feed-card-body">
+        <div class="feed-card-meta">HR -- 5 hours ago</div>
+        <div class="feed-card-title">New Parental Leave Policy Effective April 1</div>
+        <div class="feed-card-text">Updated guidelines for all employees.</div>
+      </div>
+    </div>
+    <div class="feed-card">
+      <div class="feed-card-image" style="background:linear-gradient(135deg,#488ED8 0%,#43445B 100%)"></div>
+      <div class="feed-card-body">
+        <div class="feed-card-meta">Product -- Yesterday</div>
+        <div class="feed-card-title">Feature Spotlight: Smart Notifications</div>
+        <div class="feed-card-text">Learn how the new notification engine prioritizes what matters most to each user.</div>
+      </div>
+    </div>
+    <div class="feed-card feed-card-small">
+      <div class="feed-card-image" style="background:linear-gradient(135deg,#FFD138 0%,#F6704D 100%)"></div>
+      <div class="feed-card-body">
+        <div class="feed-card-meta">Culture -- 2 days ago</div>
+        <div class="feed-card-title">Team Offsite Recap: Berlin Edition</div>
+        <div class="feed-card-text">Photos and highlights from last week.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sidebar (right) -->
+  <div class="sidebar" id="sidebar"></div>
+</div>
+
+<div class="json-panel" id="jsonPanel">
+  <div class="json-panel-header">
+    <h3>Module Configuration JSON</h3>
+    <div style="display:flex;gap:8px">
+      <button id="btnCopy">Copy</button>
+      <button id="btnCloseJson">Close</button>
+    </div>
+  </div>
+  <pre id="jsonOutput"></pre>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// -- Module definitions: each type knows how to render itself --
+const MODULE_TYPES = {
+  chat_groups: {
+    label: 'Chat Groups',
+    description: 'Active group conversations',
+    render: () => `
+      <div class="module-header"><span>Chat Groups</span></div>
+      <div class="module-body">
+        <div class="chat-item">
+          <div class="chat-avatar">PM</div>
+          <div><div class="chat-name">Product & Marketing</div><div class="chat-preview">Sarah: Updated the roadmap doc</div></div>
+          <div class="chat-badge">3</div>
+        </div>
+        <div class="chat-item">
+          <div class="chat-avatar orange">EN</div>
+          <div><div class="chat-name">Engineering</div><div class="chat-preview">New deploy pipeline is live</div></div>
+        </div>
+        <div class="chat-item">
+          <div class="chat-avatar yellow">HR</div>
+          <div><div class="chat-name">People & Culture</div><div class="chat-preview">Reminder: feedback due Friday</div></div>
+        </div>
+      </div>`
+  },
+  events: {
+    label: 'Upcoming Events',
+    description: 'Calendar events and meetups',
+    render: () => `
+      <div class="module-header"><span>Upcoming Events</span></div>
+      <div class="module-body">
+        <div class="event-item"><div class="event-date">Apr 2, 2026</div><div class="event-title">Product Demo Day</div><div class="event-meta">14:00 -- Main Stage</div></div>
+        <div class="event-item"><div class="event-date">Apr 8, 2026</div><div class="event-title">Engineering Retro</div><div class="event-meta">10:00 -- Virtual</div></div>
+        <div class="event-item"><div class="event-date">Apr 15, 2026</div><div class="event-title">Company All-Hands</div><div class="event-meta">16:00 -- Auditorium</div></div>
+      </div>`
+  },
+  pinned_content: {
+    label: 'Pinned Content',
+    description: 'Important links and resources',
+    render: () => `
+      <div class="module-header"><span>Pinned</span></div>
+      <div class="module-body">
+        <div class="pinned-item"><div class="pinned-icon">&#128218;</div><div><div class="pinned-title">Employee Handbook</div><div class="pinned-desc">Last updated Mar 2026</div></div></div>
+        <div class="pinned-item"><div class="pinned-icon">&#127919;</div><div><div class="pinned-title">OKRs Q2 2026</div><div class="pinned-desc">Company objectives</div></div></div>
+        <div class="pinned-item"><div class="pinned-icon">&#128227;</div><div><div class="pinned-title">Brand Guidelines</div><div class="pinned-desc">Logos, colors, tone</div></div></div>
+      </div>`
+  },
+  active_poll: {
+    label: 'Active Poll',
+    description: 'Current poll or survey',
+    render: () => `
+      <div class="module-header"><span>Active Poll</span></div>
+      <div class="module-body">
+        <div class="poll-question">What should be the theme for our summer offsite?</div>
+        <div class="poll-option"><div class="poll-bar" style="width:45%"></div><span>Adventure & Outdoors <span class="poll-pct">45%</span></span></div>
+        <div class="poll-option"><div class="poll-bar" style="width:30%"></div><span>Workshop & Learning <span class="poll-pct">30%</span></span></div>
+        <div class="poll-option"><div class="poll-bar" style="width:25%"></div><span>Relaxation & Wellness <span class="poll-pct">25%</span></span></div>
+      </div>`
+  },
+  navigation: {
+    label: 'Mix Navigation',
+    description: 'Browse content sections',
+    render: () => `
+      <div class="module-header"><span>Sections</span></div>
+      <div class="module-body">
+        <div class="nav-item"><div class="nav-dot" style="background:var(--orange)"></div>Company News<span class="nav-count">24</span></div>
+        <div class="nav-item"><div class="nav-dot" style="background:var(--blue)"></div>Product Updates<span class="nav-count">18</span></div>
+        <div class="nav-item"><div class="nav-dot" style="background:var(--yellow)"></div>Culture & Events<span class="nav-count">12</span></div>
+        <div class="nav-item"><div class="nav-dot" style="background:#a78bfa"></div>Learning & Growth<span class="nav-count">9</span></div>
+      </div>`
+  },
+  horizontal_mix: {
+    label: 'Horizontal Mix',
+    description: 'Swipeable content carousel',
+    render: () => `
+      <div class="module-header"><span>Trending</span></div>
+      <div class="module-body">
+        <div class="carousel">
+          <div class="carousel-item"><div class="carousel-item-img"></div><div class="carousel-item-label">AI Strategy 2026</div></div>
+          <div class="carousel-item"><div class="carousel-item-img" style="background:linear-gradient(135deg,#F6704D,#FFD138)"></div><div class="carousel-item-label">New Hires Q1</div></div>
+          <div class="carousel-item"><div class="carousel-item-img" style="background:linear-gradient(135deg,#a78bfa,#488ED8)"></div><div class="carousel-item-label">Tech Blog</div></div>
+          <div class="carousel-item"><div class="carousel-item-img" style="background:linear-gradient(135deg,#43445B,#488ED8)"></div><div class="carousel-item-label">CEO Update</div></div>
+        </div>
+      </div>`
+  },
+  empty: {
+    label: '(Empty Slot)',
+    description: 'No module assigned',
+    render: () => `
+      <div class="module-body" style="padding:24px 16px;text-align:center;color:#ccc;font-size:13px">
+        Empty slot -- click to assign a module
+      </div>`
+  }
+};
+
+// -- State --
+let config = {
+  sidebar_modules: [
+    { slot: 0, type: 'chat_groups', visible: true },
+    { slot: 1, type: 'events', visible: true },
+    { slot: 2, type: 'pinned_content', visible: true },
+    { slot: 3, type: 'active_poll', visible: true },
+  ]
+};
+let originalConfig = JSON.parse(JSON.stringify(config));
+let editMode = false;
+let dragSrcIndex = null;
+
+// -- Render sidebar --
+function renderSidebar() {
+  const sidebar = document.getElementById('sidebar');
+  sidebar.innerHTML = '';
+
+  config.sidebar_modules.forEach((mod, idx) => {
+    if (!mod.visible && !editMode) return;
+
+    const el = document.createElement('div');
+    el.className = 'sidebar-module' + (editMode ? ' editable' : '');
+    el.dataset.index = idx;
+    if (editMode) {
+      el.draggable = true;
+      el.addEventListener('dragstart', onDragStart);
+      el.addEventListener('dragover', onDragOver);
+      el.addEventListener('drop', onDrop);
+      el.addEventListener('dragend', onDragEnd);
+      el.addEventListener('dragleave', onDragLeave);
+    }
+
+    const def = MODULE_TYPES[mod.type] || MODULE_TYPES.empty;
+    el.innerHTML = def.render();
+
+    if (editMode) {
+      // Add drag handle to header
+      const header = el.querySelector('.module-header');
+      if (header) {
+        const handle = document.createElement('span');
+        handle.className = 'drag-handle';
+        handle.textContent = '\u2261';
+        handle.style.display = 'block';
+        header.appendChild(handle);
+      }
+
+      // Edit overlay
+      const overlay = document.createElement('div');
+      overlay.className = 'module-edit-overlay';
+      overlay.innerHTML = `
+        <label>Module Type</label>
+        <select class="module-select">
+          ${Object.entries(MODULE_TYPES).map(([key, val]) =>
+            `<option value="${key}" ${key === mod.type ? 'selected' : ''}>${val.label}</option>`
+          ).join('')}
+        </select>
+        <label style="margin-top:4px">
+          <input type="checkbox" class="module-visible" ${mod.visible ? 'checked' : ''}> Visible
+        </label>
+        <div class="module-edit-actions">
+          <button class="btn-apply" data-action="apply">Apply</button>
+          <button class="btn-remove" data-action="close">Close</button>
+        </div>
+      `;
+      el.appendChild(overlay);
+
+      el.addEventListener('click', (e) => {
+        if (e.target.closest('.module-edit-overlay')) return;
+        // Close all other overlays
+        document.querySelectorAll('.module-edit-overlay.active').forEach(o => o.classList.remove('active'));
+        overlay.classList.add('active');
+      });
+
+      overlay.querySelector('[data-action="apply"]').addEventListener('click', () => {
+        const newType = overlay.querySelector('.module-select').value;
+        const visible = overlay.querySelector('.module-visible').checked;
+        config.sidebar_modules[idx].type = newType;
+        config.sidebar_modules[idx].visible = visible;
+        renderSidebar();
+      });
+
+      overlay.querySelector('[data-action="close"]').addEventListener('click', () => {
+        overlay.classList.remove('active');
+      });
+    }
+
+    sidebar.appendChild(el);
+  });
+
+  // Add module slot (edit mode only)
+  const addSlot = document.createElement('div');
+  addSlot.className = 'add-module-slot' + (editMode ? ' visible' : '');
+  addSlot.innerHTML = '<div class="plus">+</div><div class="label">Add Module</div>';
+  addSlot.addEventListener('click', () => {
+    config.sidebar_modules.push({
+      slot: config.sidebar_modules.length,
+      type: 'empty',
+      visible: true
+    });
+    renderSidebar();
+  });
+  sidebar.appendChild(addSlot);
+}
+
+// -- Drag & Drop --
+function onDragStart(e) {
+  dragSrcIndex = parseInt(e.currentTarget.dataset.index);
+  e.currentTarget.classList.add('dragging');
+  e.dataTransfer.effectAllowed = 'move';
+}
+function onDragOver(e) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  e.currentTarget.classList.add('drag-over');
+}
+function onDragLeave(e) {
+  e.currentTarget.classList.remove('drag-over');
+}
+function onDrop(e) {
+  e.preventDefault();
+  e.currentTarget.classList.remove('drag-over');
+  const targetIndex = parseInt(e.currentTarget.dataset.index);
+  if (dragSrcIndex === null || dragSrcIndex === targetIndex) return;
+  const [moved] = config.sidebar_modules.splice(dragSrcIndex, 1);
+  config.sidebar_modules.splice(targetIndex, 0, moved);
+  // Re-number slots
+  config.sidebar_modules.forEach((m, i) => m.slot = i);
+  renderSidebar();
+}
+function onDragEnd(e) {
+  e.currentTarget.classList.remove('dragging');
+  dragSrcIndex = null;
+}
+
+// -- Edit mode toggle --
+document.getElementById('toggleEdit').addEventListener('click', () => {
+  editMode = true;
+  originalConfig = JSON.parse(JSON.stringify(config));
+  document.getElementById('editBanner').classList.remove('hidden');
+  document.getElementById('toggleEdit').style.display = 'none';
+  document.body.classList.add('editing');
+  renderSidebar();
+});
+
+document.getElementById('btnCancel').addEventListener('click', () => {
+  editMode = false;
+  config = JSON.parse(JSON.stringify(originalConfig));
+  document.getElementById('editBanner').classList.add('hidden');
+  document.getElementById('toggleEdit').style.display = '';
+  document.getElementById('jsonPanel').classList.remove('visible');
+  document.body.classList.remove('editing');
+  renderSidebar();
+});
+
+document.getElementById('btnSave').addEventListener('click', () => {
+  editMode = false;
+  document.getElementById('editBanner').classList.add('hidden');
+  document.getElementById('toggleEdit').style.display = '';
+  document.getElementById('jsonPanel').classList.remove('visible');
+  document.body.classList.remove('editing');
+  renderSidebar();
+  showToast('Configuration saved');
+});
+
+// -- JSON panel --
+document.getElementById('btnShowJson').addEventListener('click', () => {
+  const panel = document.getElementById('jsonPanel');
+  panel.classList.toggle('visible');
+  if (panel.classList.contains('visible')) {
+    renderJson();
+  }
+});
+document.getElementById('btnCloseJson').addEventListener('click', () => {
+  document.getElementById('jsonPanel').classList.remove('visible');
+});
+document.getElementById('btnCopy').addEventListener('click', () => {
+  const output = { layout: { sidebar: config.sidebar_modules } };
+  navigator.clipboard.writeText(JSON.stringify(output, null, 2));
+  showToast('JSON copied to clipboard');
+});
+
+function renderJson() {
+  const output = { layout: { sidebar: config.sidebar_modules } };
+  const raw = JSON.stringify(output, null, 2);
+  // Syntax highlight
+  const highlighted = raw
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"([^"]+)":/g, '<span class="json-key">"$1"</span>:')
+    .replace(/: "([^"]*)"/g, ': <span class="json-str">"$1"</span>')
+    .replace(/: (\d+)/g, ': <span class="json-num">$1</span>')
+    .replace(/: (true|false)/g, ': <span class="json-bool">$1</span>');
+  document.getElementById('jsonOutput').innerHTML = highlighted;
+}
+
+// -- Toast --
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// -- Init --
+renderSidebar();
+</script>
+</body>
+</html>

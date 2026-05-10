@@ -1,0 +1,2413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>tchop Event Card — UI Prototype</title>
+<style>
+  /* ─── DESIGN TOKENS (tchop Design System) ─── */
+  :root {
+    --color-primary: #F6704D;
+    --color-primary-hover: #e45c3a;
+    --color-secondary: #FFD138;
+    --color-accent: #488ED8;
+    --color-bg-light: #F1F1F3;
+    --color-bg-dark: #43445B;
+    --color-bg-footer: #2D2D46;
+    --color-white: #FEFEFE;
+    --color-text-primary: #2D2D46;
+    --color-text-secondary: #6B6B80;
+    --color-text-muted: #9B9BAD;
+    --color-border: #E2E2E8;
+    --color-success: #3AA76D;
+    --color-warning: #E8A830;
+    --color-danger: #D94848;
+    --color-waitlist: #8B5CF6;
+    --color-past: #9B9BAD;
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 14px;
+    --shadow-card: 0 1px 3px rgba(45, 45, 70, 0.06), 0 1px 2px rgba(45, 45, 70, 0.04);
+    --shadow-card-hover: 0 4px 12px rgba(45, 45, 70, 0.1), 0 2px 4px rgba(45, 45, 70, 0.06);
+    --shadow-elevated: 0 8px 24px rgba(45, 45, 70, 0.12);
+    --font-family: 'Basier Circle', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    --transition-fast: 150ms ease;
+    --transition-normal: 250ms ease;
+  }
+
+  /* ─── RESET & BASE ─── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--font-family);
+    background: var(--color-bg-light);
+    color: var(--color-text-primary);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ─── LAYOUT ─── */
+  .prototype-shell {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: clamp(1.5rem, 4vw, 3rem);
+  }
+
+  .prototype-header {
+    margin-bottom: clamp(2rem, 4vw, 3rem);
+  }
+
+  .prototype-header h1 {
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    font-weight: 700;
+    color: var(--color-text-primary);
+    letter-spacing: -0.02em;
+  }
+
+  .prototype-header p {
+    font-size: clamp(0.875rem, 1.2vw, 1rem);
+    color: var(--color-text-secondary);
+    margin-top: 0.5rem;
+  }
+
+  .section-label {
+    font-size: clamp(0.7rem, 1vw, 0.75rem);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-primary);
+    margin-bottom: 1rem;
+  }
+
+  .section-title {
+    font-size: clamp(1.25rem, 2.5vw, 1.5rem);
+    font-weight: 700;
+    color: var(--color-text-primary);
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.01em;
+  }
+
+  .section-desc {
+    font-size: clamp(0.8rem, 1.1vw, 0.9rem);
+    color: var(--color-text-secondary);
+    margin-bottom: 1.5rem;
+    max-width: 640px;
+  }
+
+  .section {
+    margin-bottom: clamp(3rem, 5vw, 4rem);
+  }
+
+  /* ─── CARD GRID ─── */
+  .card-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 1.25rem;
+    align-items: start;
+  }
+
+  /* ─── EVENT CARD (Feed Teaser) ─── */
+  .event-card {
+    background: var(--color-white);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-card);
+    transition: box-shadow var(--transition-normal), transform var(--transition-normal);
+    cursor: pointer;
+    position: relative;
+  }
+
+  .event-card:hover {
+    box-shadow: var(--shadow-card-hover);
+    transform: translateY(-1px);
+  }
+
+  .event-card--past {
+    opacity: 1;
+  }
+
+  .event-card--past .event-card__cover {
+    filter: grayscale(0.7) brightness(0.85);
+  }
+
+  .event-card__cover {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    background: var(--color-bg-dark);
+  }
+
+  .event-card__cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  /* Date stamp placeholder (no cover image) */
+  .event-card__date-stamp {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background: linear-gradient(135deg, var(--color-primary) 0%, #e45c3a 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-white);
+  }
+
+  .event-card__date-stamp .day {
+    font-size: clamp(2.5rem, 5vw, 3.5rem);
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+
+  .event-card__date-stamp .month {
+    font-size: clamp(0.875rem, 1.5vw, 1.125rem);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin-top: 0.25rem;
+  }
+
+  .event-card__badge {
+    position: absolute;
+    top: 0.75rem;
+    left: 0.75rem;
+    padding: 0.25rem 0.625rem;
+    border-radius: 100px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  .event-card__badge--live {
+    background: rgba(58, 167, 109, 0.9);
+    color: var(--color-white);
+  }
+
+  .event-card__badge--ended {
+    background: rgba(45, 45, 70, 0.75);
+    color: var(--color-white);
+  }
+
+  .event-card__badge--soon {
+    background: rgba(246, 112, 77, 0.9);
+    color: var(--color-white);
+  }
+
+  .event-card__body {
+    padding: 1rem 1.125rem 0.875rem;
+  }
+
+  .event-card__meta {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .event-card__meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.75rem;
+    color: var(--color-text-secondary);
+  }
+
+  .event-card__meta-item svg {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+  }
+
+  .event-card__meta-dot {
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: var(--color-border);
+  }
+
+  .event-card__title {
+    font-size: clamp(1rem, 1.5vw, 1.125rem);
+    font-weight: 600;
+    color: var(--color-text-primary);
+    line-height: 1.35;
+    margin-bottom: 0.625rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    letter-spacing: -0.01em;
+  }
+
+  .event-card__location {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.35rem;
+    font-size: 0.8rem;
+    color: var(--color-accent);
+    margin-bottom: 0.75rem;
+    cursor: pointer;
+    text-decoration: none;
+  }
+
+  .event-card__location:hover {
+    text-decoration: underline;
+  }
+
+  .event-card__location svg {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+    margin-top: 0.1rem;
+  }
+
+  .event-card__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .event-card__attendees {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .avatar-stack {
+    display: flex;
+  }
+
+  .avatar-stack__item {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: 2px solid var(--color-white);
+    margin-left: -8px;
+    background: var(--color-bg-light);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.6rem;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+  }
+
+  .avatar-stack__item:first-child { margin-left: 0; }
+
+  .avatar-stack__item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .avatar-stack__item--more {
+    background: var(--color-bg-dark);
+    color: var(--color-white);
+    font-size: 0.55rem;
+  }
+
+  .event-card__count {
+    font-size: 0.75rem;
+    color: var(--color-text-secondary);
+  }
+
+  .event-card__count strong {
+    font-weight: 600;
+    color: var(--color-text-primary);
+  }
+
+  /* ─── ACTION BUTTONS ─── */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-sm);
+    font-family: var(--font-family);
+    font-size: 0.8rem;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    white-space: nowrap;
+  }
+
+  .btn svg { width: 14px; height: 14px; }
+
+  .btn--attend {
+    background: var(--color-primary);
+    color: var(--color-white);
+  }
+
+  .btn--attend:hover {
+    background: var(--color-primary-hover);
+  }
+
+  .btn--attending {
+    background: var(--color-success);
+    color: var(--color-white);
+  }
+
+  .btn--attending:hover {
+    background: #2f8f5c;
+  }
+
+  .btn--waitlist {
+    background: var(--color-waitlist);
+    color: var(--color-white);
+  }
+
+  .btn--waitlist:hover {
+    background: #7c4fe6;
+  }
+
+  .btn--waitlisted {
+    background: rgba(139, 92, 246, 0.12);
+    color: var(--color-waitlist);
+    border: 1px solid rgba(139, 92, 246, 0.25);
+  }
+
+  .btn--disabled {
+    background: var(--color-bg-light);
+    color: var(--color-text-muted);
+    cursor: not-allowed;
+  }
+
+  .btn--outline {
+    background: transparent;
+    color: var(--color-text-secondary);
+    border: 1px solid var(--color-border);
+  }
+
+  .btn--outline:hover {
+    border-color: var(--color-text-secondary);
+    color: var(--color-text-primary);
+  }
+
+  .btn--ghost {
+    background: transparent;
+    color: var(--color-text-secondary);
+    padding: 0.5rem 0.625rem;
+  }
+
+  .btn--ghost:hover {
+    background: var(--color-bg-light);
+    color: var(--color-text-primary);
+  }
+
+  /* ─── CAPACITY BAR ─── */
+  .capacity-bar {
+    height: 3px;
+    background: var(--color-border);
+    border-radius: 2px;
+    margin-top: 0.5rem;
+    overflow: hidden;
+  }
+
+  .capacity-bar__fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 400ms ease;
+  }
+
+  .capacity-bar__fill--available { background: var(--color-success); }
+  .capacity-bar__fill--almost { background: var(--color-warning); }
+  .capacity-bar__fill--full { background: var(--color-danger); }
+
+  /* ─── EVENT DETAIL VIEW ─── */
+  .detail-view {
+    background: var(--color-white);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-card);
+    max-width: 720px;
+  }
+
+  .detail-view__cover {
+    width: 100%;
+    aspect-ratio: 21 / 9;
+    overflow: hidden;
+    background: var(--color-bg-dark);
+    position: relative;
+  }
+
+  .detail-view__cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .detail-view__content {
+    padding: clamp(1.25rem, 3vw, 2rem);
+  }
+
+  .detail-view__title {
+    font-size: clamp(1.25rem, 2.5vw, 1.75rem);
+    font-weight: 700;
+    color: var(--color-text-primary);
+    margin-bottom: 1.25rem;
+    letter-spacing: -0.02em;
+    line-height: 1.25;
+  }
+
+  .detail-view__info-grid {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.75rem 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .detail-view__info-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding-top: 0.1rem;
+  }
+
+  .detail-view__info-value {
+    font-size: 0.9rem;
+    color: var(--color-text-primary);
+  }
+
+  .detail-view__info-value a {
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  .detail-view__info-value a:hover {
+    text-decoration: underline;
+  }
+
+  .detail-view__description {
+    font-size: 0.9rem;
+    line-height: 1.65;
+    color: var(--color-text-secondary);
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .detail-view__actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  .detail-view__attendee-section {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .detail-view__attendee-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+  }
+
+  .detail-view__attendee-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--color-text-primary);
+  }
+
+  .detail-view__attendee-count {
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+  }
+
+  .attendee-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .attendee-chip {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.3rem 0.6rem 0.3rem 0.3rem;
+    background: var(--color-bg-light);
+    border-radius: 100px;
+    font-size: 0.75rem;
+    color: var(--color-text-secondary);
+  }
+
+  .attendee-chip__avatar {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--color-bg-dark);
+    color: var(--color-white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.55rem;
+    font-weight: 600;
+  }
+
+  /* ─── CALENDAR VIEW ─── */
+  .calendar-shell {
+    background: var(--color-white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+    overflow: hidden;
+  }
+
+  .calendar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .calendar-header__title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--color-text-primary);
+  }
+
+  .calendar-header__nav {
+    display: flex;
+    gap: 0.25rem;
+  }
+
+  .calendar-header__nav button {
+    width: 32px;
+    height: 32px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-white);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-text-secondary);
+    transition: all var(--transition-fast);
+  }
+
+  .calendar-header__nav button:hover {
+    border-color: var(--color-text-secondary);
+    color: var(--color-text-primary);
+  }
+
+  .calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    padding: 0.75rem;
+    gap: 2px;
+  }
+
+  .calendar-grid__day-name {
+    text-align: center;
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 0.5rem 0;
+  }
+
+  .calendar-grid__cell {
+    aspect-ratio: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-sm);
+    font-size: 0.8rem;
+    color: var(--color-text-secondary);
+    cursor: default;
+    position: relative;
+    gap: 3px;
+  }
+
+  .calendar-grid__cell--other-month {
+    color: var(--color-border);
+  }
+
+  .calendar-grid__cell--today {
+    font-weight: 700;
+    color: var(--color-primary);
+  }
+
+  .calendar-grid__cell--has-event {
+    cursor: pointer;
+  }
+
+  .calendar-grid__cell--has-event:hover {
+    background: var(--color-bg-light);
+  }
+
+  .calendar-dot-row {
+    display: flex;
+    gap: 2px;
+  }
+
+  .calendar-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--color-primary);
+  }
+
+  .calendar-dot--past {
+    background: var(--color-text-muted);
+  }
+
+  /* ─── MY EVENTS VIEW ─── */
+  .my-events {
+    background: var(--color-white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+    overflow: hidden;
+    max-width: 480px;
+  }
+
+  .my-events__header {
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--color-border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .my-events__title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--color-text-primary);
+  }
+
+  .my-events__tabs {
+    display: flex;
+    gap: 0;
+    background: var(--color-bg-light);
+    border-radius: var(--radius-sm);
+    padding: 2px;
+  }
+
+  .my-events__tab {
+    padding: 0.3rem 0.6rem;
+    font-size: 0.7rem;
+    font-weight: 600;
+    border: none;
+    background: transparent;
+    color: var(--color-text-muted);
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: var(--font-family);
+    transition: all var(--transition-fast);
+  }
+
+  .my-events__tab--active {
+    background: var(--color-white);
+    color: var(--color-text-primary);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+  }
+
+  .my-events__list {
+    list-style: none;
+  }
+
+  .my-events__item {
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
+    padding: 0.875rem 1.25rem;
+    border-bottom: 1px solid var(--color-border);
+    transition: background var(--transition-fast);
+    cursor: pointer;
+  }
+
+  .my-events__item:last-child { border-bottom: none; }
+
+  .my-events__item:hover {
+    background: rgba(241, 241, 243, 0.5);
+  }
+
+  .my-events__item--past {
+    opacity: 0.55;
+  }
+
+  .my-events__date-block {
+    width: 44px;
+    height: 44px;
+    border-radius: var(--radius-sm);
+    background: var(--color-bg-light);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .my-events__date-block--upcoming {
+    background: rgba(246, 112, 77, 0.1);
+    color: var(--color-primary);
+  }
+
+  .my-events__date-day {
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  .my-events__date-month {
+    font-size: 0.55rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    line-height: 1;
+    margin-top: 2px;
+  }
+
+  .my-events__info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .my-events__event-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .my-events__event-meta {
+    font-size: 0.72rem;
+    color: var(--color-text-muted);
+    margin-top: 0.15rem;
+  }
+
+  .my-events__status {
+    font-size: 0.65rem;
+    font-weight: 600;
+    padding: 0.2rem 0.5rem;
+    border-radius: 100px;
+    flex-shrink: 0;
+  }
+
+  .my-events__status--attending {
+    background: rgba(58, 167, 109, 0.1);
+    color: var(--color-success);
+  }
+
+  .my-events__status--waitlisted {
+    background: rgba(139, 92, 246, 0.1);
+    color: var(--color-waitlist);
+  }
+
+  /* ─── CMS FORM ─── */
+  .cms-form {
+    background: var(--color-white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+    overflow: hidden;
+    max-width: 640px;
+  }
+
+  .cms-form__header {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--color-border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .cms-form__title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--color-text-primary);
+  }
+
+  .cms-form__body {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .form-group__label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+  }
+
+  .form-group__label span {
+    color: var(--color-primary);
+  }
+
+  .form-group__input {
+    padding: 0.6rem 0.75rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    font-family: var(--font-family);
+    font-size: 0.875rem;
+    color: var(--color-text-primary);
+    background: var(--color-white);
+    transition: border-color var(--transition-fast);
+    outline: none;
+  }
+
+  .form-group__input:focus {
+    border-color: var(--color-primary);
+  }
+
+  .form-group__input::placeholder {
+    color: var(--color-text-muted);
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  .form-group__hint {
+    font-size: 0.7rem;
+    color: var(--color-text-muted);
+    margin-top: 0.1rem;
+  }
+
+  .form-toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+  }
+
+  .form-toggle-label {
+    font-size: 0.85rem;
+    color: var(--color-text-primary);
+  }
+
+  .form-toggle-label small {
+    display: block;
+    font-size: 0.72rem;
+    color: var(--color-text-muted);
+    font-weight: 400;
+    margin-top: 0.1rem;
+  }
+
+  .toggle {
+    width: 40px;
+    height: 22px;
+    background: var(--color-border);
+    border-radius: 11px;
+    position: relative;
+    cursor: pointer;
+    transition: background var(--transition-fast);
+    flex-shrink: 0;
+  }
+
+  .toggle--active { background: var(--color-success); }
+
+  .toggle__knob {
+    width: 18px;
+    height: 18px;
+    background: var(--color-white);
+    border-radius: 50%;
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    transition: transform var(--transition-fast);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+  }
+
+  .toggle--active .toggle__knob {
+    transform: translateX(18px);
+  }
+
+  .cms-form__footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid var(--color-border);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.5rem;
+  }
+
+  .btn--primary {
+    background: var(--color-primary);
+    color: var(--color-white);
+    padding: 0.6rem 1.25rem;
+  }
+
+  .btn--primary:hover { background: var(--color-primary-hover); }
+
+  .btn--secondary {
+    background: var(--color-bg-light);
+    color: var(--color-text-secondary);
+    padding: 0.6rem 1.25rem;
+  }
+
+  .btn--secondary:hover {
+    background: var(--color-border);
+    color: var(--color-text-primary);
+  }
+
+  /* ─── EVENT TAG PILLS ─── */
+  .tag-row {
+    display: flex;
+    gap: 0.35rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.5rem;
+  }
+
+  .tag-pill {
+    font-size: 0.65rem;
+    font-weight: 600;
+    padding: 0.15rem 0.45rem;
+    border-radius: 3px;
+    background: rgba(72, 142, 216, 0.1);
+    color: var(--color-accent);
+  }
+
+  .tag-pill--event {
+    background: rgba(246, 112, 77, 0.1);
+    color: var(--color-primary);
+  }
+
+  /* ─── ADMIN ATTENDEE TABLE ─── */
+  .admin-table-wrap {
+    background: var(--color-white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+    overflow: hidden;
+  }
+
+  .admin-table-header {
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--color-border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .admin-table-header h3 {
+    font-size: 0.95rem;
+    font-weight: 700;
+  }
+
+  .admin-table-stats {
+    display: flex;
+    gap: 1rem;
+  }
+
+  .admin-table-stat {
+    font-size: 0.75rem;
+    color: var(--color-text-secondary);
+  }
+
+  .admin-table-stat strong {
+    font-weight: 700;
+    color: var(--color-text-primary);
+  }
+
+  .admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.8rem;
+  }
+
+  .admin-table th {
+    text-align: left;
+    padding: 0.6rem 1rem;
+    font-size: 0.68rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-text-muted);
+    background: var(--color-bg-light);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .admin-table td {
+    padding: 0.65rem 1rem;
+    border-bottom: 1px solid var(--color-border);
+    color: var(--color-text-secondary);
+  }
+
+  .admin-table tr:last-child td { border-bottom: none; }
+
+  .admin-table .status-badge {
+    font-size: 0.65rem;
+    font-weight: 600;
+    padding: 0.15rem 0.45rem;
+    border-radius: 3px;
+  }
+
+  .status-badge--attending {
+    background: rgba(58, 167, 109, 0.1);
+    color: var(--color-success);
+  }
+
+  .status-badge--waitlisted {
+    background: rgba(139, 92, 246, 0.1);
+    color: var(--color-waitlist);
+  }
+
+  /* ─── STATE ANNOTATIONS ─── */
+  .state-label {
+    display: inline-block;
+    font-size: 0.65rem;
+    font-weight: 600;
+    padding: 0.2rem 0.5rem;
+    border-radius: 3px;
+    background: var(--color-bg-dark);
+    color: var(--color-white);
+    letter-spacing: 0.04em;
+    margin-bottom: 0.5rem;
+  }
+
+  .state-label--orange { background: var(--color-primary); }
+  .state-label--green { background: var(--color-success); }
+  .state-label--purple { background: var(--color-waitlist); }
+  .state-label--muted { background: var(--color-text-muted); }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 768px) {
+    .card-row {
+      grid-template-columns: 1fr;
+    }
+    .form-row {
+      grid-template-columns: 1fr;
+    }
+    .detail-view__cover {
+      aspect-ratio: 16 / 9;
+    }
+  }
+
+  /* ─── DIVIDER ─── */
+  .divider {
+    height: 1px;
+    background: var(--color-border);
+    margin: clamp(2rem, 4vw, 3rem) 0;
+  }
+
+  [id^="sec-"] {
+    scroll-margin-top: 1.5rem;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  /* ─── CANCEL CONFIRMATION ─── */
+  .cancel-flow {
+    background: var(--color-white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+    overflow: hidden;
+  }
+
+  .cancel-flow__step {
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .cancel-flow__step:last-child { border-bottom: none; }
+
+  .cancel-flow__step-label {
+    font-size: 0.65rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-text-muted);
+    margin-bottom: 0.5rem;
+  }
+
+  .cancel-flow__step-label span {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--color-bg-dark);
+    color: var(--color-white);
+    text-align: center;
+    line-height: 18px;
+    font-size: 0.55rem;
+    margin-right: 0.35rem;
+    vertical-align: middle;
+  }
+
+  .cancel-confirm-sheet {
+    background: var(--color-white);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: 1.25rem;
+    max-width: 340px;
+    box-shadow: var(--shadow-elevated);
+  }
+
+  .cancel-confirm-sheet__icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(217, 72, 72, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.75rem;
+  }
+
+  .cancel-confirm-sheet__title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--color-text-primary);
+    margin-bottom: 0.35rem;
+  }
+
+  .cancel-confirm-sheet__text {
+    font-size: 0.8rem;
+    color: var(--color-text-secondary);
+    line-height: 1.5;
+    margin-bottom: 1rem;
+  }
+
+  .cancel-confirm-sheet__warning {
+    font-size: 0.72rem;
+    color: var(--color-warning);
+    background: rgba(232, 168, 48, 0.08);
+    padding: 0.5rem 0.65rem;
+    border-radius: var(--radius-sm);
+    margin-bottom: 1rem;
+    line-height: 1.4;
+  }
+
+  .cancel-confirm-sheet__actions {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .btn--danger {
+    background: var(--color-danger);
+    color: var(--color-white);
+  }
+
+  .btn--danger:hover { background: #c03c3c; }
+
+  /* ─── NAV INDEX ─── */
+  .nav-index {
+    background: var(--color-white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+    overflow: hidden;
+    margin-bottom: clamp(2rem, 4vw, 3rem);
+  }
+
+  .nav-index__header {
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--color-border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .nav-index__title {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--color-text-primary);
+  }
+
+  .nav-index__links {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .nav-index__link {
+    font-size: 0.7rem;
+    color: var(--color-accent);
+    text-decoration: none;
+    padding: 0.2rem 0.5rem;
+    border: 1px solid rgba(72, 142, 216, 0.2);
+    border-radius: var(--radius-sm);
+    transition: all var(--transition-fast);
+  }
+
+  .nav-index__link:hover {
+    background: rgba(72, 142, 216, 0.06);
+    border-color: var(--color-accent);
+  }
+
+  .nav-index__body {
+    padding: 0;
+  }
+
+  .nav-index__row {
+    display: grid;
+    grid-template-columns: 200px 1fr auto;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.7rem 1.25rem;
+    border-bottom: 1px solid var(--color-border);
+    text-decoration: none;
+    color: inherit;
+    transition: background var(--transition-fast);
+  }
+
+  .nav-index__row:last-child { border-bottom: none; }
+
+  .nav-index__row:hover {
+    background: rgba(241, 241, 243, 0.5);
+  }
+
+  .nav-index__section-name {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--color-text-primary);
+  }
+
+  .nav-index__uc-tags {
+    display: flex;
+    gap: 0.3rem;
+    flex-wrap: wrap;
+  }
+
+  .uc-tag {
+    font-size: 0.62rem;
+    font-weight: 600;
+    padding: 0.15rem 0.4rem;
+    border-radius: 3px;
+    background: rgba(246, 112, 77, 0.08);
+    color: var(--color-primary);
+    white-space: nowrap;
+  }
+
+  .uc-tag--feature {
+    background: rgba(72, 142, 216, 0.08);
+    color: var(--color-accent);
+  }
+
+  .nav-index__arrow {
+    color: var(--color-text-muted);
+    font-size: 0.8rem;
+  }
+
+  /* ─── UC REFERENCE BOX ─── */
+  .uc-ref {
+    background: var(--color-white);
+    border: 1px solid var(--color-border);
+    border-left: 3px solid var(--color-primary);
+    border-radius: var(--radius-sm);
+    padding: 0.75rem 1rem;
+    margin-bottom: 1.25rem;
+    font-size: 0.78rem;
+    line-height: 1.6;
+    color: var(--color-text-secondary);
+  }
+
+  .uc-ref__title {
+    font-weight: 700;
+    color: var(--color-text-primary);
+    margin-bottom: 0.25rem;
+    font-size: 0.8rem;
+  }
+
+  .uc-ref a {
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  .uc-ref a:hover {
+    text-decoration: underline;
+  }
+
+  .uc-ref__features {
+    display: flex;
+    gap: 0.3rem;
+    flex-wrap: wrap;
+    margin-top: 0.4rem;
+  }
+
+  @media (max-width: 768px) {
+    .nav-index__row {
+      grid-template-columns: 1fr;
+      gap: 0.35rem;
+    }
+    .nav-index__arrow { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="prototype-shell">
+
+  <!-- ─── HEADER ─── -->
+  <div class="prototype-header">
+    <h1>Event Card — UI Prototype</h1>
+    <p>Card type #12 for tchop.io. All views and states based on the approved requirements spec.</p>
+  </div>
+
+  <!-- ─── NAVIGATION INDEX ─── -->
+  <div class="nav-index">
+    <div class="nav-index__header">
+      <span class="nav-index__title">Sections & Use Case Mapping</span>
+      <div class="nav-index__links">
+        <a class="nav-index__link" href="https://www.notion.so/tchop/330854bf771580dabc56fcd289b436fb" target="_blank">Use Cases (Notion)</a>
+        <a class="nav-index__link" href="https://www.notion.so/tchop/325854bf7715802ebe7ae2f5155e725a" target="_blank">Full Spec (Notion)</a>
+        <a class="nav-index__link" href="https://www.notion.so/tchop/32f854bf7715809c9931f60bd424443b" target="_blank">Briefing (Notion)</a>
+      </div>
+    </div>
+    <div class="nav-index__body">
+      <a class="nav-index__row" href="#sec-feed">
+        <span class="nav-index__section-name">1. Event Card in Feed</span>
+        <div class="nav-index__uc-tags">
+          <span class="uc-tag">UC-2 Discover</span>
+          <span class="uc-tag">UC-3 Attend</span>
+          <span class="uc-tag">UC-4 Cancel</span>
+          <span class="uc-tag">UC-10 Past State</span>
+          <span class="uc-tag uc-tag--feature">F1 F2 F4 F10 F11 F12</span>
+        </div>
+        <span class="nav-index__arrow">&#8595;</span>
+      </a>
+      <a class="nav-index__row" href="#sec-cancel">
+        <span class="nav-index__section-name">1b. Cancel Attendance Flow</span>
+        <div class="nav-index__uc-tags">
+          <span class="uc-tag">UC-4 Cancel</span>
+          <span class="uc-tag uc-tag--feature">F2 F3 F4</span>
+        </div>
+        <span class="nav-index__arrow">&#8595;</span>
+      </a>
+      <a class="nav-index__row" href="#sec-detail">
+        <span class="nav-index__section-name">2. Event Detail View</span>
+        <div class="nav-index__uc-tags">
+          <span class="uc-tag">UC-2 Discover</span>
+          <span class="uc-tag">UC-3 Attend</span>
+          <span class="uc-tag">UC-5 .ics Download</span>
+          <span class="uc-tag uc-tag--feature">F1 F2 F8 F11 F12</span>
+        </div>
+        <span class="nav-index__arrow">&#8595;</span>
+      </a>
+      <a class="nav-index__row" href="#sec-calendar">
+        <span class="nav-index__section-name">3. Calendar View</span>
+        <div class="nav-index__uc-tags">
+          <span class="uc-tag">UC-7 Calendar</span>
+          <span class="uc-tag uc-tag--feature">F5</span>
+        </div>
+        <span class="nav-index__arrow">&#8595;</span>
+      </a>
+      <a class="nav-index__row" href="#sec-myevents">
+        <span class="nav-index__section-name">4. My Events</span>
+        <div class="nav-index__uc-tags">
+          <span class="uc-tag">UC-8 My Events</span>
+          <span class="uc-tag uc-tag--feature">F6</span>
+        </div>
+        <span class="nav-index__arrow">&#8595;</span>
+      </a>
+      <a class="nav-index__row" href="#sec-cms">
+        <span class="nav-index__section-name">5. CMS: Create Event</span>
+        <div class="nav-index__uc-tags">
+          <span class="uc-tag">UC-1 Create</span>
+          <span class="uc-tag uc-tag--feature">F1 F13</span>
+        </div>
+        <span class="nav-index__arrow">&#8595;</span>
+      </a>
+      <a class="nav-index__row" href="#sec-admin">
+        <span class="nav-index__section-name">6. CMS: Attendee Management</span>
+        <div class="nav-index__uc-tags">
+          <span class="uc-tag">UC-6 Manage Attendees</span>
+          <span class="uc-tag uc-tag--feature">F7</span>
+        </div>
+        <span class="nav-index__arrow">&#8595;</span>
+      </a>
+      <a class="nav-index__row" href="#sec-states">
+        <span class="nav-index__section-name">7. Button State Matrix</span>
+        <div class="nav-index__uc-tags">
+          <span class="uc-tag">UC-3 UC-4 UC-10</span>
+          <span class="uc-tag uc-tag--feature">F2 F3 F4 F10</span>
+        </div>
+        <span class="nav-index__arrow">&#8595;</span>
+      </a>
+      <a class="nav-index__row" href="#sec-backend" style="background: rgba(241,241,243,0.5);">
+        <span class="nav-index__section-name" style="color: var(--color-text-secondary);">8. Backend-Only (no UI)</span>
+        <div class="nav-index__uc-tags">
+          <span class="uc-tag">UC-9 Push Reminders</span>
+          <span class="uc-tag uc-tag--feature">F9 F13 F14</span>
+        </div>
+        <span class="nav-index__arrow">&#8595;</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════ -->
+  <!-- SECTION 1: Feed Teaser Cards (all states)       -->
+  <!-- ════════════════════════════════════════════════ -->
+  <div class="section" id="sec-feed">
+    <div class="section-label">Section 1</div>
+    <div class="section-title">Event Card in Feed</div>
+    <div class="section-desc">How event cards appear alongside other cards in the mix feed. Shows all button states and visual treatments.</div>
+
+    <div class="uc-ref">
+      <div class="uc-ref__title">Use Cases covered in this section</div>
+      <a href="https://www.notion.so/tchop/330854bf771580dabc56fcd289b436fb" target="_blank"><strong>UC-2:</strong> User Discovers Events in Feed</a> — Event card teaser with cover image, date, location, attendee count, attend button. Old app versions hide the card entirely.<br>
+      <a href="https://www.notion.so/tchop/330854bf771580dabc56fcd289b436fb" target="_blank"><strong>UC-3:</strong> User Attends an Event (RSVP)</a> — Attend button, atomic capacity check, waitlist with position indicator, debounced at 1s.<br>
+      <a href="https://www.notion.so/tchop/330854bf771580dabc56fcd289b436fb" target="_blank"><strong>UC-4:</strong> User Cancels Attendance</a> — Toggle off "Attending", triggers waitlist auto-promotion via background job.<br>
+      <a href="https://www.notion.so/tchop/330854bf771580dabc56fcd289b436fb" target="_blank"><strong>UC-10:</strong> Past Event State</a> — Greyed-out cover, "Event ended" badge, attend button hidden. Client-side calculation from eventStartDate.
+      <div class="uc-ref__features">
+        <span class="uc-tag uc-tag--feature">F1 Card Type</span>
+        <span class="uc-tag uc-tag--feature">F2 Attend/Unattend</span>
+        <span class="uc-tag uc-tag--feature">F3 Waitlist</span>
+        <span class="uc-tag uc-tag--feature">F4 Reg. Deadline</span>
+        <span class="uc-tag uc-tag--feature">F10 Past State</span>
+        <span class="uc-tag uc-tag--feature">F11 Location Link</span>
+        <span class="uc-tag uc-tag--feature">F12 Avatars</span>
+        <span class="uc-tag uc-tag--feature">F14 Backward Compat.</span>
+      </div>
+    </div>
+
+    <div class="card-row">
+
+      <!-- STATE: Open, spots available -->
+      <div>
+        <div class="state-label state-label--orange">Open — spots available</div>
+        <div class="event-card">
+          <div class="event-card__cover">
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='640' height='360'%3E%3Crect fill='%2343445B' width='640' height='360'/%3E%3Ctext x='320' y='170' text-anchor='middle' fill='%236B6B80' font-family='sans-serif' font-size='14'%3ESummer Team Event%3C/text%3E%3Ctext x='320' y='195' text-anchor='middle' fill='%239B9BAD' font-family='sans-serif' font-size='11'%3Ecover image%3C/text%3E%3C/svg%3E" alt="">
+            <span class="event-card__badge event-card__badge--live">Registration open</span>
+          </div>
+          <div class="event-card__body">
+            <div class="tag-row">
+              <span class="tag-pill tag-pill--event">Teambuilding</span>
+            </div>
+            <div class="event-card__meta">
+              <span class="event-card__meta-item">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="12" height="11" rx="1.5"/><path d="M2 7h12M5.5 1.5v3M10.5 1.5v3"/></svg>
+                Thu, 10 Apr 2026 &middot; 14:00
+              </span>
+            </div>
+            <h3 class="event-card__title">Summer Team Event — BBQ & Activities</h3>
+            <a class="event-card__location" href="#">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 14s-5-4.5-5-8a5 5 0 1 1 10 0c0 3.5-5 8-5 8z"/><circle cx="8" cy="6" r="1.5"/></svg>
+              Schlosspark Dresden, Hauptallee 12
+            </a>
+            <div class="event-card__footer">
+              <div class="event-card__attendees">
+                <div class="avatar-stack">
+                  <div class="avatar-stack__item">MK</div>
+                  <div class="avatar-stack__item">JR</div>
+                  <div class="avatar-stack__item">TH</div>
+                  <div class="avatar-stack__item avatar-stack__item--more">+9</div>
+                </div>
+                <span class="event-card__count"><strong>12</strong>/50 attending</span>
+              </div>
+              <button class="btn btn--attend">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8.5l3.5 3.5 6.5-7"/></svg>
+                Attend
+              </button>
+            </div>
+            <div class="capacity-bar"><div class="capacity-bar__fill capacity-bar__fill--available" style="width: 24%"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STATE: User attending -->
+      <div>
+        <div class="state-label state-label--green">User is attending</div>
+        <div class="event-card">
+          <div class="event-card__cover">
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='640' height='360'%3E%3Crect fill='%2343445B' width='640' height='360'/%3E%3Ctext x='320' y='170' text-anchor='middle' fill='%236B6B80' font-family='sans-serif' font-size='14'%3EHealth %26 Wellness Week%3C/text%3E%3Ctext x='320' y='195' text-anchor='middle' fill='%239B9BAD' font-family='sans-serif' font-size='11'%3Ecover image%3C/text%3E%3C/svg%3E" alt="">
+          </div>
+          <div class="event-card__body">
+            <div class="tag-row">
+              <span class="tag-pill tag-pill--event">Gesundheit</span>
+              <span class="tag-pill">Alle Mitarbeitende</span>
+            </div>
+            <div class="event-card__meta">
+              <span class="event-card__meta-item">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="12" height="11" rx="1.5"/><path d="M2 7h12M5.5 1.5v3M10.5 1.5v3"/></svg>
+                Mon, 14 Apr 2026 &middot; 09:00 – 17:00
+              </span>
+            </div>
+            <h3 class="event-card__title">Gesundheitswoche: Ergonomie am Arbeitsplatz</h3>
+            <a class="event-card__location" href="#">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 14s-5-4.5-5-8a5 5 0 1 1 10 0c0 3.5-5 8-5 8z"/><circle cx="8" cy="6" r="1.5"/></svg>
+              AOK Plus Zentrale, Raum 4.02
+            </a>
+            <div class="event-card__footer">
+              <div class="event-card__attendees">
+                <div class="avatar-stack">
+                  <div class="avatar-stack__item">SL</div>
+                  <div class="avatar-stack__item">PW</div>
+                  <div class="avatar-stack__item">KM</div>
+                  <div class="avatar-stack__item">AB</div>
+                  <div class="avatar-stack__item avatar-stack__item--more">+28</div>
+                </div>
+                <span class="event-card__count"><strong>32</strong>/40 attending</span>
+              </div>
+              <button class="btn btn--attending">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8.5l3.5 3.5 6.5-7"/></svg>
+                Attending
+              </button>
+            </div>
+            <div class="capacity-bar"><div class="capacity-bar__fill capacity-bar__fill--almost" style="width: 80%"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STATE: Full — Waitlist -->
+      <div>
+        <div class="state-label state-label--purple">Full — waitlist open</div>
+        <div class="event-card">
+          <div class="event-card__date-stamp">
+            <span class="day">18</span>
+            <span class="month">Apr</span>
+          </div>
+          <div class="event-card__body">
+            <div class="tag-row">
+              <span class="tag-pill tag-pill--event">Workshop</span>
+            </div>
+            <div class="event-card__meta">
+              <span class="event-card__meta-item">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="12" height="11" rx="1.5"/><path d="M2 7h12M5.5 1.5v3M10.5 1.5v3"/></svg>
+                Fri, 18 Apr 2026 &middot; 10:00 – 12:00
+              </span>
+            </div>
+            <h3 class="event-card__title">Erste Hilfe Auffrischungskurs</h3>
+            <a class="event-card__location" href="#">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 14s-5-4.5-5-8a5 5 0 1 1 10 0c0 3.5-5 8-5 8z"/><circle cx="8" cy="6" r="1.5"/></svg>
+              Schulungszentrum, EG Saal 1
+            </a>
+            <div class="event-card__footer">
+              <div class="event-card__attendees">
+                <div class="avatar-stack">
+                  <div class="avatar-stack__item">RS</div>
+                  <div class="avatar-stack__item">FG</div>
+                  <div class="avatar-stack__item">DM</div>
+                  <div class="avatar-stack__item avatar-stack__item--more">+17</div>
+                </div>
+                <span class="event-card__count"><strong>20</strong>/20 &middot; 3 waitlisted</span>
+              </div>
+              <button class="btn btn--waitlist">Join Waitlist</button>
+            </div>
+            <div class="capacity-bar"><div class="capacity-bar__fill capacity-bar__fill--full" style="width: 100%"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STATE: On waitlist -->
+      <div>
+        <div class="state-label state-label--purple">User is on waitlist</div>
+        <div class="event-card">
+          <div class="event-card__date-stamp">
+            <span class="day">18</span>
+            <span class="month">Apr</span>
+          </div>
+          <div class="event-card__body">
+            <div class="event-card__meta">
+              <span class="event-card__meta-item">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="12" height="11" rx="1.5"/><path d="M2 7h12M5.5 1.5v3M10.5 1.5v3"/></svg>
+                Fri, 18 Apr 2026 &middot; 10:00 – 12:00
+              </span>
+            </div>
+            <h3 class="event-card__title">Erste Hilfe Auffrischungskurs</h3>
+            <a class="event-card__location" href="#">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 14s-5-4.5-5-8a5 5 0 1 1 10 0c0 3.5-5 8-5 8z"/><circle cx="8" cy="6" r="1.5"/></svg>
+              Schulungszentrum, EG Saal 1
+            </a>
+            <div class="event-card__footer">
+              <div class="event-card__attendees">
+                <span class="event-card__count"><strong>20</strong>/20 full</span>
+              </div>
+              <button class="btn btn--waitlisted">On Waitlist #4</button>
+            </div>
+            <div class="capacity-bar"><div class="capacity-bar__fill capacity-bar__fill--full" style="width: 100%"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STATE: Past event -->
+      <div>
+        <div class="state-label state-label--muted">Past event (UC-10)</div>
+        <div class="event-card event-card--past">
+          <div class="event-card__cover">
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='640' height='360'%3E%3Crect fill='%2343445B' width='640' height='360'/%3E%3Ctext x='320' y='180' text-anchor='middle' fill='%236B6B80' font-family='sans-serif' font-size='14'%3EOnboarding Day%3C/text%3E%3C/svg%3E" alt="">
+            <span class="event-card__badge event-card__badge--ended">Event ended</span>
+          </div>
+          <div class="event-card__body">
+            <div class="event-card__meta">
+              <span class="event-card__meta-item">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="12" height="11" rx="1.5"/><path d="M2 7h12M5.5 1.5v3M10.5 1.5v3"/></svg>
+                Mon, 17 Mar 2026 &middot; 09:00
+              </span>
+            </div>
+            <h3 class="event-card__title">Neuer Mitarbeitenden-Tag Q1</h3>
+            <div class="event-card__footer">
+              <div class="event-card__attendees">
+                <span class="event-card__count"><strong>38</strong> attended</span>
+              </div>
+              <!-- No attend button for past events -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STATE: Unlimited capacity, no cover image -->
+      <div>
+        <div class="state-label">Unlimited capacity, no image</div>
+        <div class="event-card">
+          <div class="event-card__date-stamp">
+            <span class="day">22</span>
+            <span class="month">Apr</span>
+          </div>
+          <div class="event-card__body">
+            <div class="event-card__meta">
+              <span class="event-card__meta-item">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="12" height="11" rx="1.5"/><path d="M2 7h12M5.5 1.5v3M10.5 1.5v3"/></svg>
+                Tue, 22 Apr 2026 &middot; 11:00 – 12:00
+              </span>
+            </div>
+            <h3 class="event-card__title">All-Hands: Quartalsbericht Q1 2026</h3>
+            <a class="event-card__location" href="#">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 14s-5-4.5-5-8a5 5 0 1 1 10 0c0 3.5-5 8-5 8z"/><circle cx="8" cy="6" r="1.5"/></svg>
+              Online (MS Teams)
+            </a>
+            <div class="event-card__footer">
+              <div class="event-card__attendees">
+                <div class="avatar-stack">
+                  <div class="avatar-stack__item">HK</div>
+                  <div class="avatar-stack__item">LS</div>
+                  <div class="avatar-stack__item avatar-stack__item--more">+84</div>
+                </div>
+                <span class="event-card__count"><strong>86</strong> attending</span>
+              </div>
+              <button class="btn btn--attend">Attend</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ════════════════════════════════════════════════ -->
+  <!-- SECTION 1b: Cancel / Unattend Flow              -->
+  <!-- ════════════════════════════════════════════════ -->
+  <div class="section" id="sec-cancel">
+    <div class="section-label">Section 1b</div>
+    <div class="section-title">Cancel Attendance Flow</div>
+    <div class="section-desc">What happens when a user taps "Attending" or "On Waitlist" to cancel. Includes confirmation to prevent accidental cancellation.</div>
+
+    <div class="uc-ref">
+      <div class="uc-ref__title">Use Case covered in this section</div>
+      <a href="https://www.notion.so/tchop/330854bf771580dabc56fcd289b436fb" target="_blank"><strong>UC-4:</strong> User Cancels Attendance</a> — Toggle off "Attending" or explicit cancel. If user was ATTENDING and waitlist exists, next waitlisted user auto-promoted via background job (FIFO). Promotion triggers push notification. Unattend blocked after event starts or registration deadline.<br>
+      <strong>Why confirmation:</strong> Cancelling when a waitlist exists is not easily reversible -- the user's spot is immediately given to the next waitlisted person. Re-attending may result in being waitlisted.
+      <div class="uc-ref__features">
+        <span class="uc-tag uc-tag--feature">F2 Attend/Unattend</span>
+        <span class="uc-tag uc-tag--feature">F3 Waitlist Promotion</span>
+        <span class="uc-tag uc-tag--feature">F4 Reg. Deadline Lock</span>
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; align-items: start;">
+
+      <!-- CANCEL: Attending user (with waitlist) -->
+      <div>
+        <div class="state-label state-label--green">Attending user cancels (waitlist exists)</div>
+        <div class="cancel-flow">
+          <div class="cancel-flow__step">
+            <div class="cancel-flow__step-label"><span>1</span> User taps button</div>
+            <button class="btn btn--attending" style="pointer-events:none;">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><path d="M3 8.5l3.5 3.5 6.5-7"/></svg>
+              Attending
+            </button>
+          </div>
+          <div class="cancel-flow__step">
+            <div class="cancel-flow__step-label"><span>2</span> Confirmation sheet appears</div>
+            <div class="cancel-confirm-sheet">
+              <div class="cancel-confirm-sheet__icon">
+                <svg viewBox="0 0 16 16" fill="none" stroke="#D94848" stroke-width="1.5" style="width:18px;height:18px"><circle cx="8" cy="8" r="6.5"/><path d="M8 5v3.5M8 10.5v.5"/></svg>
+              </div>
+              <div class="cancel-confirm-sheet__title">Cancel attendance?</div>
+              <div class="cancel-confirm-sheet__text">You will lose your spot at "Summer Team Event". If the event is full, you may end up on the waitlist when re-registering.</div>
+              <div class="cancel-confirm-sheet__warning">3 people are on the waitlist. Your spot will be given to the next person immediately.</div>
+              <div class="cancel-confirm-sheet__actions">
+                <button class="btn btn--danger" style="flex:1;">Yes, cancel</button>
+                <button class="btn btn--secondary" style="flex:1;">Keep spot</button>
+              </div>
+            </div>
+          </div>
+          <div class="cancel-flow__step">
+            <div class="cancel-flow__step-label"><span>3</span> After confirmation</div>
+            <div style="font-size: 0.8rem; color: var(--color-text-secondary); line-height: 1.6;">
+              Button reverts to <button class="btn btn--attend" style="font-size:0.7rem;padding:0.25rem 0.5rem;pointer-events:none;vertical-align:middle;">Attend</button> (or <button class="btn btn--waitlist" style="font-size:0.7rem;padding:0.25rem 0.5rem;pointer-events:none;vertical-align:middle;">Join Waitlist</button> if event is now full).<br>
+              Waitlist promotion runs as background job. Promoted user gets push: "A spot opened up! You're now attending [Event Name]."
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CANCEL: Attending user (no waitlist) -->
+      <div>
+        <div class="state-label state-label--green">Attending user cancels (no waitlist)</div>
+        <div class="cancel-flow">
+          <div class="cancel-flow__step">
+            <div class="cancel-flow__step-label"><span>1</span> User taps button</div>
+            <button class="btn btn--attending" style="pointer-events:none;">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><path d="M3 8.5l3.5 3.5 6.5-7"/></svg>
+              Attending
+            </button>
+          </div>
+          <div class="cancel-flow__step">
+            <div class="cancel-flow__step-label"><span>2</span> Confirmation sheet appears</div>
+            <div class="cancel-confirm-sheet">
+              <div class="cancel-confirm-sheet__icon">
+                <svg viewBox="0 0 16 16" fill="none" stroke="#D94848" stroke-width="1.5" style="width:18px;height:18px"><circle cx="8" cy="8" r="6.5"/><path d="M8 5v3.5M8 10.5v.5"/></svg>
+              </div>
+              <div class="cancel-confirm-sheet__title">Cancel attendance?</div>
+              <div class="cancel-confirm-sheet__text">You will no longer attend "Summer Team Event". You can re-register anytime before the deadline.</div>
+              <div class="cancel-confirm-sheet__actions">
+                <button class="btn btn--danger" style="flex:1;">Yes, cancel</button>
+                <button class="btn btn--secondary" style="flex:1;">Keep spot</button>
+              </div>
+            </div>
+          </div>
+          <div class="cancel-flow__step">
+            <div class="cancel-flow__step-label"><span>3</span> After confirmation</div>
+            <div style="font-size: 0.8rem; color: var(--color-text-secondary); line-height: 1.6;">
+              Button reverts to <button class="btn btn--attend" style="font-size:0.7rem;padding:0.25rem 0.5rem;pointer-events:none;vertical-align:middle;">Attend</button>. No side effects -- spot remains open for the user or others.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CANCEL: Waitlisted user -->
+      <div>
+        <div class="state-label state-label--purple">Waitlisted user leaves waitlist</div>
+        <div class="cancel-flow">
+          <div class="cancel-flow__step">
+            <div class="cancel-flow__step-label"><span>1</span> User taps button</div>
+            <button class="btn btn--waitlisted" style="pointer-events:none;">On Waitlist #4</button>
+          </div>
+          <div class="cancel-flow__step">
+            <div class="cancel-flow__step-label"><span>2</span> Confirmation sheet appears</div>
+            <div class="cancel-confirm-sheet">
+              <div class="cancel-confirm-sheet__icon">
+                <svg viewBox="0 0 16 16" fill="none" stroke="#8B5CF6" stroke-width="1.5" style="width:18px;height:18px"><circle cx="8" cy="8" r="6.5"/><path d="M8 5v3.5M8 10.5v.5"/></svg>
+              </div>
+              <div class="cancel-confirm-sheet__title">Leave waitlist?</div>
+              <div class="cancel-confirm-sheet__text">You will lose your position (#4) on the waitlist for "Erste Hilfe Kurs". If you rejoin, you'll be placed at the end.</div>
+              <div class="cancel-confirm-sheet__actions">
+                <button class="btn" style="flex:1; background: var(--color-waitlist); color: white;">Yes, leave</button>
+                <button class="btn btn--secondary" style="flex:1;">Keep position</button>
+              </div>
+            </div>
+          </div>
+          <div class="cancel-flow__step">
+            <div class="cancel-flow__step-label"><span>3</span> After confirmation</div>
+            <div style="font-size: 0.8rem; color: var(--color-text-secondary); line-height: 1.6;">
+              Button reverts to <button class="btn btn--waitlist" style="font-size:0.7rem;padding:0.25rem 0.5rem;pointer-events:none;vertical-align:middle;">Join Waitlist</button>. No promotion triggered -- waitlist positions above shift down.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BLOCKED: After deadline -->
+      <div>
+        <div class="state-label state-label--muted">Cancel blocked (after deadline)</div>
+        <div class="cancel-flow">
+          <div class="cancel-flow__step">
+            <div class="cancel-flow__step-label"><span>1</span> User taps button</div>
+            <button class="btn btn--attending" style="pointer-events:none;">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><path d="M3 8.5l3.5 3.5 6.5-7"/></svg>
+              Attending
+            </button>
+          </div>
+          <div class="cancel-flow__step">
+            <div class="cancel-flow__step-label"><span>2</span> Inline error</div>
+            <div style="display: flex; align-items: center; gap: 0.5rem; padding: 0.6rem 0.75rem; background: rgba(217, 72, 72, 0.06); border: 1px solid rgba(217, 72, 72, 0.15); border-radius: var(--radius-sm); font-size: 0.8rem; color: var(--color-danger);">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" style="width:16px;height:16px;flex-shrink:0"><circle cx="8" cy="8" r="6.5"/><path d="M8 5v3.5M8 10.5v.5"/></svg>
+              Registration is closed. You can no longer cancel your attendance.
+            </div>
+            <div style="font-size: 0.72rem; color: var(--color-text-muted); margin-top: 0.5rem;">
+              Registration deadline was 8 Apr 2026, 23:59. Contact the event organizer if you need to cancel.
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ════════════════════════════════════════════════ -->
+  <!-- SECTION 2: Event Detail View                    -->
+  <!-- ════════════════════════════════════════════════ -->
+  <div class="section" id="sec-detail">
+    <div class="section-label">Section 2</div>
+    <div class="section-title">Event Detail View</div>
+    <div class="section-desc">Full event detail with description, info grid, actions, and attendee list. Opens when tapping a card in the feed.</div>
+
+    <div class="uc-ref">
+      <div class="uc-ref__title">Use Cases covered in this section</div>
+      <a href="https://www.notion.so/tchop/330854bf771580dabc56fcd289b436fb" target="_blank"><strong>UC-2:</strong> User Discovers Events</a> — Detail view with all event fields: title, date/time (local TZ), location (tappable map link), capacity, deadline, organizer, description. Attendee list with avatar chips.<br>
+      <a href="https://www.notion.so/tchop/330854bf771580dabc56fcd289b436fb" target="_blank"><strong>UC-3:</strong> User Attends</a> — Primary Attend button, pessimistic UI (waits for server confirmation).<br>
+      <a href="https://www.notion.so/tchop/330854bf771580dabc56fcd289b436fb" target="_blank"><strong>UC-5:</strong> .ics Calendar Download</a> — "Add to Calendar" button generates .ics on-demand with VEVENT. Available to all users regardless of RSVP status.
+      <div class="uc-ref__features">
+        <span class="uc-tag uc-tag--feature">F1 Card Type</span>
+        <span class="uc-tag uc-tag--feature">F2 Attend/Unattend</span>
+        <span class="uc-tag uc-tag--feature">F8 .ics Download</span>
+        <span class="uc-tag uc-tag--feature">F11 Location Link</span>
+        <span class="uc-tag uc-tag--feature">F12 Avatars</span>
+      </div>
+    </div>
+
+    <div class="detail-view">
+      <div class="detail-view__cover">
+        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='960' height='400'%3E%3Crect fill='%2343445B' width='960' height='400'/%3E%3Ctext x='480' y='195' text-anchor='middle' fill='%236B6B80' font-family='sans-serif' font-size='16'%3ESummer Team Event%3C/text%3E%3Ctext x='480' y='220' text-anchor='middle' fill='%239B9BAD' font-family='sans-serif' font-size='12'%3Ecover image (21:9)%3C/text%3E%3C/svg%3E" alt="">
+      </div>
+      <div class="detail-view__content">
+        <div class="tag-row">
+          <span class="tag-pill tag-pill--event">Teambuilding</span>
+          <span class="tag-pill">Alle Mitarbeitende</span>
+        </div>
+        <h2 class="detail-view__title">Summer Team Event — BBQ & Activities</h2>
+
+        <div class="detail-view__info-grid">
+          <span class="detail-view__info-label">Date</span>
+          <span class="detail-view__info-value">Thursday, 10 April 2026</span>
+
+          <span class="detail-view__info-label">Time</span>
+          <span class="detail-view__info-value">14:00 – 19:00 (CEST)</span>
+
+          <span class="detail-view__info-label">Location</span>
+          <span class="detail-view__info-value"><a href="#">Schlosspark Dresden, Hauptallee 12</a></span>
+
+          <span class="detail-view__info-label">Capacity</span>
+          <span class="detail-view__info-value">12 / 50 attending</span>
+
+          <span class="detail-view__info-label">Deadline</span>
+          <span class="detail-view__info-value">8 April 2026, 23:59</span>
+
+          <span class="detail-view__info-label">Organizer</span>
+          <span class="detail-view__info-value">Sarah Lindner, HR</span>
+        </div>
+
+        <div class="detail-view__description">
+          Freut euch auf einen entspannten Nachmittag mit dem gesamten Team. Wir grillen gemeinsam im Schlosspark, haben Spiele und Aktivitaeten vorbereitet, und lassen den Tag gemuetlich ausklingen. Bitte meldet euch bis zum 8. April an, damit wir entsprechend planen koennen. Bei Regen weichen wir in die Kantine aus.
+        </div>
+
+        <div class="detail-view__actions">
+          <button class="btn btn--attend" style="padding: 0.6rem 1.5rem; font-size: 0.875rem;">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M3 8.5l3.5 3.5 6.5-7"/></svg>
+            Attend
+          </button>
+          <button class="btn btn--outline">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" style="width:15px;height:15px"><rect x="2" y="3" width="12" height="11" rx="1.5"/><path d="M2 7h12M5.5 1.5v3M10.5 1.5v3"/></svg>
+            Add to Calendar
+          </button>
+          <button class="btn btn--ghost">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" style="width:15px;height:15px"><path d="M2 5V3.5A1.5 1.5 0 0 1 3.5 2h9A1.5 1.5 0 0 1 14 3.5V5M2 5l6 5 6-5"/><rect x="2" y="5" width="12" height="8.5" rx="1"/></svg>
+            Share
+          </button>
+        </div>
+
+        <div class="detail-view__attendee-section">
+          <div class="detail-view__attendee-header">
+            <span class="detail-view__attendee-title">Attendees</span>
+            <span class="detail-view__attendee-count">12 of 50 spots filled</span>
+          </div>
+          <div class="attendee-list">
+            <div class="attendee-chip">
+              <div class="attendee-chip__avatar">SL</div> Sarah L.
+            </div>
+            <div class="attendee-chip">
+              <div class="attendee-chip__avatar">PW</div> Peter W.
+            </div>
+            <div class="attendee-chip">
+              <div class="attendee-chip__avatar">KM</div> Katrin M.
+            </div>
+            <div class="attendee-chip">
+              <div class="attendee-chip__avatar">AB</div> Anna B.
+            </div>
+            <div class="attendee-chip">
+              <div class="attendee-chip__avatar">TH</div> Thomas H.
+            </div>
+            <div class="attendee-chip">
+              <div class="attendee-chip__avatar" style="background: var(--color-text-muted); font-size: 0.6rem;">+7</div> 7 more
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ════════════════════════════════════════════════ -->
+  <!-- SECTION 3: Calendar + My Events (side by side)  -->
+  <!-- ════════════════════════════════════════════════ -->
+  <div class="section" id="sec-calendar">
+    <div class="section-label">Sections 3 & 4</div>
+    <div class="section-title">Calendar View & My Events</div>
+    <div class="section-desc">Channel-level calendar (left) aggregates events across all mixes. "My Events" (right) shows the user's personal commitments cross-channel.</div>
+
+    <div class="uc-ref">
+      <div class="uc-ref__title">Use Cases covered in this section</div>
+      <a href="https://www.notion.so/tchop/330854bf771580dabc56fcd289b436fb" target="_blank"><strong>UC-7:</strong> Calendar View (Channel-Level)</a> — Dedicated calendar within a channel showing all events across all mixes. Month/week navigation. Events as dots on dates. Powered by <code>eventCardsByChannel(channelId, dateRange)</code>. Needs composite index on (channel_id, card_type, event_start_date).<br>
+      <a href="https://www.notion.so/tchop/330854bf771580dabc56fcd289b436fb" target="_blank"><strong>UC-8:</strong> "My Events" Personal View</a> — Cross-channel view of all events the user is attending or waitlisted for. Sorted by date. Powered by <code>eventCardsByUser(page, size)</code> — user-scoped query, not channel scan. Navigation placement TBD with UX team.
+      <div class="uc-ref__features">
+        <span class="uc-tag uc-tag--feature">F5 Calendar View</span>
+        <span class="uc-tag uc-tag--feature">F6 My Events</span>
+      </div>
+    </div>
+
+    <div id="sec-myevents" style="display: grid; grid-template-columns: 1fr 380px; gap: 1.25rem; align-items: start;">
+
+      <!-- Calendar -->
+      <div class="calendar-shell">
+        <div class="calendar-header">
+          <div class="calendar-header__nav">
+            <button><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 3L5 8l5 5"/></svg></button>
+          </div>
+          <h3 class="calendar-header__title">April 2026</h3>
+          <div class="calendar-header__nav">
+            <button><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3l5 5-5 5"/></svg></button>
+          </div>
+        </div>
+        <div class="calendar-grid">
+          <div class="calendar-grid__day-name">Mon</div>
+          <div class="calendar-grid__day-name">Tue</div>
+          <div class="calendar-grid__day-name">Wed</div>
+          <div class="calendar-grid__day-name">Thu</div>
+          <div class="calendar-grid__day-name">Fri</div>
+          <div class="calendar-grid__day-name">Sat</div>
+          <div class="calendar-grid__day-name">Sun</div>
+          <!-- Week 1 -->
+          <div class="calendar-grid__cell calendar-grid__cell--other-month">30</div>
+          <div class="calendar-grid__cell calendar-grid__cell--other-month">31</div>
+          <div class="calendar-grid__cell">1</div>
+          <div class="calendar-grid__cell">2</div>
+          <div class="calendar-grid__cell">3</div>
+          <div class="calendar-grid__cell">4</div>
+          <div class="calendar-grid__cell">5</div>
+          <!-- Week 2 -->
+          <div class="calendar-grid__cell">6</div>
+          <div class="calendar-grid__cell">7</div>
+          <div class="calendar-grid__cell">8</div>
+          <div class="calendar-grid__cell">9</div>
+          <div class="calendar-grid__cell calendar-grid__cell--has-event">10<div class="calendar-dot-row"><div class="calendar-dot"></div></div></div>
+          <div class="calendar-grid__cell">11</div>
+          <div class="calendar-grid__cell">12</div>
+          <!-- Week 3 -->
+          <div class="calendar-grid__cell">13</div>
+          <div class="calendar-grid__cell calendar-grid__cell--has-event">14<div class="calendar-dot-row"><div class="calendar-dot"></div><div class="calendar-dot"></div></div></div>
+          <div class="calendar-grid__cell">15</div>
+          <div class="calendar-grid__cell">16</div>
+          <div class="calendar-grid__cell">17</div>
+          <div class="calendar-grid__cell calendar-grid__cell--has-event">18<div class="calendar-dot-row"><div class="calendar-dot"></div></div></div>
+          <div class="calendar-grid__cell">19</div>
+          <!-- Week 4 -->
+          <div class="calendar-grid__cell">20</div>
+          <div class="calendar-grid__cell">21</div>
+          <div class="calendar-grid__cell calendar-grid__cell--has-event">22<div class="calendar-dot-row"><div class="calendar-dot"></div></div></div>
+          <div class="calendar-grid__cell">23</div>
+          <div class="calendar-grid__cell calendar-grid__cell--has-event">24<div class="calendar-dot-row"><div class="calendar-dot"></div><div class="calendar-dot"></div><div class="calendar-dot"></div></div></div>
+          <div class="calendar-grid__cell">25</div>
+          <div class="calendar-grid__cell">26</div>
+          <!-- Week 5 -->
+          <div class="calendar-grid__cell calendar-grid__cell--today">27</div>
+          <div class="calendar-grid__cell">28</div>
+          <div class="calendar-grid__cell">29</div>
+          <div class="calendar-grid__cell">30</div>
+          <div class="calendar-grid__cell calendar-grid__cell--other-month">1</div>
+          <div class="calendar-grid__cell calendar-grid__cell--other-month">2</div>
+          <div class="calendar-grid__cell calendar-grid__cell--other-month">3</div>
+        </div>
+      </div>
+
+      <!-- My Events -->
+      <div class="my-events">
+        <div class="my-events__header">
+          <h3 class="my-events__title">My Events</h3>
+          <div class="my-events__tabs">
+            <button class="my-events__tab my-events__tab--active">Upcoming</button>
+            <button class="my-events__tab">Past</button>
+          </div>
+        </div>
+        <ul class="my-events__list">
+          <li class="my-events__item">
+            <div class="my-events__date-block my-events__date-block--upcoming">
+              <span class="my-events__date-day">10</span>
+              <span class="my-events__date-month">Apr</span>
+            </div>
+            <div class="my-events__info">
+              <div class="my-events__event-title">Summer Team Event</div>
+              <div class="my-events__event-meta">14:00 &middot; Schlosspark Dresden</div>
+            </div>
+            <span class="my-events__status my-events__status--attending">Attending</span>
+          </li>
+          <li class="my-events__item">
+            <div class="my-events__date-block my-events__date-block--upcoming">
+              <span class="my-events__date-day">14</span>
+              <span class="my-events__date-month">Apr</span>
+            </div>
+            <div class="my-events__info">
+              <div class="my-events__event-title">Gesundheitswoche</div>
+              <div class="my-events__event-meta">09:00 – 17:00 &middot; Zentrale</div>
+            </div>
+            <span class="my-events__status my-events__status--attending">Attending</span>
+          </li>
+          <li class="my-events__item">
+            <div class="my-events__date-block my-events__date-block--upcoming">
+              <span class="my-events__date-day">18</span>
+              <span class="my-events__date-month">Apr</span>
+            </div>
+            <div class="my-events__info">
+              <div class="my-events__event-title">Erste Hilfe Kurs</div>
+              <div class="my-events__event-meta">10:00 &middot; Schulungszentrum</div>
+            </div>
+            <span class="my-events__status my-events__status--waitlisted">Waitlist #4</span>
+          </li>
+          <li class="my-events__item">
+            <div class="my-events__date-block my-events__date-block--upcoming">
+              <span class="my-events__date-day">22</span>
+              <span class="my-events__date-month">Apr</span>
+            </div>
+            <div class="my-events__info">
+              <div class="my-events__event-title">All-Hands Q1</div>
+              <div class="my-events__event-meta">11:00 &middot; Online</div>
+            </div>
+            <span class="my-events__status my-events__status--attending">Attending</span>
+          </li>
+          <li class="my-events__item my-events__item--past">
+            <div class="my-events__date-block">
+              <span class="my-events__date-day">17</span>
+              <span class="my-events__date-month">Mar</span>
+            </div>
+            <div class="my-events__info">
+              <div class="my-events__event-title">Neuer Mitarbeitenden-Tag</div>
+              <div class="my-events__event-meta">09:00 &middot; Zentrale</div>
+            </div>
+            <span class="my-events__status my-events__status--attending" style="opacity:0.5">Attended</span>
+          </li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ════════════════════════════════════════════════ -->
+  <!-- SECTION 4: CMS Create Event Form                -->
+  <!-- ════════════════════════════════════════════════ -->
+  <div class="section" id="sec-cms">
+    <div class="section-label">Section 5</div>
+    <div class="section-title">CMS: Create Event Card</div>
+    <div class="section-desc">Admin/Editor form in the CMS dashboard. Follows existing "Add Content" patterns with event-specific fields.</div>
+
+    <div class="uc-ref">
+      <div class="uc-ref__title">Use Case covered in this section</div>
+      <a href="https://www.notion.so/tchop/330854bf771580dabc56fcd289b436fb" target="_blank"><strong>UC-1:</strong> Admin Creates an Event</a> — Admin selects "Event" from "Add Content" in any mix. Fields: headline (required, 360 chars), description (rich text), start date/time with timezone (required), end date/time, location, cover image, capacity, registration deadline (defaults to event start), show-attendees toggle. Feature flag must be ON for Event type to appear in "Add Content".<br>
+      <strong>Validations:</strong> Start must be future, end after start, deadline before/equal to start, capacity >= 1 if set.
+      <div class="uc-ref__features">
+        <span class="uc-tag uc-tag--feature">F1 Card Type</span>
+        <span class="uc-tag uc-tag--feature">F13 Feature Flag</span>
+      </div>
+    </div>
+
+    <div class="cms-form">
+      <div class="cms-form__header">
+        <h3 class="cms-form__title">New Event Card</h3>
+        <span style="font-size: 0.75rem; color: var(--color-text-muted);">Draft</span>
+      </div>
+      <div class="cms-form__body">
+        <div class="form-group">
+          <label class="form-group__label">Headline <span>*</span></label>
+          <input type="text" class="form-group__input" placeholder="Event title (max 360 characters)" value="Summer Team Event — BBQ & Activities">
+        </div>
+
+        <div class="form-group">
+          <label class="form-group__label">Description</label>
+          <textarea class="form-group__input" rows="3" placeholder="Rich text event description..." style="resize: vertical;">Freut euch auf einen entspannten Nachmittag mit dem gesamten Team.</textarea>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-group__label">Start Date & Time <span>*</span></label>
+            <input type="text" class="form-group__input" value="10 Apr 2026, 14:00 CEST">
+          </div>
+          <div class="form-group">
+            <label class="form-group__label">End Date & Time</label>
+            <input type="text" class="form-group__input" value="10 Apr 2026, 19:00 CEST">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-group__label">Location</label>
+          <input type="text" class="form-group__input" placeholder="Free text — tappable as map link if address detected" value="Schlosspark Dresden, Hauptallee 12">
+        </div>
+
+        <div class="form-group">
+          <label class="form-group__label">Cover Image</label>
+          <div style="border: 2px dashed var(--color-border); border-radius: var(--radius-sm); padding: 1.5rem; text-align: center; color: var(--color-text-muted); font-size: 0.8rem; cursor: pointer;">
+            Drop image here or click to upload
+            <div style="font-size: 0.7rem; margin-top: 0.25rem;">Uses existing media system. If empty, date-stamp placeholder is shown.</div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-group__label">Capacity</label>
+            <input type="number" class="form-group__input" placeholder="Leave empty for unlimited" value="50">
+            <span class="form-group__hint">Max attendees. Empty = unlimited.</span>
+          </div>
+          <div class="form-group">
+            <label class="form-group__label">Registration Deadline</label>
+            <input type="text" class="form-group__input" value="8 Apr 2026, 23:59">
+            <span class="form-group__hint">Defaults to event start if not set.</span>
+          </div>
+        </div>
+
+        <div style="border-top: 1px solid var(--color-border); padding-top: 1rem;">
+          <div class="form-toggle-row">
+            <div class="form-toggle-label">
+              Show attendees on card
+              <small>Display first 3-5 attendee avatars on the card teaser</small>
+            </div>
+            <div class="toggle toggle--active"><div class="toggle__knob"></div></div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-group__label">Event Tags</label>
+          <div style="display: flex; gap: 0.35rem; flex-wrap: wrap;">
+            <span class="tag-pill tag-pill--event" style="cursor: pointer; padding: 0.25rem 0.55rem; font-size: 0.72rem;">Teambuilding</span>
+            <span style="font-size: 0.72rem; padding: 0.25rem 0.55rem; border: 1px dashed var(--color-border); border-radius: 3px; color: var(--color-text-muted); cursor: pointer;">+ Add tag</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="cms-form__footer">
+        <button class="btn btn--secondary">Save Draft</button>
+        <button class="btn btn--outline">Schedule</button>
+        <button class="btn btn--primary">Publish</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ════════════════════════════════════════════════ -->
+  <!-- SECTION 5: Admin Attendee Management            -->
+  <!-- ════════════════════════════════════════════════ -->
+  <div class="section" id="sec-admin">
+    <div class="section-label">Section 6</div>
+    <div class="section-title">CMS: Attendee Management</div>
+    <div class="section-desc">Admin view for managing attendees, exporting CSV, and monitoring capacity. Available in the CMS event card detail.</div>
+
+    <div class="uc-ref">
+      <div class="uc-ref__title">Use Case covered in this section</div>
+      <a href="https://www.notion.so/tchop/330854bf771580dabc56fcd289b436fb" target="_blank"><strong>UC-6:</strong> Admin Views and Manages Attendees</a> — Paginated attendee list with name, email, department, position, status (ATTENDING/WAITLISTED), RSVP timestamp. CSV export with streaming generation for large events. Admin/editor role required (PII access). Deleted/banned users anonymized.
+      <div class="uc-ref__features">
+        <span class="uc-tag uc-tag--feature">F7 CSV Export</span>
+      </div>
+    </div>
+
+    <div class="admin-table-wrap" style="max-width: 800px;">
+      <div class="admin-table-header">
+        <h3>Summer Team Event — Attendees</h3>
+        <div style="display: flex; align-items: center; gap: 1rem;">
+          <div class="admin-table-stats">
+            <span class="admin-table-stat"><strong>12</strong> attending</span>
+            <span class="admin-table-stat"><strong>3</strong> waitlisted</span>
+          </div>
+          <button class="btn btn--outline" style="font-size: 0.72rem; padding: 0.35rem 0.75rem;">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" style="width:13px;height:13px"><path d="M2 10v3.5h12V10M8 2v8M5 7l3 3 3-3"/></svg>
+            Export CSV
+          </button>
+        </div>
+      </div>
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Department</th>
+            <th>Status</th>
+            <th>RSVP Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="color: var(--color-text-primary); font-weight: 500;">Sarah Lindner</td>
+            <td>s.lindner@aok-plus.de</td>
+            <td>HR</td>
+            <td><span class="status-badge status-badge--attending">Attending</span></td>
+            <td>26 Mar 2026</td>
+          </tr>
+          <tr>
+            <td style="color: var(--color-text-primary); font-weight: 500;">Peter Weber</td>
+            <td>p.weber@aok-plus.de</td>
+            <td>IT</td>
+            <td><span class="status-badge status-badge--attending">Attending</span></td>
+            <td>26 Mar 2026</td>
+          </tr>
+          <tr>
+            <td style="color: var(--color-text-primary); font-weight: 500;">Katrin Meier</td>
+            <td>k.meier@aok-plus.de</td>
+            <td>Marketing</td>
+            <td><span class="status-badge status-badge--attending">Attending</span></td>
+            <td>27 Mar 2026</td>
+          </tr>
+          <tr>
+            <td style="color: var(--color-text-primary); font-weight: 500;">Frank Gruber</td>
+            <td>f.gruber@aok-plus.de</td>
+            <td>Vertrieb</td>
+            <td><span class="status-badge status-badge--waitlisted">Waitlisted</span></td>
+            <td>27 Mar 2026</td>
+          </tr>
+          <tr>
+            <td style="color: var(--color-text-primary); font-weight: 500;">Diana Mohr</td>
+            <td>d.mohr@aok-plus.de</td>
+            <td>Finanzen</td>
+            <td><span class="status-badge status-badge--waitlisted">Waitlisted</span></td>
+            <td>27 Mar 2026</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ════════════════════════════════════════════════ -->
+  <!-- SECTION 6: State Reference                      -->
+  <!-- ════════════════════════════════════════════════ -->
+  <div class="section" id="sec-states">
+    <div class="section-label">Section 7 — Reference</div>
+    <div class="section-title">Button State Matrix</div>
+    <div class="section-desc">All possible states for the attend button, mapped to conditions. Covers UC-3 (Attend), UC-4 (Cancel), UC-10 (Past).</div>
+
+    <div class="uc-ref">
+      <div class="uc-ref__title">Implementation notes from spec</div>
+      <strong>Atomic capacity:</strong> <code>UPDATE ... SET attendeeCount = attendeeCount + 1 WHERE attendeeCount &lt; capacity</code> prevents race conditions.<br>
+      <strong>Debounce:</strong> Attend/unattend debounced at 1s minimum. Double-tap is idempotent.<br>
+      <strong>Pessimistic UI:</strong> Wait for server confirmation before updating button state. On failure: inline error "Could not register. Try again."<br>
+      <strong>Locking:</strong> Attend/unattend locked after event starts OR after registration deadline (whichever is earlier).<br>
+      <a href="https://www.notion.so/tchop/325854bf7715802ebe7ae2f5155e725a" target="_blank">See full spec: Architecture Decisions #2, #5</a>
+      <div class="uc-ref__features">
+        <span class="uc-tag uc-tag--feature">F2 Attend/Unattend</span>
+        <span class="uc-tag uc-tag--feature">F3 Waitlist</span>
+        <span class="uc-tag uc-tag--feature">F4 Reg. Deadline</span>
+        <span class="uc-tag uc-tag--feature">F10 Past State</span>
+      </div>
+    </div>
+
+    <div class="admin-table-wrap" style="max-width: 800px;">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Condition</th>
+            <th>Button</th>
+            <th>Behavior</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Open, spots available, not attending</td>
+            <td><button class="btn btn--attend" style="font-size:0.7rem;padding:0.3rem 0.6rem;">Attend</button></td>
+            <td>Tap to RSVP</td>
+          </tr>
+          <tr>
+            <td>Open, user is attending</td>
+            <td><button class="btn btn--attending" style="font-size:0.7rem;padding:0.3rem 0.6rem;">Attending</button></td>
+            <td>Tap to cancel</td>
+          </tr>
+          <tr>
+            <td>Full, not attending</td>
+            <td><button class="btn btn--waitlist" style="font-size:0.7rem;padding:0.3rem 0.6rem;">Join Waitlist</button></td>
+            <td>Tap to join waitlist</td>
+          </tr>
+          <tr>
+            <td>Full, user is on waitlist</td>
+            <td><button class="btn btn--waitlisted" style="font-size:0.7rem;padding:0.3rem 0.6rem;">On Waitlist #4</button></td>
+            <td>Tap to leave waitlist</td>
+          </tr>
+          <tr>
+            <td>Registration closed / past event</td>
+            <td><button class="btn btn--disabled" style="font-size:0.7rem;padding:0.3rem 0.6rem;">Closed</button></td>
+            <td>No action</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ════════════════════════════════════════════════ -->
+  <!-- SECTION 8: Backend-Only Features                -->
+  <!-- ════════════════════════════════════════════════ -->
+  <div class="section" id="sec-backend">
+    <div class="section-label">Section 8 — Backend Only</div>
+    <div class="section-title">Features Without Dedicated UI</div>
+    <div class="section-desc">These use cases and features are backend/infrastructure concerns with no dedicated screen. Listed here for completeness of the UC mapping.</div>
+
+    <div class="uc-ref">
+      <div class="uc-ref__title">UC-9: Push Reminders</div>
+      <a href="https://www.notion.so/tchop/330854bf771580dabc56fcd289b436fb" target="_blank">View in Notion</a><br>
+      Scheduled background job checks for events starting within the configured reminder window. Sends push notification to all ATTENDING users: "[Event Name] starts in [time]" with deep-link to event card. Uses existing push notification infrastructure.<br>
+      <strong>Reminder timing:</strong> Organisation-level setting (default: 24h + 1h before event start). Per-event override is Phase 2.<br>
+      <strong>Must handle:</strong> Event deleted before reminder, user unattended after scheduling, event time changed.<br>
+      <strong>Open question:</strong> Polling-based job (check every N minutes) vs. event-driven scheduling (schedule job on create/update).
+      <div class="uc-ref__features">
+        <span class="uc-tag uc-tag--feature">F9 Push Reminders</span>
+      </div>
+    </div>
+
+    <div class="uc-ref" style="border-left-color: var(--color-accent);">
+      <div class="uc-ref__title">F13: Feature Flag per Organisation</div>
+      <a href="https://www.notion.so/tchop/325854bf7715802ebe7ae2f5155e725a" target="_blank">View in Notion</a><br>
+      Mandatory per-organisation feature flag. Controls: Event type visibility in "Add Content", event card rendering in feed, calendar view availability, My Events inclusion. Enables gradual rollout, kill switch, and client-by-client enablement.
+      <div class="uc-ref__features">
+        <span class="uc-tag uc-tag--feature">F13 Feature Flag</span>
+      </div>
+    </div>
+
+    <div class="uc-ref" style="border-left-color: var(--color-accent);">
+      <div class="uc-ref__title">F14: Backward Compatibility</div>
+      <a href="https://www.notion.so/tchop/325854bf7715802ebe7ae2f5155e725a" target="_blank">View in Notion</a><br>
+      Old native app versions (iOS/Android) that don't know the Event card type hide it entirely. Users on old versions won't see event cards until they update. No crash, no broken layout.
+      <div class="uc-ref__features">
+        <span class="uc-tag uc-tag--feature">F14 Backward Compat.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div style="text-align: center; padding: 2rem 0 1rem; color: var(--color-text-muted); font-size: 0.72rem;">
+    tchop.io Event Card Prototype &middot; Card Type #12 &middot; Based on approved spec (2026-03-27)
+  </div>
+
+</div>
+
+</body>
+</html>

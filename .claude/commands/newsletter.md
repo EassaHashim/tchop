@@ -1,0 +1,1 @@
+Create the monthly tchop.io newsletter. Follow the full workflow defined in .agents/skills/newsletter/SKILL.md

@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>tchop Event Card v3 — Web App Figma Benchmark</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* tchop Web App palette — extracted from Figma L3MCvDp7YWgs3y3QvEsMe1 */
+    --color-bg-base: #FFFFFF;
+    --color-bg-secondary-light: #EBF6FC;
+    --color-bg-page: #F5F5F7;
+    --color-border-card: #EBEBEB;
+    --color-border-divider: #EBEBEB;
+    --color-border-secondary: #488ED8;
+    --color-secondary: #488ED8;
+    --color-secondary-hover: #3A7BC0;
+    --color-txt-primary: #43445B;
+    --color-txt-secondary: #787878;
+    --color-txt-muted: #A0A0A0;
+    --color-btn-secondary: #FFFFFF;
+    --color-success: #34A853;
+    --color-warning: #E8A317;
+    --color-danger: #D93025;
+    --color-waitlist: #7C5CDB;
+    --elevation-03: 0px 4px 8px 0px rgba(96,97,112,0.16), 0px 0px 2px 0px rgba(40,41,61,0.04);
+    --elevation-01: 0px 1px 3px rgba(96,97,112,0.1);
+    /* Basier Circle approximation — DM Sans is geometrically close */
+    --font: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --radius-card: 10px;
+    --radius-btn: 8px;
+    --radius-badge: 4px;
+    --radius-pill: 26px;
+    --card-width: 630px;
+    --card-padding-x: 24px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--font);
+    background: var(--color-bg-page);
+    color: var(--color-txt-primary);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── PROTOTYPE LAYOUT ── */
+  .wrap { max-width: 1380px; margin: 0 auto; padding: 2rem; }
+  .section { margin-bottom: 3rem; }
+  .section-label {
+    font-size: 0.6rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.12em; color: var(--color-secondary); margin-bottom: 0.5rem;
+  }
+  .section-title { font-size: 1.25rem; font-weight: 700; margin-bottom: 0.2rem; }
+  .section-desc { font-size: 0.82rem; color: var(--color-txt-secondary); margin-bottom: 1.25rem; max-width: 720px; line-height: 1.6; }
+  .divider { height: 1px; background: var(--color-border-divider); margin: 2.5rem 0; }
+  .tag { display: inline-block; font-size: 0.55rem; font-weight: 600; padding: 0.1rem 0.35rem; border-radius: 3px; margin-right: 0.15rem; }
+  .tag--uc { background: rgba(72,142,216,0.08); color: var(--color-secondary); }
+  .tag--new { background: rgba(124,92,219,0.08); color: var(--color-waitlist); }
+  .state-label { display: inline-block; font-size: 0.6rem; font-weight: 700; padding: 0.15rem 0.5rem; border-radius: 3px; color: #fff; margin-bottom: 0.5rem; }
+  .state-label--blue { background: var(--color-secondary); }
+  .state-label--green { background: var(--color-success); }
+  .state-label--purple { background: var(--color-waitlist); }
+  .state-label--grey { background: var(--color-txt-secondary); }
+  .state-label--new { background: #D93025; }
+
+  .uc-ref {
+    background: #fff; border: 1px solid var(--color-border-card); border-left: 3px solid var(--color-secondary);
+    border-radius: 6px; padding: 0.75rem 1rem; margin-bottom: 1.25rem;
+    font-size: 0.75rem; line-height: 1.6; color: var(--color-txt-secondary);
+  }
+  .uc-ref strong { color: var(--color-txt-primary); }
+  .uc-ref__tags { display: flex; flex-wrap: wrap; gap: 0.15rem; margin-top: 0.35rem; }
+
+  .grid-row { display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: start; }
+  .compare-col { flex: 1; min-width: 320px; }
+  .compare-label { font-size: 0.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.5rem; text-align: center; }
+  .compare-label--old { color: var(--color-txt-muted); }
+  .compare-label--new { color: var(--color-waitlist); }
+
+  .benchmark { background: #fff; border: 1px solid var(--color-border-card); border-radius: 8px; overflow: hidden; position: relative; }
+  .benchmark img { width: 100%; display: block; }
+  .benchmark__tag { position: absolute; top: 0.5rem; left: 0.5rem; background: rgba(0,0,0,0.65); color: #fff; font-size: 0.5rem; font-weight: 600; padding: 0.12rem 0.4rem; border-radius: 3px; }
+
+  /* ═══════════════════════════════════════════ */
+  /* EVENT CARD — matches Figma component 6926:264261 */
+  /* ═══════════════════════════════════════════ */
+  .ec {
+    background: var(--color-bg-base);
+    border: 1px solid var(--color-border-card);
+    border-radius: var(--radius-card);
+    width: var(--card-width);
+    max-width: 100%;
+    overflow: hidden;
+  }
+
+  /* -- Teaser (cover image + date badge) -- */
+  .ec__teaser { position: relative; width: 100%; }
+  .ec__cover { width: 100%; aspect-ratio: 16/9; object-fit: cover; display: block; }
+  .ec__cover--past { filter: grayscale(0.6) brightness(0.85); }
+  .ec__cover--placeholder {
+    aspect-ratio: 16/9; background: linear-gradient(135deg, #43445B 0%, #6B6B80 100%);
+    display: flex; align-items: center; justify-content: center;
+    color: rgba(255,255,255,0.3); font-size: 0.75rem;
+  }
+
+  /* Date badge — absolute positioned, white bg, shadow, 4px radius */
+  .ec__date {
+    position: absolute; top: 24px; left: 24px;
+    background: #FFFFFF; border-radius: var(--radius-badge);
+    box-shadow: var(--elevation-03);
+    display: flex; flex-direction: column; align-items: center;
+    min-width: 70px; overflow: hidden;
+  }
+  .ec__date-month {
+    background: var(--color-secondary); color: #fff;
+    font-size: 0.7rem; font-weight: 600; text-transform: capitalize;
+    padding: 0.15rem 0; width: 100%; text-align: center;
+    letter-spacing: 0.03em;
+  }
+  .ec__date-day {
+    font-size: 1.6rem; font-weight: 700; color: var(--color-txt-primary);
+    padding: 0.1rem 0.5rem 0.2rem; line-height: 1.2;
+  }
+  .ec__date--past .ec__date-month { background: var(--color-txt-secondary); }
+
+  .ec__ended {
+    position: absolute; top: 24px; right: 24px;
+    background: rgba(0,0,0,0.55); color: #fff; font-size: 0.65rem;
+    font-weight: 600; padding: 0.2rem 0.6rem; border-radius: var(--radius-badge);
+  }
+
+  /* -- Content area -- */
+  .ec__content { padding: 0 var(--card-padding-x) 12px; display: flex; flex-direction: column; gap: 16px; }
+
+  /* Date/time text */
+  .ec__datetime { font-size: 0.82rem; color: var(--color-secondary); margin-top: 16px; }
+
+  /* Title */
+  .ec__title { font-size: 1.1rem; font-weight: 700; color: var(--color-txt-primary); line-height: 1.35; }
+
+  /* Location */
+  .ec__location { display: flex; align-items: flex-start; gap: 0.4rem; font-size: 0.88rem; }
+  .ec__location-icon { flex-shrink: 0; margin-top: 0.15rem; color: var(--color-txt-muted); }
+  .ec__location-text {}
+  .ec__location-addr { font-weight: 600; color: var(--color-txt-primary); }
+  .ec__location-city { color: var(--color-txt-secondary); }
+
+  /* Guests */
+  .ec__guests { display: flex; align-items: center; gap: 12px; }
+  .ec__avatars { display: flex; }
+  .ec__avatar {
+    width: 32px; height: 32px; border-radius: 50%;
+    border: 2px solid #fff; margin-left: -8px; overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.55rem; font-weight: 600; color: #fff;
+  }
+  .ec__avatar:first-child { margin-left: 0; }
+  .ec__avatar--a { background: #7C5CDB; }
+  .ec__avatar--b { background: #D93025; }
+  .ec__avatar--c { background: #488ED8; }
+  .ec__avatar--d { background: #34A853; }
+  .ec__guest-count { font-size: 0.88rem; color: var(--color-secondary); }
+
+  /* RSVP pill */
+  .ec__rsvp {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--color-bg-secondary-light); border-radius: var(--radius-pill);
+    padding: 4px 8px 4px 4px; width: fit-content;
+  }
+  .ec__rsvp-icon { width: 20px; height: 20px; flex-shrink: 0; }
+  .ec__rsvp-text { font-size: 0.82rem; color: var(--color-txt-primary); }
+  .ec__rsvp-text b { font-weight: 600; }
+
+  /* NEW: Capacity indicator */
+  .ec__capacity {
+    display: flex; align-items: center; gap: 0.4rem;
+    font-size: 0.82rem; color: var(--color-txt-secondary);
+  }
+  .ec__capacity strong { color: var(--color-txt-primary); font-weight: 600; }
+  .ec__capacity-bar {
+    width: 60px; height: 4px; background: #E8E8E8;
+    border-radius: 2px; overflow: hidden; margin-left: 0.25rem;
+  }
+  .ec__capacity-fill { height: 100%; border-radius: 2px; }
+  .ec__capacity-fill--ok { background: var(--color-success); }
+  .ec__capacity-fill--warn { background: var(--color-warning); }
+  .ec__capacity-fill--full { background: var(--color-danger); }
+
+  /* CTA buttons row — matches event response component */
+  .ec__ctas { display: flex; align-items: center; gap: 8px; }
+
+  .ec-btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 12px 20px 12px 16px; border-radius: var(--radius-btn);
+    font-family: var(--font); font-size: 0.88rem; font-weight: 600;
+    border: 2px solid transparent; cursor: pointer; transition: all 120ms ease;
+    white-space: nowrap; text-decoration: none; line-height: 1;
+  }
+  .ec-btn svg { width: 18px; height: 18px; flex-shrink: 0; }
+
+  /* Primary filled (blue) */
+  .ec-btn--primary { background: var(--color-secondary); color: #fff; border-color: var(--color-secondary); flex: 1; }
+  .ec-btn--primary:hover { background: var(--color-secondary-hover); border-color: var(--color-secondary-hover); }
+
+  /* Secondary outline */
+  .ec-btn--outline { background: var(--color-btn-secondary); color: var(--color-secondary); border-color: var(--color-secondary); }
+  .ec-btn--outline:hover { background: var(--color-bg-secondary-light); }
+
+  /* Icon-only (calendar) */
+  .ec-btn--icon { padding: 12px; background: var(--color-btn-secondary); color: var(--color-secondary); border-color: var(--color-border-secondary); }
+  .ec-btn--icon:hover { background: var(--color-bg-secondary-light); }
+
+  /* NEW: Attending (green) */
+  .ec-btn--attending { background: var(--color-success); color: #fff; border-color: var(--color-success); flex: 1; }
+  .ec-btn--attending:hover { background: #2d9249; border-color: #2d9249; }
+
+  /* NEW: Waitlist */
+  .ec-btn--waitlist { background: var(--color-waitlist); color: #fff; border-color: var(--color-waitlist); flex: 1; }
+  .ec-btn--waitlist:hover { background: #6B4DC4; border-color: #6B4DC4; }
+
+  /* NEW: Waitlisted (outline purple) */
+  .ec-btn--waitlisted { background: #fff; color: var(--color-waitlist); border-color: var(--color-waitlist); }
+  .ec-btn--waitlisted:hover { background: rgba(124,92,219,0.05); }
+
+  /* NEW: Disabled */
+  .ec-btn--disabled { background: #F0F0F0; color: var(--color-txt-muted); border-color: #E0E0E0; cursor: not-allowed; flex: 1; }
+
+  /* -- Footer -- */
+  .ec__footer { padding: 0 var(--card-padding-x) 4px; display: flex; flex-direction: column; gap: 12px; }
+  .ec__timestamp { font-size: 0.88rem; color: var(--color-txt-secondary); }
+  .ec__actions {
+    display: flex; align-items: center; justify-content: space-between;
+    border-top: 1px solid var(--color-border-divider);
+    padding: 12px 0;
+  }
+  .ec__actions-left { display: flex; align-items: center; gap: 40px; }
+  .ec__action {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 0.88rem; color: var(--color-txt-primary); cursor: pointer;
+    background: none; border: none; font-family: var(--font); font-weight: 500;
+  }
+  .ec__action:hover { color: var(--color-secondary); }
+  .ec__action svg { width: 18px; height: 18px; }
+  .ec__action-menu { color: var(--color-txt-secondary); cursor: pointer; background: none; border: none; }
+  .ec__action-menu svg { width: 24px; height: 24px; }
+
+  /* ── Cancel confirmation ── */
+  .cancel-sheet {
+    background: #fff; border: 1px solid var(--color-border-card); border-radius: var(--radius-card);
+    padding: 1.25rem; max-width: 380px; box-shadow: var(--elevation-03);
+  }
+  .cancel-sheet__title { font-size: 1rem; font-weight: 700; margin-bottom: 0.35rem; }
+  .cancel-sheet__text { font-size: 0.82rem; color: var(--color-txt-secondary); line-height: 1.6; margin-bottom: 0.75rem; }
+  .cancel-sheet__warning {
+    font-size: 0.75rem; color: #92400E; background: #FEF3C7;
+    padding: 0.5rem 0.65rem; border-radius: 6px; margin-bottom: 0.85rem; line-height: 1.5;
+  }
+  .cancel-sheet__btns { display: flex; gap: 8px; }
+  .cancel-sheet__btns .ec-btn { flex: 1; justify-content: center; padding: 10px 16px; font-size: 0.82rem; }
+  .ec-btn--danger { background: var(--color-danger); color: #fff; border-color: var(--color-danger); }
+  .ec-btn--danger:hover { background: #C12A1F; border-color: #C12A1F; }
+  .ec-btn--ghost { background: #F5F5F7; color: var(--color-txt-primary); border-color: #E0E0E0; }
+  .ec-btn--ghost:hover { background: #EBEBEB; }
+  .ec-btn--waitlist-cancel { background: var(--color-waitlist); color: #fff; border-color: var(--color-waitlist); }
+
+  /* ── NEW badge ── */
+  .new-dot {
+    display: inline-block; font-size: 0.48rem; font-weight: 700; background: var(--color-waitlist);
+    color: #fff; padding: 0.08rem 0.28rem; border-radius: 2px; vertical-align: middle; margin-left: 0.25rem;
+    letter-spacing: 0.04em;
+  }
+
+  /* ── My Events widget ── */
+  .my-events { background: #fff; border: 1px solid var(--color-border-card); border-radius: var(--radius-card); max-width: 420px; overflow: hidden; }
+  .my-events__header { padding: 0.75rem 1rem; border-bottom: 1px solid var(--color-border-divider); display: flex; align-items: center; justify-content: space-between; }
+  .my-events__title { font-size: 0.95rem; font-weight: 700; }
+  .me-tabs { display: flex; gap: 0; background: var(--color-bg-page); border-radius: 6px; padding: 2px; }
+  .me-tab { padding: 0.25rem 0.6rem; font-size: 0.7rem; font-weight: 600; border: none; background: transparent; color: var(--color-txt-muted); border-radius: 4px; cursor: pointer; font-family: var(--font); }
+  .me-tab--active { background: #fff; color: var(--color-txt-primary); box-shadow: var(--elevation-01); }
+  .me-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.65rem 1rem; border-bottom: 1px solid #F5F5F5; cursor: pointer; }
+  .me-item:last-child { border-bottom: none; }
+  .me-item:hover { background: #FAFAFA; }
+  .me-item--past { opacity: 0.5; }
+  .me-date { width: 44px; height: 44px; border-radius: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: var(--color-bg-page); flex-shrink: 0; }
+  .me-date--upcoming { background: var(--color-bg-secondary-light); }
+  .me-date__day { font-size: 1rem; font-weight: 700; line-height: 1; }
+  .me-date__month { font-size: 0.5rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--color-txt-secondary); }
+  .me-info { flex: 1; min-width: 0; }
+  .me-info__title { font-size: 0.82rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .me-info__meta { font-size: 0.7rem; color: var(--color-txt-muted); }
+  .me-status { font-size: 0.6rem; font-weight: 600; padding: 0.15rem 0.4rem; border-radius: 4px; flex-shrink: 0; }
+  .me-status--attending { background: rgba(52,168,83,0.1); color: var(--color-success); }
+  .me-status--waitlisted { background: rgba(124,92,219,0.1); color: var(--color-waitlist); }
+
+  /* ── Figma reference images (inline) ── */
+  .figma-ref { max-width: 340px; background: #fff; border: 1px solid var(--color-border-card); border-radius: 8px; overflow: hidden; }
+  .figma-ref img { width: 100%; display: block; }
+  .figma-ref__label { padding: 0.4rem 0.6rem; font-size: 0.6rem; color: var(--color-txt-muted); border-top: 1px solid var(--color-border-divider); }
+
+  html { scroll-behavior: smooth; }
+  [id] { scroll-margin-top: 1rem; }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <div style="margin-bottom: 2rem;">
+    <div style="font-size: 1.4rem; font-weight: 700;">Event Card v3 — Web App Design</div>
+    <div style="font-size: 0.82rem; color: var(--color-txt-secondary); margin-top: 0.15rem;">
+      Based on Figma file "Tchop Web App" (L3MCvDp7YWgs3y3QvEsMe1). Components: Event card, RSVP, event response, event buttons, event guests, event date.
+      <span class="new-dot">NEW</span> marks features added for v1 spec (not yet in Figma).
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- 1. EVENT CARD — Default (not responded) -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="section" id="s-default">
+    <div class="section-label">UC-2 Discover / UC-3 Attend</div>
+    <div class="section-title">Event Card — Default State</div>
+    <div class="section-desc">
+      User has not responded. Two configurable CTA buttons (filled blue). RSVP deadline shown as light-blue pill.
+      New: capacity bar added below guests.
+    </div>
+
+    <div class="uc-ref">
+      <strong>Figma components used:</strong> Event card (6926:264261), event date, event teaser (16:9), event guests (&lt;5), RSVP (Default), event response (Default)
+      <div class="uc-ref__tags">
+        <span class="tag tag--uc">UC-2</span><span class="tag tag--uc">UC-3</span>
+        <span class="tag tag--new">NEW: F2 Capacity</span>
+      </div>
+    </div>
+
+    <div class="grid-row">
+      <div class="compare-col" style="max-width:340px;">
+        <div class="compare-label compare-label--old">Figma Benchmark</div>
+        <div class="figma-ref">
+          <img src="figma-webapp/event-card-component.png" alt="Figma event card">
+          <div class="figma-ref__label">Component: Event card (6926:264261)</div>
+        </div>
+      </div>
+      <div class="compare-col">
+        <div class="compare-label compare-label--new">Extended with v1 Spec</div>
+        <div class="state-label state-label--blue">Default — not responded</div>
+        <div class="ec">
+          <div class="ec__teaser">
+            <img class="ec__cover" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='630' height='354'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%232d5a27'/%3E%3Cstop offset='100%25' stop-color='%231a3a18'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect fill='url(%23g)' width='630' height='354'/%3E%3Ctext x='315' y='185' text-anchor='middle' fill='rgba(255,255,255,0.15)' font-family='sans-serif' font-size='14'%3ECover image 16:9%3C/text%3E%3C/svg%3E" alt="">
+            <div class="ec__date">
+              <div class="ec__date-month">Apr</div>
+              <div class="ec__date-day">10</div>
+            </div>
+          </div>
+          <div class="ec__content">
+            <div class="ec__datetime">10 Apr 2026, 14:00 – 19:00</div>
+            <div class="ec__title">Summer Team Event — BBQ & Activities im Schlosspark</div>
+            <div class="ec__location">
+              <svg class="ec__location-icon" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 1.5A4.5 4.5 0 0 1 12.5 6c0 3.5-4.5 8.5-4.5 8.5S3.5 9.5 3.5 6A4.5 4.5 0 0 1 8 1.5Z" stroke="currentColor" stroke-width="1.2"/><circle cx="8" cy="6" r="1.5" stroke="currentColor" stroke-width="1.2"/></svg>
+              <div class="ec__location-text">
+                <span class="ec__location-addr">Schlosspark Dresden, Hauptallee 12</span>
+                <span class="ec__location-city"> Dresden, 01067</span>
+              </div>
+            </div>
+            <div class="ec__guests">
+              <div class="ec__avatars">
+                <div class="ec__avatar ec__avatar--a">SL</div>
+                <div class="ec__avatar ec__avatar--b">PW</div>
+                <div class="ec__avatar ec__avatar--c">KM</div>
+              </div>
+              <span class="ec__guest-count">+12 Guests are going</span>
+            </div>
+            <!-- NEW: Capacity bar -->
+            <div class="ec__capacity">
+              <strong>15</strong>/50 spots
+              <div class="ec__capacity-bar"><div class="ec__capacity-fill ec__capacity-fill--ok" style="width:30%"></div></div>
+              <span class="new-dot">NEW</span>
+            </div>
+            <div class="ec__rsvp">
+              <svg class="ec__rsvp-icon" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" fill="#488ED8"/><path d="M10 6v5M10 13.5v.5" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg>
+              <span class="ec__rsvp-text">RSVP by <b>8 April</b></span>
+            </div>
+            <div class="ec__ctas">
+              <button class="ec-btn ec-btn--primary">
+                <svg viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7" stroke="currentColor" stroke-width="1.5"/><path d="M6 9.5l2 2 4-4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                CTA Button 1
+              </button>
+              <button class="ec-btn ec-btn--primary">
+                <svg viewBox="0 0 18 18" fill="none"><path d="M9 3l1.8 4.2H16l-3.6 2.8 1.2 4.5L9 11.8l-4.6 2.7 1.2-4.5L2 7.2h5.2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
+                CTA Button 2
+              </button>
+            </div>
+          </div>
+          <div class="ec__footer">
+            <div class="ec__timestamp">Vor 5 Stunden</div>
+            <div class="ec__actions">
+              <div class="ec__actions-left">
+                <button class="ec__action">
+                  <svg viewBox="0 0 18 18" fill="none"><path d="M3.5 8.5c0-1 .5-4 5-4.5 4.5-.5 5 3.5 5 4.5s-.5 5-5 5.5c-3 .33-4-1.5-4-1.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M3 6.5L3.5 8.5 5.5 7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  Like
+                </button>
+                <button class="ec__action">
+                  <svg viewBox="0 0 18 18" fill="none"><path d="M2.5 12.5v-8a1 1 0 0 1 1-1h11a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1h-8l-4 2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
+                  Kommentieren
+                </button>
+                <button class="ec__action">
+                  <svg viewBox="0 0 18 18" fill="none"><path d="M7 11l-3.5 3.5V11H2.5a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h13a1 1 0 0 1 1 1V10a1 1 0 0 1-1 1H7z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
+                  Share
+                </button>
+              </div>
+              <button class="ec__action-menu">
+                <svg viewBox="0 0 24 24" fill="none"><circle cx="6" cy="12" r="1.5" fill="currentColor"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/><circle cx="18" cy="12" r="1.5" fill="currentColor"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- 2. RESPONDED STATE + ATTENDING          -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="section" id="s-responded">
+    <div class="section-label">UC-3 Attend / UC-4 Cancel</div>
+    <div class="section-title">Event Card — Responded States</div>
+    <div class="section-desc">
+      Figma "Responded" variant shows: Ticket, Join now, Get direction buttons (outline), pressed CTA states, + calendar icon. New: we add an "Attending" confirmation state and waitlist states.
+    </div>
+
+    <div class="uc-ref">
+      <strong>Figma:</strong> event response (Responded) shows CTA pressed states + Ticket/Join/Direction/Calendar buttons.
+      <div class="uc-ref__tags">
+        <span class="tag tag--uc">UC-3</span><span class="tag tag--uc">UC-4</span>
+        <span class="tag tag--new">NEW: Attending state</span><span class="tag tag--new">NEW: Waitlist</span>
+      </div>
+    </div>
+
+    <div class="grid-row">
+      <div class="compare-col" style="max-width:360px;">
+        <div class="compare-label compare-label--old">Figma: event response variants</div>
+        <div class="figma-ref">
+          <img src="figma-webapp/event-response-set.png" alt="Figma event response set">
+          <div class="figma-ref__label">Component set: event response (11112:296333) — Default, Responded, Own event</div>
+        </div>
+        <div style="margin-top:0.75rem;">
+          <div class="figma-ref">
+            <img src="figma-webapp/event-buttons-set.png" alt="Figma event buttons set">
+            <div class="figma-ref__label">Component set: event buttons (11112:255840) — all variants</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="compare-col">
+        <div class="compare-label compare-label--new">v1 States</div>
+
+        <!-- Attending -->
+        <div style="margin-bottom:1.25rem;">
+          <div class="state-label state-label--green">Attending</div>
+          <div class="ec" style="width:480px;">
+            <div class="ec__content" style="padding-top:16px;">
+              <div class="ec__datetime">14 Apr 2026, 09:00 – 17:00</div>
+              <div class="ec__title">Gesundheitswoche: Ergonomie am Arbeitsplatz</div>
+              <div class="ec__location">
+                <svg class="ec__location-icon" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 1.5A4.5 4.5 0 0 1 12.5 6c0 3.5-4.5 8.5-4.5 8.5S3.5 9.5 3.5 6A4.5 4.5 0 0 1 8 1.5Z" stroke="currentColor" stroke-width="1.2"/><circle cx="8" cy="6" r="1.5" stroke="currentColor" stroke-width="1.2"/></svg>
+                <span class="ec__location-addr">AOK Plus Zentrale, Raum 4.02</span>
+              </div>
+              <div class="ec__capacity">
+                <strong>32</strong>/40 spots
+                <div class="ec__capacity-bar"><div class="ec__capacity-fill ec__capacity-fill--warn" style="width:80%"></div></div>
+                <span class="new-dot">NEW</span>
+              </div>
+              <div class="ec__rsvp">
+                <svg class="ec__rsvp-icon" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" fill="#488ED8"/><path d="M10 6.5v4M7 14h6" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg>
+                <span class="ec__rsvp-text">Starts in <b>18d 6h</b></span>
+              </div>
+              <div class="ec__ctas">
+                <button class="ec-btn ec-btn--attending">
+                  <svg viewBox="0 0 18 18" fill="none"><path d="M4 9.5l3.5 3.5 6.5-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  Attending
+                  <span class="new-dot">NEW</span>
+                </button>
+                <button class="ec-btn ec-btn--outline">
+                  <svg viewBox="0 0 18 18" fill="none"><path d="M9 3l1.8 4.2H16l-3.6 2.8 1.2 4.5L9 11.8l-4.6 2.7 1.2-4.5L2 7.2h5.2z" fill="currentColor"/></svg>
+                  CTA 2
+                </button>
+                <button class="ec-btn ec-btn--icon" title="Add to calendar">
+                  <svg viewBox="0 0 18 18" fill="none"><rect x="2.5" y="3.5" width="13" height="12" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M2.5 7.5h13M6 2v3M12 2v3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Waitlist available -->
+        <div style="margin-bottom:1.25rem;">
+          <div class="state-label state-label--purple">Full — join waitlist</div>
+          <div class="ec" style="width:480px;">
+            <div class="ec__content" style="padding-top:16px;">
+              <div class="ec__datetime">18 Apr 2026, 10:00 – 12:00</div>
+              <div class="ec__title">Erste Hilfe Auffrischungskurs</div>
+              <div class="ec__capacity">
+                <strong>20</strong>/20 spots &middot; 3 on waitlist
+                <div class="ec__capacity-bar"><div class="ec__capacity-fill ec__capacity-fill--full" style="width:100%"></div></div>
+              </div>
+              <div class="ec__ctas">
+                <button class="ec-btn ec-btn--waitlist">
+                  <svg viewBox="0 0 18 18" fill="none"><path d="M9 2v7l4 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="9" r="7" stroke="currentColor" stroke-width="1.3"/></svg>
+                  Join Waitlist
+                  <span class="new-dot">NEW</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- On waitlist -->
+        <div>
+          <div class="state-label state-label--purple">On waitlist #4</div>
+          <div class="ec" style="width:480px;">
+            <div class="ec__content" style="padding-top:16px;">
+              <div class="ec__datetime">18 Apr 2026, 10:00 – 12:00</div>
+              <div class="ec__title">Erste Hilfe Auffrischungskurs</div>
+              <div class="ec__capacity">
+                <strong>20</strong>/20 spots &middot; You are #4 on waitlist
+                <div class="ec__capacity-bar"><div class="ec__capacity-fill ec__capacity-fill--full" style="width:100%"></div></div>
+              </div>
+              <div class="ec__ctas">
+                <button class="ec-btn ec-btn--waitlisted">
+                  <svg viewBox="0 0 18 18" fill="none"><path d="M9 2v7l4 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="9" r="7" stroke="currentColor" stroke-width="1.3"/></svg>
+                  Waitlist #4
+                  <span class="new-dot">NEW</span>
+                </button>
+                <button class="ec-btn ec-btn--icon" title="Add to calendar">
+                  <svg viewBox="0 0 18 18" fill="none"><rect x="2.5" y="3.5" width="13" height="12" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M2.5 7.5h13M6 2v3M12 2v3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- 3. PAST EVENT                           -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="section" id="s-past">
+    <div class="section-label">UC-10 Past Events <span class="new-dot">NEW</span></div>
+    <div class="section-title">Event Card — Past Event</div>
+    <div class="section-desc">Greyed-out cover, muted date badge, "Event ended" overlay. No action buttons. Attendance count replaces capacity.</div>
+
+    <div class="ec" style="width: var(--card-width);">
+      <div class="ec__teaser">
+        <img class="ec__cover ec__cover--past" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='630' height='354'%3E%3Crect fill='%2343445B' width='630' height='354'/%3E%3C/svg%3E" alt="">
+        <div class="ec__date ec__date--past">
+          <div class="ec__date-month">Mar</div>
+          <div class="ec__date-day">17</div>
+        </div>
+        <div class="ec__ended">Event ended</div>
+      </div>
+      <div class="ec__content">
+        <div class="ec__datetime" style="color: var(--color-txt-muted);">17 Mar 2026, 09:00 – 16:00</div>
+        <div class="ec__title" style="color: var(--color-txt-secondary);">Neuer Mitarbeitenden-Tag Q1</div>
+        <div class="ec__guests">
+          <div class="ec__avatars">
+            <div class="ec__avatar ec__avatar--a">TK</div>
+            <div class="ec__avatar ec__avatar--d">RM</div>
+          </div>
+          <span class="ec__guest-count" style="color: var(--color-txt-secondary);">38 attended</span>
+        </div>
+        <div class="ec__ctas">
+          <button class="ec-btn ec-btn--disabled" disabled>Event ended</button>
+        </div>
+      </div>
+      <div class="ec__footer">
+        <div class="ec__timestamp">17 Mar 2026</div>
+        <div class="ec__actions">
+          <div class="ec__actions-left">
+            <button class="ec__action"><svg viewBox="0 0 18 18" fill="none"><path d="M3.5 8.5c0-1 .5-4 5-4.5 4.5-.5 5 3.5 5 4.5s-.5 5-5 5.5c-3 .33-4-1.5-4-1.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M3 6.5L3.5 8.5 5.5 7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg> Like</button>
+            <button class="ec__action"><svg viewBox="0 0 18 18" fill="none"><path d="M2.5 12.5v-8a1 1 0 0 1 1-1h11a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1h-8l-4 2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg> Kommentieren</button>
+          </div>
+          <button class="ec__action-menu"><svg viewBox="0 0 24 24" fill="none"><circle cx="6" cy="12" r="1.5" fill="currentColor"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/><circle cx="18" cy="12" r="1.5" fill="currentColor"/></svg></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- 4. CANCEL FLOW                          -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="section" id="s-cancel">
+    <div class="section-label">UC-4 Cancel Attendance <span class="new-dot">NEW</span></div>
+    <div class="section-title">Cancel Confirmation</div>
+    <div class="section-desc">
+      Triggered when user taps "Attending" or "Waitlist #N" button. Confirmation step prevents accidental spot loss.
+      Uses same border-radius (10px) and elevation as card components.
+    </div>
+
+    <div class="grid-row">
+      <div>
+        <div class="state-label state-label--green">Cancel attendance (waitlist exists)</div>
+        <div class="cancel-sheet">
+          <div class="cancel-sheet__title">Cancel attendance?</div>
+          <div class="cancel-sheet__text">You will lose your spot at "Summer Team Event". If the event is full when re-registering, you may end up on the waitlist.</div>
+          <div class="cancel-sheet__warning">3 people are on the waitlist. Your spot will be given to the next person immediately.</div>
+          <div class="cancel-sheet__btns">
+            <button class="ec-btn ec-btn--danger">Yes, cancel</button>
+            <button class="ec-btn ec-btn--ghost">Keep spot</button>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="state-label state-label--purple">Leave waitlist</div>
+        <div class="cancel-sheet">
+          <div class="cancel-sheet__title">Leave waitlist?</div>
+          <div class="cancel-sheet__text">You will lose position #4 on the waitlist for "Erste Hilfe Kurs". If you rejoin, you'll be placed at the end.</div>
+          <div class="cancel-sheet__btns">
+            <button class="ec-btn ec-btn--waitlist-cancel">Yes, leave</button>
+            <button class="ec-btn ec-btn--ghost">Keep position</button>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="state-label state-label--grey">Deadline passed</div>
+        <div style="background:#fff; border:1px solid var(--color-border-card); border-radius:var(--radius-card); padding:1rem; max-width:340px; display:flex; align-items:center; gap:0.5rem; font-size:0.82rem; color:var(--color-danger);">
+          <svg viewBox="0 0 18 18" fill="none" style="width:18px;height:18px;flex-shrink:0;"><circle cx="9" cy="9" r="7" stroke="currentColor" stroke-width="1.3"/><path d="M9 5.5v4M9 12v.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          Registration closed. Contact the event organizer to cancel.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- 5. MY EVENTS                            -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="section" id="s-myevents">
+    <div class="section-label">UC-8 My Events <span class="new-dot">NEW</span></div>
+    <div class="section-title">"My Events" — Personal View</div>
+    <div class="section-desc">Cross-channel, user-scoped list of events the user is attending or waitlisted for. Uses same card border/radius system. Tabs: Upcoming / Past.</div>
+
+    <div class="my-events">
+      <div class="my-events__header">
+        <span class="my-events__title">My Events</span>
+        <div class="me-tabs">
+          <button class="me-tab me-tab--active">Upcoming</button>
+          <button class="me-tab">Past</button>
+        </div>
+      </div>
+      <div class="me-item">
+        <div class="me-date me-date--upcoming"><span class="me-date__day">10</span><span class="me-date__month">Apr</span></div>
+        <div class="me-info"><div class="me-info__title">Summer Team Event</div><div class="me-info__meta">14:00 -- Schlosspark Dresden</div></div>
+        <span class="me-status me-status--attending">Attending</span>
+      </div>
+      <div class="me-item">
+        <div class="me-date me-date--upcoming"><span class="me-date__day">14</span><span class="me-date__month">Apr</span></div>
+        <div class="me-info"><div class="me-info__title">Gesundheitswoche: Ergonomie</div><div class="me-info__meta">09:00 -- AOK Zentrale</div></div>
+        <span class="me-status me-status--attending">Attending</span>
+      </div>
+      <div class="me-item">
+        <div class="me-date me-date--upcoming"><span class="me-date__day">18</span><span class="me-date__month">Apr</span></div>
+        <div class="me-info"><div class="me-info__title">Erste Hilfe Auffrischungskurs</div><div class="me-info__meta">10:00 -- Schulungszentrum</div></div>
+        <span class="me-status me-status--waitlisted">Waitlist #4</span>
+      </div>
+      <div class="me-item me-item--past">
+        <div class="me-date"><span class="me-date__day">17</span><span class="me-date__month">Mar</span></div>
+        <div class="me-info"><div class="me-info__title">Neuer Mitarbeitenden-Tag Q1</div><div class="me-info__meta">09:00 -- Zentrale</div></div>
+        <span class="me-status me-status--attending" style="opacity:0.5;">Attended</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- 6. BUTTON STATE MATRIX                  -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="section" id="s-matrix">
+    <div class="section-label">Reference</div>
+    <div class="section-title">Button State Matrix + Figma Component Map</div>
+
+    <div class="grid-row">
+      <div style="flex:1; min-width:320px;">
+        <div style="font-size:0.9rem;font-weight:700;margin-bottom:0.65rem;">Interactive Button States</div>
+        <table style="width:100%;border-collapse:collapse;font-size:0.78rem;background:#fff;border:1px solid var(--color-border-card);border-radius:var(--radius-card);overflow:hidden;">
+          <thead><tr style="background:var(--color-bg-page);"><th style="text-align:left;padding:0.5rem 0.65rem;font-size:0.6rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--color-txt-muted);">Condition</th><th style="padding:0.5rem 0.65rem;">Button</th><th style="padding:0.5rem 0.65rem;text-align:left;">Tap action</th></tr></thead>
+          <tbody>
+            <tr style="border-top:1px solid var(--color-border-divider);"><td style="padding:0.5rem 0.65rem;">Open, not responded</td><td style="padding:0.5rem 0.65rem;"><button class="ec-btn ec-btn--primary" style="font-size:0.7rem;padding:0.35rem 0.6rem;">CTA 1</button></td><td style="padding:0.5rem 0.65rem;color:var(--color-txt-secondary);">RSVP attend</td></tr>
+            <tr style="border-top:1px solid var(--color-border-divider);"><td style="padding:0.5rem 0.65rem;">Attending <span class="new-dot">NEW</span></td><td style="padding:0.5rem 0.65rem;"><button class="ec-btn ec-btn--attending" style="font-size:0.7rem;padding:0.35rem 0.6rem;">Attending</button></td><td style="padding:0.5rem 0.65rem;color:var(--color-txt-secondary);">Cancel confirm</td></tr>
+            <tr style="border-top:1px solid var(--color-border-divider);"><td style="padding:0.5rem 0.65rem;">Full, not on list <span class="new-dot">NEW</span></td><td style="padding:0.5rem 0.65rem;"><button class="ec-btn ec-btn--waitlist" style="font-size:0.7rem;padding:0.35rem 0.6rem;">Join Waitlist</button></td><td style="padding:0.5rem 0.65rem;color:var(--color-txt-secondary);">Add to waitlist</td></tr>
+            <tr style="border-top:1px solid var(--color-border-divider);"><td style="padding:0.5rem 0.65rem;">On waitlist <span class="new-dot">NEW</span></td><td style="padding:0.5rem 0.65rem;"><button class="ec-btn ec-btn--waitlisted" style="font-size:0.7rem;padding:0.35rem 0.6rem;">Waitlist #4</button></td><td style="padding:0.5rem 0.65rem;color:var(--color-txt-secondary);">Leave confirm</td></tr>
+            <tr style="border-top:1px solid var(--color-border-divider);"><td style="padding:0.5rem 0.65rem;">Closed / past</td><td style="padding:0.5rem 0.65rem;"><button class="ec-btn ec-btn--disabled" style="font-size:0.7rem;padding:0.35rem 0.6rem;">Event ended</button></td><td style="padding:0.5rem 0.65rem;color:var(--color-txt-secondary);">None</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div style="flex:1; min-width:320px;">
+        <div style="font-size:0.9rem;font-weight:700;margin-bottom:0.65rem;">Figma Component Map</div>
+        <table style="width:100%;border-collapse:collapse;font-size:0.72rem;background:#fff;border:1px solid var(--color-border-card);border-radius:var(--radius-card);overflow:hidden;">
+          <thead><tr style="background:var(--color-bg-page);"><th style="text-align:left;padding:0.45rem 0.6rem;font-size:0.55rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--color-txt-muted);">Component</th><th style="padding:0.45rem 0.6rem;text-align:left;">Figma ID</th><th style="padding:0.45rem 0.6rem;text-align:center;">In v1</th></tr></thead>
+          <tbody>
+            <tr style="border-top:1px solid #F5F5F5;"><td style="padding:0.4rem 0.6rem;">Event card</td><td style="padding:0.4rem 0.6rem;font-family:monospace;font-size:0.62rem;color:var(--color-txt-muted);">6926:264261</td><td style="padding:0.4rem 0.6rem;text-align:center;">Extended</td></tr>
+            <tr style="border-top:1px solid #F5F5F5;"><td style="padding:0.4rem 0.6rem;">event date</td><td style="padding:0.4rem 0.6rem;font-family:monospace;font-size:0.62rem;color:var(--color-txt-muted);">6926:263392</td><td style="padding:0.4rem 0.6rem;text-align:center;">As-is</td></tr>
+            <tr style="border-top:1px solid #F5F5F5;"><td style="padding:0.4rem 0.6rem;">event teaser (16:9)</td><td style="padding:0.4rem 0.6rem;font-family:monospace;font-size:0.62rem;color:var(--color-txt-muted);">11112:292963</td><td style="padding:0.4rem 0.6rem;text-align:center;">As-is</td></tr>
+            <tr style="border-top:1px solid #F5F5F5;"><td style="padding:0.4rem 0.6rem;">event guests</td><td style="padding:0.4rem 0.6rem;font-family:monospace;font-size:0.62rem;color:var(--color-txt-muted);">6926:263397</td><td style="padding:0.4rem 0.6rem;text-align:center;">As-is</td></tr>
+            <tr style="border-top:1px solid #F5F5F5;"><td style="padding:0.4rem 0.6rem;">RSVP</td><td style="padding:0.4rem 0.6rem;font-family:monospace;font-size:0.62rem;color:var(--color-txt-muted);">11112:302748</td><td style="padding:0.4rem 0.6rem;text-align:center;">As-is</td></tr>
+            <tr style="border-top:1px solid #F5F5F5;"><td style="padding:0.4rem 0.6rem;">event response</td><td style="padding:0.4rem 0.6rem;font-family:monospace;font-size:0.62rem;color:var(--color-txt-muted);">11112:296333</td><td style="padding:0.4rem 0.6rem;text-align:center;">Extended</td></tr>
+            <tr style="border-top:1px solid #F5F5F5;"><td style="padding:0.4rem 0.6rem;">event buttons</td><td style="padding:0.4rem 0.6rem;font-family:monospace;font-size:0.62rem;color:var(--color-txt-muted);">11112:255840</td><td style="padding:0.4rem 0.6rem;text-align:center;">Extended</td></tr>
+            <tr style="border-top:1px solid #F5F5F5;"><td style="padding:0.4rem 0.6rem;">location type</td><td style="padding:0.4rem 0.6rem;font-family:monospace;font-size:0.62rem;color:var(--color-txt-muted);">11112:251051</td><td style="padding:0.4rem 0.6rem;text-align:center;">As-is</td></tr>
+            <tr style="border-top:1px solid #F5F5F5;background:rgba(124,92,219,0.03);"><td style="padding:0.4rem 0.6rem;font-weight:600;">Capacity bar <span class="new-dot">NEW</span></td><td style="padding:0.4rem 0.6rem;font-family:monospace;font-size:0.62rem;color:var(--color-txt-muted);">--</td><td style="padding:0.4rem 0.6rem;text-align:center;color:var(--color-waitlist);font-weight:600;">New</td></tr>
+            <tr style="border-top:1px solid #F5F5F5;background:rgba(124,92,219,0.03);"><td style="padding:0.4rem 0.6rem;font-weight:600;">Attending button <span class="new-dot">NEW</span></td><td style="padding:0.4rem 0.6rem;font-family:monospace;font-size:0.62rem;color:var(--color-txt-muted);">--</td><td style="padding:0.4rem 0.6rem;text-align:center;color:var(--color-waitlist);font-weight:600;">New</td></tr>
+            <tr style="border-top:1px solid #F5F5F5;background:rgba(124,92,219,0.03);"><td style="padding:0.4rem 0.6rem;font-weight:600;">Waitlist button <span class="new-dot">NEW</span></td><td style="padding:0.4rem 0.6rem;font-family:monospace;font-size:0.62rem;color:var(--color-txt-muted);">--</td><td style="padding:0.4rem 0.6rem;text-align:center;color:var(--color-waitlist);font-weight:600;">New</td></tr>
+            <tr style="border-top:1px solid #F5F5F5;background:rgba(124,92,219,0.03);"><td style="padding:0.4rem 0.6rem;font-weight:600;">Cancel sheet <span class="new-dot">NEW</span></td><td style="padding:0.4rem 0.6rem;font-family:monospace;font-size:0.62rem;color:var(--color-txt-muted);">--</td><td style="padding:0.4rem 0.6rem;text-align:center;color:var(--color-waitlist);font-weight:600;">New</td></tr>
+            <tr style="border-top:1px solid #F5F5F5;background:rgba(124,92,219,0.03);"><td style="padding:0.4rem 0.6rem;font-weight:600;">My Events view <span class="new-dot">NEW</span></td><td style="padding:0.4rem 0.6rem;font-family:monospace;font-size:0.62rem;color:var(--color-txt-muted);">--</td><td style="padding:0.4rem 0.6rem;text-align:center;color:var(--color-waitlist);font-weight:600;">New</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div style="text-align:center;padding:2rem 0 1rem;color:var(--color-txt-muted);font-size:0.7rem;">
+    tchop Event Card v3 -- Web App Figma (L3MCvDp7YWgs3y3QvEsMe1) + v1 Spec Extensions
+  </div>
+
+</div>
+</body>
+</html>

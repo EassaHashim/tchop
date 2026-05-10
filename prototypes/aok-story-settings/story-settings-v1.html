@@ -1,0 +1,1513 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Story-Einstellungen — Redesign — tchop webapp</title>
+<link rel="icon" href="https://mxz-assets.tchop.it/img/app-icons/aok/dialog_onlinefavicon.ico" />
+<style>
+  /* ============================================================
+     Story Settings Redesign — v1 prototype
+     Grounded in:
+       - ~/claude-projects/.impeccable.md
+       - ~/claude-projects/.impeccable-inventory.md
+       - services/AOK-webapp/src/pages/StoryTabListAdmin/CreateStoryModal/
+       - generated.json (AOK NDS theme tokens)
+     Replaces the 8-tab "Update standard mix" modal with a
+     single-scroll form: left section rail, stacked sections,
+     visual Placement map, presets, sticky save bar.
+     ============================================================ */
+
+  @font-face {
+    font-family: 'AOKBuenosAires';
+    src: url('https://mxz-assets.tchop.it/font/aok/AOKBuenosAiresText-Regular.woff2') format('woff2');
+    font-style: normal; font-weight: 400; font-display: swap;
+  }
+  @font-face {
+    font-family: 'AOKBuenosAires';
+    src: url('https://mxz-assets.tchop.it/font/aok/AOKBuenosAiresText-SemiBold.woff2') format('woff2');
+    font-style: normal; font-weight: 600; font-display: swap;
+  }
+  @font-face {
+    font-family: 'AOKBuenosAires';
+    src: url('https://mxz-assets.tchop.it/font/aok/AOKBuenosAiresText-Bold.woff2') format('woff2');
+    font-style: normal; font-weight: 700; font-display: swap;
+  }
+
+  :root {
+    --primary:        #005E3F;
+    --secondary:      #18AB42;
+    --btn-primary-bg: #91F54A;
+    --btn-primary-text: #004730;
+    --tint:           #E8F4F2;
+    --tint-deep:      #D4ECE4;
+
+    --txt-prominent:  #005E3F;
+    --txt-base:       #293033;
+    --txt-secondary:  #6D767C;
+    --txt-disabled:   #98A1A6;
+
+    --bg-base:        #FFFFFF;
+    --bg-secondary:   #F8F8F8;
+    --bg-rail:        #FAFAFB;
+    --bg-overlay:     rgba(35, 35, 46, 0.5);
+
+    --border-card:    #EBEBEB;
+    --border-divider: #DFE3E6;
+    --border-default: #B3B3B3;
+    --border-hovered: #8F8F8F;
+
+    --error:          #FF5560;
+    --error-hover:    #fe212f;
+    --warning:        #d4870e;
+    --warning-bg:     #fdf4e4;
+    --active-bg:      #e8f5ee;
+    --active-text:    #2d9d5e;
+    --info-bg:        #eef6ff;
+
+    --navbar-height: 4.5rem;
+    --left-sidebar-width: 16.875rem;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { font-size: 16px; }
+  @media (max-width: 600px) { html { font-size: 0.875rem; } }
+
+  body {
+    font-family: 'AOKBuenosAires', sans-serif;
+    background: var(--bg-secondary);
+    color: var(--txt-base);
+    font-size: 1rem;
+    line-height: 1.5rem;
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  a { color: var(--secondary); text-decoration: none; }
+  a:hover { color: var(--primary); }
+
+  button {
+    font-family: inherit;
+    cursor: pointer;
+    background: none;
+    border: none;
+    color: inherit;
+    padding: 0;
+  }
+
+  :focus { outline: none; }
+  button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, [tabindex]:focus-visible {
+    outline: 0.125rem solid var(--secondary);
+    outline-offset: 0.125rem;
+    border-radius: 0.25rem;
+  }
+
+  /* ============================================================
+     App shell simulation
+     ============================================================ */
+  .shell { display: flex; min-height: 100vh; }
+
+  .sidebar {
+    width: var(--left-sidebar-width);
+    background: var(--bg-secondary);
+    border-right: 0.0625rem solid var(--border-divider);
+    padding: 1.5rem 1rem;
+    flex-shrink: 0;
+  }
+  .sidebar-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0 0.75rem 1.5rem;
+  }
+  .sidebar-brand img { height: 1.75rem; }
+  .sidebar-brand-label { font-weight: 600; color: var(--primary); font-size: 0.875rem; }
+
+  .sidebar-section { margin-top: 1rem; }
+  .sidebar-section-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--txt-secondary);
+    padding: 0.5rem 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+  .sidebar-link {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.25rem;
+    color: var(--txt-secondary);
+    font-size: 0.875rem;
+    width: 100%;
+    text-align: left;
+  }
+  .sidebar-link:hover { color: var(--primary); }
+  .sidebar-link.active {
+    color: var(--primary);
+    background: var(--tint);
+    font-weight: 600;
+  }
+  .sidebar-link svg { width: 1rem; height: 1rem; flex-shrink: 0; }
+
+  .main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+
+  .navbar {
+    height: var(--navbar-height);
+    background: var(--bg-base);
+    border-bottom: 0.0625rem solid #DDE1E4;
+    display: flex;
+    align-items: center;
+    padding: 0 1.5rem;
+    gap: 1rem;
+  }
+  .navbar-logo { height: 2.25rem; }
+  .navbar-title { font-weight: 600; color: var(--txt-base); font-size: 1rem; margin-left: auto; }
+  .navbar-avatar {
+    width: 2.25rem; height: 2.25rem;
+    border-radius: 50%;
+    background: var(--primary); color: #fff;
+    display: grid; place-items: center;
+    font-weight: 600; font-size: 0.875rem;
+  }
+
+  .content {
+    padding: 2rem;
+    max-width: 80rem;
+    width: 100%;
+    margin: 0 auto;
+  }
+
+  /* Faux story-list page behind the modal */
+  .page-title {
+    font-size: 1.75rem; font-weight: 700;
+    color: var(--txt-prominent);
+    margin-bottom: 0.25rem;
+  }
+  .page-intro { font-size: 0.875rem; color: var(--txt-secondary); margin-bottom: 1.5rem; }
+  .story-list { display: flex; flex-direction: column; gap: 0.5rem; }
+  .story-row {
+    display: flex; align-items: center;
+    padding: 1rem 1.25rem;
+    background: #fff;
+    border: 0.0625rem solid var(--border-card);
+    border-radius: 0.25rem;
+    gap: 1rem;
+  }
+  .story-row-title { font-weight: 600; }
+  .story-row-meta { color: var(--txt-secondary); font-size: 0.8125rem; margin-left: auto; }
+
+  /* ============================================================
+     Modal overlay + container
+     ============================================================ */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: var(--bg-overlay);
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 2rem 1rem;
+    z-index: 1000;
+  }
+  .modal {
+    width: 100%;
+    max-width: 72rem;
+    height: calc(100vh - 4rem);
+    max-height: 56rem;
+    background: var(--bg-base);
+    border-radius: 0.25rem;
+    box-shadow: 0 1.25rem 3rem rgba(0, 0, 0, 0.25);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* Modal header */
+  .modal-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1.25rem 1.5rem;
+    border-bottom: 0.0625rem solid var(--border-card);
+  }
+  .modal-header-titles { flex: 1; min-width: 0; }
+  .modal-eyebrow {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--txt-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .modal-title-field {
+    font-family: inherit;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--txt-prominent);
+    background: transparent;
+    border: 0.0625rem solid transparent;
+    border-radius: 0.25rem;
+    padding: 0.25rem 0.5rem;
+    margin-left: -0.5rem;
+    width: 100%;
+    max-width: 30rem;
+  }
+  .modal-title-field:hover { border-color: var(--border-card); }
+  .modal-title-field:focus-visible { border-color: var(--secondary); outline: none; }
+  .modal-close {
+    width: 2rem; height: 2rem;
+    border-radius: 0.25rem;
+    display: grid; place-items: center;
+    color: var(--txt-secondary);
+  }
+  .modal-close:hover { background: var(--bg-secondary); color: var(--txt-base); }
+
+  /* Modal body — two columns: section rail + content */
+  .modal-body {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+  }
+
+  /* ============================================================
+     Left section rail
+     ============================================================ */
+  .rail {
+    width: 14rem;
+    flex-shrink: 0;
+    border-right: 0.0625rem solid var(--border-card);
+    background: var(--bg-rail);
+    overflow-y: auto;
+    padding: 1rem 0.75rem;
+  }
+  .rail-search {
+    position: relative;
+    margin-bottom: 0.75rem;
+  }
+  .rail-search input {
+    width: 100%;
+    height: 2rem;
+    padding: 0 0.75rem 0 2rem;
+    font-family: inherit;
+    font-size: 0.8125rem;
+    color: var(--txt-base);
+    background: #fff;
+    border: 0.0625rem solid var(--border-default);
+    border-radius: 0.25rem;
+  }
+  .rail-search input:focus { outline: none; border-color: var(--secondary); }
+  .rail-search input::placeholder { color: var(--txt-secondary); }
+  .rail-search svg {
+    position: absolute;
+    left: 0.5rem;
+    top: 0.5rem;
+    width: 1rem; height: 1rem;
+    color: var(--txt-secondary);
+    pointer-events: none;
+  }
+
+  .rail-link {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    padding: 0.5rem 0.625rem;
+    border-radius: 0.25rem;
+    color: var(--txt-secondary);
+    font-size: 0.875rem;
+    font-weight: 400;
+    width: 100%;
+    text-align: left;
+    margin-bottom: 0.125rem;
+  }
+  .rail-link:hover { color: var(--primary); background: #fff; }
+  .rail-link.active {
+    color: var(--primary);
+    background: var(--tint);
+    font-weight: 600;
+  }
+  .rail-link svg { width: 1rem; height: 1rem; flex-shrink: 0; }
+  .rail-link-changed {
+    margin-left: auto;
+    width: 0.375rem;
+    height: 0.375rem;
+    border-radius: 50%;
+    background: var(--secondary);
+    flex-shrink: 0;
+  }
+  .rail-link.hidden { display: none; }
+
+  .rail-section-label {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    color: var(--txt-disabled);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 0.75rem 0.625rem 0.25rem;
+  }
+
+  /* ============================================================
+     Scrollable content area
+     ============================================================ */
+  .scroll {
+    flex: 1;
+    min-width: 0;
+    overflow-y: auto;
+    padding: 1.5rem 2rem 2rem;
+  }
+
+  /* Section */
+  .section {
+    scroll-margin-top: 1rem;
+    margin-bottom: 2.5rem;
+  }
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+    margin-bottom: 0.25rem;
+  }
+  .section-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--txt-prominent);
+  }
+  .section-sub {
+    font-size: 0.8125rem;
+    color: var(--txt-secondary);
+    margin-bottom: 1rem;
+    max-width: 36rem;
+    line-height: 1.25rem;
+  }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 0.875rem 0;
+    border-bottom: 0.0625rem solid var(--border-card);
+  }
+  .field:last-child { border-bottom: none; }
+  .field-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+  .field-label {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--txt-base);
+  }
+  .field-help {
+    font-size: 0.8125rem;
+    color: var(--txt-secondary);
+    line-height: 1.15rem;
+    max-width: 32rem;
+  }
+  .field-controls {
+    margin-top: 0.5rem;
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  /* ============================================================
+     Content fields (top section — title/intro/image)
+     ============================================================ */
+  .content-grid {
+    display: grid;
+    grid-template-columns: 1fr 12rem;
+    gap: 1rem 1.5rem;
+    align-items: flex-start;
+  }
+  .input, .textarea, .select {
+    font-family: inherit;
+    font-size: 0.9375rem;
+    color: var(--txt-base);
+    background: #fff;
+    border: 0.0625rem solid var(--border-default);
+    border-radius: 0.25rem;
+    padding: 0.625rem 0.75rem;
+    width: 100%;
+  }
+  .textarea { resize: vertical; min-height: 4rem; line-height: 1.35rem; }
+  .input:focus, .textarea:focus, .select:focus { outline: none; border-color: var(--secondary); }
+  .input::placeholder, .textarea::placeholder { color: var(--txt-secondary); }
+
+  .header-image-drop {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.375rem;
+    aspect-ratio: 1/1;
+    background: var(--tint);
+    border: 0.125rem dashed var(--tint-deep);
+    border-radius: 0.25rem;
+    color: var(--primary);
+    font-size: 0.8125rem;
+    text-align: center;
+    padding: 0.75rem;
+  }
+  .header-image-drop svg { width: 1.5rem; height: 1.5rem; opacity: 0.7; }
+  .header-image-drop:hover { background: var(--tint-deep); }
+
+  /* ============================================================
+     Presets
+     ============================================================ */
+  .presets {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.625rem;
+  }
+  .preset {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.375rem;
+    padding: 0.875rem 1rem;
+    background: #fff;
+    border: 0.0625rem solid var(--border-card);
+    border-radius: 0.25rem;
+    text-align: left;
+    transition: 0.2s;
+    width: 100%;
+  }
+  .preset:hover {
+    border-color: var(--secondary);
+    background: var(--tint);
+  }
+  .preset.selected {
+    border-color: var(--primary);
+    background: var(--tint);
+    box-shadow: inset 0 0 0 0.0625rem var(--primary);
+  }
+  .preset-icon {
+    width: 1.75rem; height: 1.75rem;
+    border-radius: 0.25rem;
+    background: var(--tint);
+    color: var(--primary);
+    display: grid; place-items: center;
+  }
+  .preset.selected .preset-icon { background: #fff; }
+  .preset-icon svg { width: 1rem; height: 1rem; }
+  .preset-name {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--txt-base);
+  }
+  .preset-desc {
+    font-size: 0.75rem;
+    color: var(--txt-secondary);
+    line-height: 1rem;
+  }
+
+  /* ============================================================
+     Placement — visual map
+     ============================================================ */
+  .place-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+    background: #fff;
+    border: 0.0625rem solid var(--border-card);
+    border-radius: 0.25rem;
+    margin-bottom: 0.5rem;
+    transition: 0.2s;
+  }
+  .place-card.enabled {
+    border-color: var(--secondary);
+    background: var(--tint);
+  }
+  .place-card.empty {
+    opacity: 0.55;
+    border-style: dashed;
+  }
+  .place-icon {
+    flex-shrink: 0;
+    width: 3rem; height: 3rem;
+    border-radius: 0.25rem;
+    background: var(--bg-secondary);
+    color: var(--txt-secondary);
+    display: grid; place-items: center;
+  }
+  .place-card.enabled .place-icon {
+    background: #fff;
+    color: var(--primary);
+  }
+  .place-icon svg { width: 1.375rem; height: 1.375rem; }
+  .place-body { flex: 1; min-width: 0; }
+  .place-title {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--txt-base);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .place-title .tag {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    color: var(--txt-secondary);
+    background: var(--bg-secondary);
+    padding: 0.125rem 0.375rem;
+    border-radius: 0.15rem;
+  }
+  .place-card.enabled .place-title .tag {
+    color: var(--primary);
+    background: #fff;
+  }
+  .place-desc {
+    font-size: 0.8125rem;
+    color: var(--txt-secondary);
+    line-height: 1.15rem;
+    margin-top: 0.125rem;
+  }
+  .place-subcontrols {
+    margin-top: 0.5rem;
+    display: flex;
+    gap: 0.625rem;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .place-toggle-col {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  /* Toggle switch (matches Switch component in webapp) */
+  .switch {
+    position: relative;
+    width: 2.25rem;
+    height: 1.25rem;
+    flex-shrink: 0;
+    cursor: pointer;
+  }
+  .switch input {
+    position: absolute;
+    opacity: 0;
+    width: 0; height: 0;
+  }
+  .switch-track {
+    position: absolute;
+    inset: 0;
+    background: var(--border-default);
+    border-radius: 2rem;
+    transition: 0.2s;
+  }
+  .switch-thumb {
+    position: absolute;
+    top: 0.125rem; left: 0.125rem;
+    width: 1rem; height: 1rem;
+    background: #fff;
+    border-radius: 50%;
+    transition: 0.2s;
+    box-shadow: 0 0.0625rem 0.1875rem rgba(0, 0, 0, 0.15);
+  }
+  .switch input:checked + .switch-track {
+    background: var(--primary);
+  }
+  .switch input:checked + .switch-track + .switch-thumb {
+    transform: translateX(1rem);
+  }
+
+  /* Inline chip */
+  .chip-group {
+    display: inline-flex;
+    align-items: center;
+    background: var(--bg-secondary);
+    border-radius: 0.25rem;
+    padding: 0.1875rem;
+    gap: 0.125rem;
+  }
+  .chip-group button {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--txt-secondary);
+    padding: 0.3125rem 0.75rem;
+    border-radius: 0.2rem;
+  }
+  .chip-group button:hover { color: var(--txt-base); }
+  .chip-group button.selected {
+    background: #fff;
+    color: var(--primary);
+    box-shadow: 0 0.0625rem 0.25rem rgba(0, 0, 0, 0.08);
+  }
+
+  .inline-select {
+    font-family: inherit;
+    font-size: 0.8125rem;
+    color: var(--txt-base);
+    background: #fff;
+    border: 0.0625rem solid var(--border-default);
+    border-radius: 0.2rem;
+    padding: 0.25rem 0.5rem;
+  }
+  .inline-input {
+    font-family: inherit;
+    font-size: 0.8125rem;
+    color: var(--txt-base);
+    background: #fff;
+    border: 0.0625rem solid var(--border-default);
+    border-radius: 0.2rem;
+    padding: 0.25rem 0.5rem;
+    width: 3.5rem;
+    text-align: center;
+  }
+
+  /* ============================================================
+     Content behaviour — toggle rows
+     ============================================================ */
+  .toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.75rem 0;
+    border-bottom: 0.0625rem solid var(--border-card);
+  }
+  .toggle-row:last-child { border-bottom: none; }
+  .toggle-row-text { flex: 1; min-width: 0; }
+  .toggle-row-label {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--txt-base);
+  }
+  .toggle-row-help {
+    font-size: 0.8125rem;
+    color: var(--txt-secondary);
+    margin-top: 0.125rem;
+    line-height: 1.15rem;
+  }
+
+  /* ============================================================
+     Teaser style — radio cards
+     ============================================================ */
+  .teaser-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.625rem;
+  }
+  .teaser {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    background: #fff;
+    border: 0.0625rem solid var(--border-card);
+    border-radius: 0.25rem;
+    text-align: left;
+    transition: 0.2s;
+  }
+  .teaser:hover { border-color: var(--secondary); }
+  .teaser.selected {
+    border-color: var(--primary);
+    background: var(--tint);
+    box-shadow: inset 0 0 0 0.0625rem var(--primary);
+  }
+  .teaser-preview {
+    aspect-ratio: 16/9;
+    background: var(--bg-secondary);
+    border-radius: 0.2rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .teaser-preview.standard { background: linear-gradient(135deg, #D4ECE4, #91F54A33); }
+  .teaser-preview.small { background: linear-gradient(135deg, var(--bg-secondary), var(--tint)); }
+  .teaser-preview.small-no-text { background: linear-gradient(135deg, #DDE1E4, #EBEBEB); }
+  .teaser-preview.big { background: linear-gradient(135deg, var(--primary), #91F54A); }
+  .teaser-preview::after {
+    content: '';
+    position: absolute;
+    bottom: 0.375rem; left: 0.375rem; right: 0.375rem;
+    height: 0.5rem;
+    background: rgba(255,255,255,0.6);
+    border-radius: 0.125rem;
+  }
+  .teaser.small .teaser-preview::after,
+  .teaser.small-no-text .teaser-preview::after { display: none; }
+  .teaser-name {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--txt-base);
+  }
+  .teaser-desc {
+    font-size: 0.6875rem;
+    color: var(--txt-secondary);
+    line-height: 0.9rem;
+  }
+
+  /* ============================================================
+     Advanced collapse
+     ============================================================ */
+  .advanced {
+    background: var(--bg-secondary);
+    border: 0.0625rem solid var(--border-card);
+    border-radius: 0.25rem;
+    margin-top: 1rem;
+    overflow: hidden;
+  }
+  .advanced-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.875rem 1.25rem;
+    width: 100%;
+    text-align: left;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--txt-base);
+  }
+  .advanced-head svg { transition: 0.2s; }
+  .advanced.open .advanced-head svg { transform: rotate(90deg); }
+  .advanced-body {
+    display: none;
+    padding: 0 1.25rem 1rem;
+    background: #fff;
+    border-top: 0.0625rem solid var(--border-card);
+  }
+  .advanced.open .advanced-body { display: block; }
+
+  /* ============================================================
+     Sticky footer
+     ============================================================ */
+  .modal-footer {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 1.5rem;
+    border-top: 0.0625rem solid var(--border-card);
+    background: #fff;
+  }
+  .unsaved {
+    flex: 1;
+    font-size: 0.8125rem;
+    color: var(--txt-secondary);
+  }
+  .unsaved strong { color: var(--secondary); font-weight: 600; }
+  .unsaved.none strong { color: var(--txt-disabled); }
+
+  /* Buttons */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.5rem;
+    padding: 0.4rem 1.5rem;
+    border-radius: 0.25rem;
+    border: 0.125rem solid;
+    transition: 0.3s;
+    white-space: nowrap;
+    font-family: inherit;
+  }
+  .btn-primary {
+    color: var(--btn-primary-text);
+    background: var(--btn-primary-bg);
+    border-color: var(--btn-primary-bg);
+  }
+  .btn-primary:hover {
+    background: #fff;
+    border-color: var(--btn-primary-bg);
+  }
+  .btn-primary:disabled {
+    background: #F8F5E3;
+    border-color: #F8F5E3;
+    color: var(--txt-disabled);
+    cursor: not-allowed;
+  }
+  .btn-secondary {
+    color: var(--primary);
+    background: #fff;
+    border-color: #AFB6BC;
+  }
+  .btn-secondary:hover { background: var(--border-divider); }
+
+  /* Tag pickers (simplified) */
+  .tag-stack { display: flex; flex-wrap: wrap; gap: 0.375rem; }
+  .tag-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.3125rem 0.625rem;
+    font-size: 0.8125rem;
+    color: var(--primary);
+    background: var(--tint);
+    border-radius: 0.2rem;
+    border: 0.0625rem solid var(--tint-deep);
+  }
+  .tag-pill button {
+    color: var(--primary);
+    opacity: 0.7;
+    font-size: 1rem;
+    line-height: 0.8;
+  }
+  .tag-pill button:hover { opacity: 1; }
+  .tag-add {
+    padding: 0.3125rem 0.625rem;
+    font-size: 0.8125rem;
+    color: var(--txt-secondary);
+    background: #fff;
+    border: 0.0625rem dashed var(--border-default);
+    border-radius: 0.2rem;
+  }
+  .tag-add:hover { color: var(--primary); border-color: var(--secondary); }
+
+  /* Debug bar */
+  .debug-bar {
+    position: fixed;
+    bottom: 0.75rem;
+    right: 0.75rem;
+    background: #fff;
+    border: 0.0625rem solid var(--border-card);
+    border-radius: 0.25rem;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.75rem;
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.08);
+    z-index: 2000;
+  }
+  .debug-bar label { color: var(--txt-secondary); font-weight: 600; }
+  .debug-bar button {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    background: var(--bg-secondary);
+    color: var(--txt-base);
+  }
+  .debug-bar button:hover { background: var(--tint); color: var(--primary); }
+  .debug-bar button.active { background: var(--primary); color: #fff; }
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <!-- Sidebar -->
+  <aside class="sidebar" aria-label="Navigation">
+    <div class="sidebar-brand">
+      <img src="https://mxz-assets.tchop.it/img/app-icons/aok/dialog_online.svg" alt="dialog online" />
+      <span class="sidebar-brand-label">AOK quantum</span>
+    </div>
+    <nav class="sidebar-section">
+      <div class="sidebar-section-label">Inhalt</div>
+      <button class="sidebar-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>News Feed</button>
+      <button class="sidebar-link active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>Storys</button>
+      <button class="sidebar-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg>Kommentare</button>
+      <button class="sidebar-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>Chats</button>
+    </nav>
+    <nav class="sidebar-section">
+      <div class="sidebar-section-label">Verwaltung</div>
+      <button class="sidebar-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>Integrationen</button>
+      <button class="sidebar-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Benutzer</button>
+      <button class="sidebar-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/></svg>Einstellungen</button>
+    </nav>
+  </aside>
+
+  <div class="main">
+    <header class="navbar">
+      <img class="navbar-logo" src="https://mxz-assets.tchop.it/img/app-icons/aok/dialog_online.svg" alt="" />
+      <div class="navbar-title">Storys</div>
+      <div class="navbar-avatar">MM</div>
+    </header>
+
+    <main class="content">
+      <div class="page-title">Storys</div>
+      <div class="page-intro">Kuratierte Feeds, die automatisch Karten anzeigen und auf Kanäle verteilt werden.</div>
+      <div class="story-list">
+        <div class="story-row">
+          <div class="story-row-title">News</div>
+          <div class="story-row-meta">234 Karten · Zuletzt aktualisiert gerade eben</div>
+        </div>
+        <div class="story-row">
+          <div class="story-row-title">Gesundheit</div>
+          <div class="story-row-meta">112 Karten · vor 3h</div>
+        </div>
+        <div class="story-row">
+          <div class="story-row-title">AOK Intern</div>
+          <div class="story-row-meta">58 Karten · gestern</div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- =====================================================================
+     MODAL: Story settings redesign
+     ===================================================================== -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+
+    <!-- Header -->
+    <div class="modal-header">
+      <div class="modal-header-titles">
+        <div class="modal-eyebrow">Story bearbeiten</div>
+        <input class="modal-title-field" value="News" aria-label="Story-Titel" />
+      </div>
+      <button class="modal-close" aria-label="Schließen" onclick="void 0">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+
+    <!-- Body: left rail + scrollable right -->
+    <div class="modal-body">
+
+      <!-- Section rail -->
+      <nav class="rail" id="rail" aria-label="Abschnitte">
+        <div class="rail-search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          <input type="text" id="railSearch" placeholder="Einstellung suchen…" aria-label="Einstellung suchen" />
+        </div>
+
+        <div class="rail-section-label">Inhalt</div>
+        <button class="rail-link active" data-jump="content">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z"/><path d="M4 9h16"/></svg>
+          Titel &amp; Intro
+        </button>
+
+        <div class="rail-section-label">Einstellungen</div>
+        <button class="rail-link" data-jump="preset">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 2 7l10 5 10-5-10-5z"/><path d="m2 17 10 5 10-5"/><path d="m2 12 10 5 10-5"/></svg>
+          Vorlage
+        </button>
+        <button class="rail-link" data-jump="placement">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          Platzierung
+          <span class="rail-link-changed" title="Geändert"></span>
+        </button>
+        <button class="rail-link" data-jump="behavior">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          Inhaltsverhalten
+        </button>
+        <button class="rail-link" data-jump="teaser">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/></svg>
+          Teaser-Stil
+        </button>
+        <button class="rail-link" data-jump="access">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          Berechtigungen
+        </button>
+        <button class="rail-link" data-jump="tags">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.6 13.4 12 22l-9-9V3h10l8.6 8.6a2 2 0 0 1 0 2.83z"/><circle cx="7" cy="7" r="1" fill="currentColor"/></svg>
+          Tags
+        </button>
+        <button class="rail-link" data-jump="push">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+          Push-Nachrichten
+        </button>
+        <button class="rail-link" data-jump="advanced">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v6m0 10v6M4.22 4.22l4.24 4.24m7.08 7.08 4.24 4.24M1 12h6m10 0h6M4.22 19.78l4.24-4.24m7.08-7.08 4.24-4.24"/></svg>
+          Erweitert
+        </button>
+      </nav>
+
+      <!-- Scrollable content -->
+      <div class="scroll" id="scroll">
+
+        <!-- CONTENT: title / intro / image -->
+        <section class="section" id="content">
+          <div class="section-header">
+            <h2 class="section-title">Titel &amp; Intro</h2>
+          </div>
+          <p class="section-sub">Wie sich deine Story in Feeds und Listen vorstellt. Das Titelbild wird überall dort gezeigt, wo die Story als Karte auftaucht.</p>
+          <div class="content-grid">
+            <div style="display:flex; flex-direction:column; gap:1rem;">
+              <div class="field">
+                <div class="field-head">
+                  <label class="field-label" for="storyIntro">Intro</label>
+                </div>
+                <div class="field-help">Erscheint oben in der Story. Maximal zwei Sätze halten.</div>
+                <textarea id="storyIntro" class="textarea">Aktuelle Nachrichten rund um Gesundheit, Niedersachsen und die AOK.</textarea>
+              </div>
+              <div class="field">
+                <div class="field-head">
+                  <label class="field-label" for="storyUrl">Externe URL (optional)</label>
+                </div>
+                <div class="field-help">Wenn gesetzt, leitet der Titel der Story auf diese Adresse weiter — nützlich für Link-Storys wie „Alle Ausgaben der Mitgliederzeitschrift".</div>
+                <input id="storyUrl" class="input" type="text" placeholder="https://…" />
+              </div>
+            </div>
+            <div>
+              <div class="field-label" style="margin-bottom:0.5rem;">Titelbild</div>
+              <button class="header-image-drop" type="button">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/></svg>
+                <div>Bild ablegen<br /><span style="opacity:0.7">oder zum Hochladen klicken</span></div>
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- PRESETS -->
+        <section class="section" id="preset">
+          <div class="section-header"><h2 class="section-title">Vorlage</h2></div>
+          <p class="section-sub">Wähle eine Vorlage, um sinnvolle Standards für alle Einstellungen auf einmal zu übernehmen. Du kannst danach alles anpassen.</p>
+          <div class="presets" id="presetGrid"></div>
+        </section>
+
+        <!-- PLACEMENT -->
+        <section class="section" id="placement">
+          <div class="section-header"><h2 class="section-title">Platzierung</h2></div>
+          <p class="section-sub">Wo diese Story in deiner App erscheint. Nur aktivierte Platzierungen werden angezeigt.</p>
+
+          <div class="place-card enabled">
+            <div class="place-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+            </div>
+            <div class="place-body">
+              <div class="place-title">News-Feed <span class="tag">Startansicht</span></div>
+              <div class="place-desc">Der erste Feed, den Mitglieder beim Öffnen sehen.</div>
+              <div class="place-subcontrols">
+                <div class="chip-group">
+                  <button class="selected">Web</button>
+                  <button class="selected">Mobile</button>
+                </div>
+                <span style="font-size:0.75rem; color: var(--txt-secondary);">auf beiden Plattformen sichtbar</span>
+              </div>
+            </div>
+            <div class="place-toggle-col">
+              <label class="switch"><input type="checkbox" checked /><span class="switch-track"></span><span class="switch-thumb"></span></label>
+            </div>
+          </div>
+
+          <div class="place-card enabled">
+            <div class="place-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/></svg>
+            </div>
+            <div class="place-body">
+              <div class="place-title">Storys-Tab</div>
+              <div class="place-desc">Die durchsuchbare Liste aller Storys im Kanal.</div>
+            </div>
+            <div class="place-toggle-col">
+              <label class="switch"><input type="checkbox" checked /><span class="switch-track"></span><span class="switch-thumb"></span></label>
+            </div>
+          </div>
+
+          <div class="place-card">
+            <div class="place-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="m8 12 3 3 5-5"/></svg>
+            </div>
+            <div class="place-body">
+              <div class="place-title">Pinned-Tab – „Pinneds"</div>
+              <div class="place-desc">Fester Tab in der Bottom-Navigation der App.</div>
+              <div class="place-subcontrols">
+                <label style="font-size:0.8125rem; color: var(--txt-secondary);">Sichtbarkeit
+                  <select class="inline-select" style="margin-left:0.375rem;">
+                    <option>Nur dieser Kanal</option>
+                    <option>Organisation</option>
+                  </select>
+                </label>
+              </div>
+            </div>
+            <div class="place-toggle-col">
+              <label class="switch"><input type="checkbox" /><span class="switch-track"></span><span class="switch-thumb"></span></label>
+            </div>
+          </div>
+
+          <div class="place-card">
+            <div class="place-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M8 6l-5 6 5 6M16 6l5 6-5 6"/></svg>
+            </div>
+            <div class="place-body">
+              <div class="place-title">Horizontaler Swipe im News-Feed</div>
+              <div class="place-desc">Eingebettete Karussell-Reihe an einer festen Position im News-Feed.</div>
+              <div class="place-subcontrols">
+                <label style="font-size:0.8125rem; color: var(--txt-secondary);">Position
+                  <input type="number" min="1" max="100" value="3" class="inline-input" />
+                </label>
+                <span style="font-size:0.75rem; color: var(--txt-secondary);">(1 = ganz oben)</span>
+              </div>
+            </div>
+            <div class="place-toggle-col">
+              <label class="switch"><input type="checkbox" /><span class="switch-track"></span><span class="switch-thumb"></span></label>
+            </div>
+          </div>
+
+          <div class="place-card empty">
+            <div class="place-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+            </div>
+            <div class="place-body">
+              <div class="place-title">Weitere Tabs <span class="tag">Nicht im Kanal aktiviert</span></div>
+              <div class="place-desc">Zusätzliche Storys- und Pinned-Tabs (2–5) sind in diesem Kanal nicht konfiguriert. Wende dich an einen Org-Admin, um sie zu aktivieren.</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- BEHAVIOUR -->
+        <section class="section" id="behavior">
+          <div class="section-header"><h2 class="section-title">Inhaltsverhalten</h2></div>
+          <p class="section-sub">Wie sich Karten innerhalb dieser Story verhalten. Diese Einstellungen gelten für alle neuen Karten; bestehende bleiben unverändert.</p>
+
+          <div class="toggle-row">
+            <div class="toggle-row-text">
+              <div class="toggle-row-label">Kommentare</div>
+              <div class="toggle-row-help">Mitglieder können Karten in dieser Story kommentieren.</div>
+            </div>
+            <label class="switch"><input type="checkbox" checked /><span class="switch-track"></span><span class="switch-thumb"></span></label>
+          </div>
+          <div class="toggle-row">
+            <div class="toggle-row-text">
+              <div class="toggle-row-label">Likes &amp; Reaktionen</div>
+              <div class="toggle-row-help">Mitglieder können Karten liken oder mit Emoji reagieren.</div>
+            </div>
+            <label class="switch"><input type="checkbox" checked /><span class="switch-track"></span><span class="switch-thumb"></span></label>
+          </div>
+          <div class="toggle-row">
+            <div class="toggle-row-text">
+              <div class="toggle-row-label">Teilen nach außen</div>
+              <div class="toggle-row-help">Mitglieder können Karten per Link-Vorschau außerhalb der App teilen.</div>
+            </div>
+            <label class="switch"><input type="checkbox" /><span class="switch-track"></span><span class="switch-thumb"></span></label>
+          </div>
+          <div class="toggle-row">
+            <div class="toggle-row-text">
+              <div class="toggle-row-label">Autor anzeigen</div>
+              <div class="toggle-row-help">Zeige Name und Avatar der Editor:in über jeder Karte.</div>
+            </div>
+            <label class="switch"><input type="checkbox" checked /><span class="switch-track"></span><span class="switch-thumb"></span></label>
+          </div>
+
+          <div class="field" style="padding-top:1.25rem;">
+            <div class="field-head">
+              <div class="field-label">Sortierung</div>
+            </div>
+            <div class="field-help">Wie Karten im Feed gereiht werden.</div>
+            <div class="field-controls">
+              <div class="chip-group">
+                <button class="selected">Neueste zuerst</button>
+                <button>Manuell sortiert</button>
+                <button>Aktualisiert zuerst</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="field">
+            <div class="field-head">
+              <div class="field-label">Hervorgehobene Kommentare</div>
+            </div>
+            <div class="field-help">Welche Kommentare direkt unter jeder Karte prominent gezeigt werden.</div>
+            <div class="field-controls">
+              <div class="chip-group">
+                <button class="selected">Meistgelikte</button>
+                <button>Manuell</button>
+                <button>Erste Antwort</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="field">
+            <div class="field-head">
+              <div class="field-label">Zeitstempel</div>
+            </div>
+            <div class="field-help">Welches Datum neben der Karte im Feed erscheint.</div>
+            <div class="field-controls">
+              <div class="chip-group">
+                <button class="selected">Erstellt</button>
+                <button>Zuletzt aktualisiert</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- TEASER STYLE -->
+        <section class="section" id="teaser">
+          <div class="section-header"><h2 class="section-title">Teaser-Stil</h2></div>
+          <p class="section-sub">Wie Karten mit Titelbild in dieser Story angezeigt werden. Die Vorschauen spiegeln das tatsächliche Verhalten wider.</p>
+          <div class="teaser-grid">
+            <button class="teaser selected" data-teaser="standard">
+              <div class="teaser-preview standard"></div>
+              <div class="teaser-name">Standard</div>
+              <div class="teaser-desc">Großes Bild, Titel darunter.</div>
+            </button>
+            <button class="teaser" data-teaser="small">
+              <div class="teaser-preview small"></div>
+              <div class="teaser-name">Klein mit Text</div>
+              <div class="teaser-desc">Kleines Bild links, Titel rechts.</div>
+            </button>
+            <button class="teaser" data-teaser="small-no-text">
+              <div class="teaser-preview small-no-text"></div>
+              <div class="teaser-name">Nur Bild, klein</div>
+              <div class="teaser-desc">Kleines Bild ohne Titel.</div>
+            </button>
+            <button class="teaser" data-teaser="big">
+              <div class="teaser-preview big"></div>
+              <div class="teaser-name">Großes Bild</div>
+              <div class="teaser-desc">Volles Bild ohne Text darunter.</div>
+            </button>
+          </div>
+        </section>
+
+        <!-- ACCESS -->
+        <section class="section" id="access">
+          <div class="section-header"><h2 class="section-title">Berechtigungen</h2></div>
+          <p class="section-sub">Wer Karten in dieser Story veröffentlichen darf. Lesen können standardmäßig alle Mitglieder.</p>
+          <div class="toggle-row">
+            <div class="toggle-row-text">
+              <div class="toggle-row-label">Eingeschränkte Editor:innen</div>
+              <div class="toggle-row-help">Nur ausgewählte Editor:innen dürfen posten. Lass dies aus, wenn alle Editor:innen posten dürfen.</div>
+            </div>
+            <label class="switch"><input type="checkbox" /><span class="switch-track"></span><span class="switch-thumb"></span></label>
+          </div>
+          <div class="toggle-row">
+            <div class="toggle-row-text">
+              <div class="toggle-row-label">Mitglieder dürfen posten</div>
+              <div class="toggle-row-help">Nicht-Editor:innen können Karten in diese Story stellen — geeignet für offene Feeds und Foren.</div>
+            </div>
+            <label class="switch"><input type="checkbox" /><span class="switch-track"></span><span class="switch-thumb"></span></label>
+          </div>
+        </section>
+
+        <!-- TAGS -->
+        <section class="section" id="tags">
+          <div class="section-header"><h2 class="section-title">Standard-Tags</h2></div>
+          <p class="section-sub">Tags, die automatisch an jede neue Karte in dieser Story vergeben werden. Editor:innen können sie pro Karte anpassen.</p>
+          <div class="field">
+            <div class="field-label">Interne Tags</div>
+            <div class="field-help">Nicht für Mitglieder sichtbar — dienen der internen Organisation.</div>
+            <div class="tag-stack" style="margin-top:0.5rem;">
+              <span class="tag-pill">Gesundheit <button aria-label="Entfernen">×</button></span>
+              <span class="tag-pill">Kuratiert <button aria-label="Entfernen">×</button></span>
+              <button class="tag-add">+ Tag hinzufügen</button>
+            </div>
+          </div>
+          <div class="field">
+            <div class="field-label">Sichtbare Tags</div>
+            <div class="field-help">Werden in der App als Chips unter der Karte angezeigt.</div>
+            <div class="tag-stack" style="margin-top:0.5rem;">
+              <span class="tag-pill">#Niedersachsen <button aria-label="Entfernen">×</button></span>
+              <button class="tag-add">+ Tag hinzufügen</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- PUSH -->
+        <section class="section" id="push">
+          <div class="section-header"><h2 class="section-title">Push-Nachrichten</h2></div>
+          <p class="section-sub">Automatische Push-Nachrichten beim Erstellen neuer Karten in dieser Story.</p>
+          <div class="toggle-row">
+            <div class="toggle-row-text">
+              <div class="toggle-row-label">Bei neuer Karte automatisch senden</div>
+              <div class="toggle-row-help">Jede neu veröffentlichte Karte löst eine Push-Nachricht an alle berechtigten Mitglieder aus.</div>
+            </div>
+            <label class="switch"><input type="checkbox" /><span class="switch-track"></span><span class="switch-thumb"></span></label>
+          </div>
+          <div class="toggle-row">
+            <div class="toggle-row-text">
+              <div class="toggle-row-label">Nur bei „Prio hoch"</div>
+              <div class="toggle-row-help">Push nur auslösen, wenn Editor:innen die Karte als hoch priorisiert markiert haben.</div>
+            </div>
+            <label class="switch"><input type="checkbox" /><span class="switch-track"></span><span class="switch-thumb"></span></label>
+          </div>
+        </section>
+
+        <!-- ADVANCED -->
+        <section class="section" id="advanced">
+          <div class="section-header"><h2 class="section-title">Erweitert</h2></div>
+          <p class="section-sub">Selten benötigte Einstellungen. Standardwerte sind meist die beste Wahl.</p>
+
+          <div class="advanced" id="advanced1">
+            <button class="advanced-head" onclick="toggleAdvanced('advanced1')">
+              Duplikate vermeiden
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+            </button>
+            <div class="advanced-body">
+              <div class="field">
+                <div class="field-help">Verhindere, dass dieselbe URL innerhalb eines Zeitfensters mehrfach als Karte erscheint.</div>
+                <div class="field-controls">
+                  <select class="select" style="max-width:18rem;">
+                    <option>Nie prüfen</option>
+                    <option>Innerhalb von 24 Stunden</option>
+                    <option>Innerhalb von 7 Tagen</option>
+                    <option>Innerhalb von 30 Tagen</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="advanced" id="advanced2">
+            <button class="advanced-head" onclick="toggleAdvanced('advanced2')">
+              Karten-Limit
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+            </button>
+            <div class="advanced-body">
+              <div class="field">
+                <div class="field-help">Maximale Anzahl an Karten in dieser Story. Ältere werden automatisch archiviert. (Nur für Staff)</div>
+                <div class="field-controls">
+                  <select class="select" style="max-width:12rem;">
+                    <option>1.000</option>
+                    <option>2.000</option>
+                    <option>5.000</option>
+                    <option>10.000</option>
+                    <option>20.000</option>
+                    <option>Unbegrenzt</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="advanced" id="advanced3">
+            <button class="advanced-head" onclick="toggleAdvanced('advanced3')">
+              Kanal-Synchronisation
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+            </button>
+            <div class="advanced-body">
+              <div class="field">
+                <div class="field-help">Spiegle diese Story automatisch in einen oder mehrere andere Kanäle. Änderungen erfolgen nur in der Quell-Story.</div>
+                <div class="tag-stack" style="margin-top:0.5rem;">
+                  <button class="tag-add">+ Ziel-Kanal wählen</button>
+                </div>
+              </div>
+              <div class="toggle-row">
+                <div class="toggle-row-text">
+                  <div class="toggle-row-label">Position zwischen verbundenen Storys synchronisieren</div>
+                  <div class="toggle-row-help">Wenn Karten neu sortiert werden, gilt die Reihenfolge auch für alle gespiegelten Kopien.</div>
+                </div>
+                <label class="switch"><input type="checkbox" /><span class="switch-track"></span><span class="switch-thumb"></span></label>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </div>
+
+    <!-- Sticky footer -->
+    <div class="modal-footer">
+      <div class="unsaved" id="unsaved"><strong>1 Änderung</strong> nicht gespeichert</div>
+      <button class="btn btn-secondary">Abbrechen</button>
+      <button class="btn btn-primary">Speichern</button>
+    </div>
+  </div>
+</div>
+
+<!-- Debug bar -->
+<div class="debug-bar">
+  <label>View:</label>
+  <button id="stateEdit" class="active">Edit existing</button>
+  <button id="stateNew">Create new</button>
+</div>
+
+<script>
+/* ============================================================
+   Presets — see .impeccable-inventory.md for expansion candidates
+   ============================================================ */
+const PRESETS = [
+  { id: 'news',         name: 'News',                desc: 'Kuratierte Nachrichten, offen für Kommentare, Push optional.',             icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14h-8M15 18h-5M10 6h8v4h-8z"/></svg>' },
+  { id: 'announcement', name: 'Ankündigung',         desc: 'Wichtige Mitteilungen, Pinned-Tab, Push an, Kommentare aus.',              icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg>' },
+  { id: 'social',       name: 'Social Wall',         desc: 'Offener Mix aus Social-Posts, Likes an, keine Kommentare, kleiner Teaser.',icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="7" r="4"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg>' },
+  { id: 'team',         name: 'Team-Kanal',          desc: 'Interne Team-Updates, nur Editor:innen, Push für Prio-Karten.',            icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>' },
+  { id: 'forum',        name: 'Mitglieder-Forum',    desc: 'Alle Mitglieder dürfen posten, Kommentare an, kein Push.',                 icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>' },
+  { id: 'custom',       name: 'Eigene Einstellungen',desc: 'Ohne Vorlage — alle Werte auf Standard.',                                  icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>' },
+];
+
+let selectedPreset = 'news';
+
+function renderPresets() {
+  const grid = document.getElementById('presetGrid');
+  grid.innerHTML = PRESETS.map(p => `
+    <button class="preset ${p.id === selectedPreset ? 'selected' : ''}" data-preset="${p.id}" onclick="selectPreset('${p.id}')">
+      <div class="preset-icon">${p.icon}</div>
+      <div class="preset-name">${p.name}</div>
+      <div class="preset-desc">${p.desc}</div>
+    </button>
+  `).join('');
+}
+function selectPreset(id) {
+  selectedPreset = id;
+  renderPresets();
+}
+
+/* Teaser radio */
+document.addEventListener('click', (e) => {
+  const t = e.target.closest('.teaser');
+  if (!t) return;
+  document.querySelectorAll('.teaser').forEach(el => el.classList.remove('selected'));
+  t.classList.add('selected');
+});
+
+/* Advanced collapses */
+function toggleAdvanced(id) {
+  const el = document.getElementById(id);
+  if (el) el.classList.toggle('open');
+}
+
+/* Place-card toggles: flip "enabled" styling when switch flips */
+document.addEventListener('change', (e) => {
+  if (!e.target.matches('.place-card .switch input')) return;
+  const card = e.target.closest('.place-card');
+  card.classList.toggle('enabled', e.target.checked);
+});
+
+/* Rail jump + active state on scroll */
+const rail = document.getElementById('rail');
+const scroll = document.getElementById('scroll');
+rail.addEventListener('click', (e) => {
+  const btn = e.target.closest('.rail-link[data-jump]');
+  if (!btn) return;
+  const id = btn.dataset.jump;
+  const target = document.getElementById(id);
+  if (!target) return;
+  scroll.scrollTo({ top: target.offsetTop - 16, behavior: 'smooth' });
+});
+scroll.addEventListener('scroll', () => {
+  const sections = Array.from(document.querySelectorAll('.section'));
+  const threshold = scroll.scrollTop + 40;
+  let active = sections[0];
+  for (const s of sections) {
+    if (s.offsetTop <= threshold) active = s;
+  }
+  document.querySelectorAll('.rail-link[data-jump]').forEach(l => {
+    l.classList.toggle('active', l.dataset.jump === active.id);
+  });
+});
+
+/* Rail search: filter rail items by label */
+document.getElementById('railSearch').addEventListener('input', (e) => {
+  const q = e.target.value.trim().toLowerCase();
+  document.querySelectorAll('.rail-link[data-jump]').forEach(l => {
+    const text = l.textContent.toLowerCase();
+    l.classList.toggle('hidden', q && !text.includes(q));
+  });
+});
+
+/* Debug view toggle */
+function setView(which) {
+  const editBtn = document.getElementById('stateEdit');
+  const newBtn = document.getElementById('stateNew');
+  const title = document.querySelector('.modal-title-field');
+  const eyebrow = document.querySelector('.modal-eyebrow');
+  const unsaved = document.getElementById('unsaved');
+  const saveBtn = document.querySelector('.btn-primary');
+  if (which === 'edit') {
+    editBtn.classList.add('active'); newBtn.classList.remove('active');
+    title.value = 'News';
+    eyebrow.textContent = 'Story bearbeiten';
+    unsaved.innerHTML = '<strong>1 Änderung</strong> nicht gespeichert';
+    saveBtn.textContent = 'Speichern';
+  } else {
+    newBtn.classList.add('active'); editBtn.classList.remove('active');
+    title.value = 'Neue Story';
+    title.focus(); title.select();
+    eyebrow.textContent = 'Neue Story anlegen';
+    unsaved.innerHTML = '<strong>Noch nicht gespeichert</strong>';
+    saveBtn.textContent = 'Story anlegen';
+  }
+}
+document.getElementById('stateEdit').addEventListener('click', () => setView('edit'));
+document.getElementById('stateNew').addEventListener('click', () => setView('new'));
+
+/* init */
+renderPresets();
+</script>
+</body>
+</html>

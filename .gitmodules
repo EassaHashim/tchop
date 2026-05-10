@@ -1,0 +1,3 @@
+[submodule ".claude/skills/frontend-slides"]
+	path = .claude/skills/frontend-slides
+	url = https://github.com/zarazhangrui/frontend-slides.git

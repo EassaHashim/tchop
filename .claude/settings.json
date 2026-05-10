@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:tchop.io)",
+      "Bash(claude mcp list)",
+      "Bash(python3:*)",
+      "WebFetch",
+      "Bash(curl *)"
+    ]
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/bin/session-start.sh\""
+          }
+        ]
+      }
+    ]
+  },
+  "enabledPlugins": {
+    "compound-engineering@compound-engineering-plugin": true
+  }
+}

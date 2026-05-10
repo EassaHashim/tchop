@@ -1,0 +1,141 @@
+<template id="bg-ambient-template">
+  <div data-composition-id="bg-ambient" data-width="1920" data-height="1080" data-start="0" data-duration="30">
+    <div class="bg-base"></div>
+    <div class="glow glow-coral"></div>
+    <div class="glow glow-blue"></div>
+    <div class="starfield" id="starfield"></div>
+    <div class="grid-overlay"></div>
+
+    <style>
+      [data-composition-id="bg-ambient"] {
+        position: absolute;
+        inset: 0;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background: #2D2D46;
+      }
+      [data-composition-id="bg-ambient"] .bg-base {
+        position: absolute;
+        inset: 0;
+        background: #2D2D46;
+        z-index: 1;
+      }
+      [data-composition-id="bg-ambient"] .glow {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(60px);
+        z-index: 2;
+        will-change: transform, opacity;
+      }
+      [data-composition-id="bg-ambient"] .glow-coral {
+        width: 1200px;
+        height: 1200px;
+        top: -400px;
+        left: -300px;
+        background: radial-gradient(circle, rgba(246,112,77,0.22) 0%, rgba(246,112,77,0) 60%);
+      }
+      [data-composition-id="bg-ambient"] .glow-blue {
+        width: 900px;
+        height: 900px;
+        bottom: -350px;
+        right: -200px;
+        background: radial-gradient(circle, rgba(72,142,216,0.16) 0%, rgba(72,142,216,0) 60%);
+      }
+      [data-composition-id="bg-ambient"] .starfield {
+        position: absolute;
+        inset: 0;
+        z-index: 3;
+      }
+      [data-composition-id="bg-ambient"] .star {
+        position: absolute;
+        background: #F1F1F3;
+        border-radius: 50%;
+        will-change: transform, opacity;
+      }
+      [data-composition-id="bg-ambient"] .grid-overlay {
+        position: absolute;
+        inset: 0;
+        z-index: 4;
+        background-image:
+          linear-gradient(to right, rgba(241,241,243,0.035) 1px, transparent 1px),
+          linear-gradient(to bottom, rgba(241,241,243,0.035) 1px, transparent 1px);
+        background-size: 160px 160px;
+        opacity: 0.6;
+      }
+    </style>
+
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <script>
+      (function () {
+        function mulberry32(seed) {
+          return function () {
+            seed |= 0; seed = (seed + 0x6D2B79F5) | 0;
+            var t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+            t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+            return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+          };
+        }
+
+        var rand = mulberry32(1337);
+        var field = document.getElementById("starfield");
+        var STAR_COUNT = 140;
+        var stars = [];
+        for (var i = 0; i < STAR_COUNT; i++) {
+          var s = document.createElement("div");
+          s.className = "star";
+          var size = rand() < 0.15 ? 2.4 : (rand() < 0.5 ? 1.6 : 1.0);
+          var x = rand() * 1920;
+          var y = rand() * 1080;
+          var baseOpacity = 0.18 + rand() * 0.42;
+          s.style.width = size + "px";
+          s.style.height = size + "px";
+          s.style.left = x + "px";
+          s.style.top = y + "px";
+          s.style.opacity = baseOpacity;
+          field.appendChild(s);
+          stars.push({ el: s, x: x, y: y, baseOpacity: baseOpacity, speed: 0.3 + rand() * 0.7 });
+        }
+
+        window.__timelines = window.__timelines || {};
+        var tl = gsap.timeline({ paused: true });
+
+        // Coral glow slow breathe
+        tl.to(".glow-coral", {
+          scale: 1.08, opacity: 0.75,
+          duration: 7, ease: "sine.inOut",
+          repeat: 4, yoyo: true
+        }, 0);
+
+        // Blue glow counter-breathe
+        tl.to(".glow-blue", {
+          scale: 1.12, opacity: 0.7,
+          duration: 8, ease: "sine.inOut",
+          repeat: 3, yoyo: true
+        }, 1.5);
+
+        // Starfield parallax drift — each star moves slowly
+        stars.forEach(function (star, idx) {
+          var dx = (idx % 2 === 0 ? 1 : -1) * (8 + star.speed * 18);
+          var dy = (idx % 3 === 0 ? 1 : -1) * (4 + star.speed * 10);
+          tl.to(star.el, {
+            x: dx, y: dy,
+            duration: 30, ease: "none"
+          }, 0);
+          // Twinkle — subtle opacity pulse, finite repeats
+          var cycleDur = 3.5 + star.speed * 2.5;
+          var repeats = Math.ceil(30 / cycleDur) - 1;
+          tl.to(star.el, {
+            opacity: star.baseOpacity * 0.35,
+            duration: cycleDur / 2,
+            ease: "sine.inOut",
+            repeat: repeats,
+            yoyo: true
+          }, idx * 0.03);
+        });
+
+        window.__timelines["bg-ambient"] = tl;
+      })();
+    </script>
+  </div>
+</template>

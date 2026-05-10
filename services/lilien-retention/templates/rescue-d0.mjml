@@ -1,0 +1,209 @@
+<mjml>
+  <mj-head>
+    <mj-attributes>
+      <mj-all font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" />
+      <mj-text font-size="16px" line-height="1.55" color="#2D2D46" />
+      <mj-section padding="0" />
+    </mj-attributes>
+    <mj-style>
+      a { color: #004B8D; text-decoration: none; }
+      .card-headline { color: #2D2D46 !important; text-decoration: none !important; }
+      .card-source { color: #8B8B9B !important; font-size: 12px !important; text-transform: uppercase; letter-spacing: 0.5px; }
+      .quote-border { border-left: 4px solid #004B8D !important; }
+      .comment-text { color: #43445B !important; }
+      .section-label { color: #8B8B9B !important; font-size: 11px !important; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+      .footer-link { color: #8B8B9B !important; }
+    </mj-style>
+    <mj-preview>{{app_name}} -- Schau mal, was los ist</mj-preview>
+  </mj-head>
+
+  <mj-body background-color="#F0F0F2" width="600px">
+
+    <!-- Top accent line -->
+    <mj-section padding="0">
+      <mj-column>
+        <mj-divider border-color="#004B8D" border-width="4px" padding="0" />
+      </mj-column>
+    </mj-section>
+
+    <!-- Header with logo -->
+    <mj-section background-color="#FFFFFF" padding="32px 40px 24px 40px">
+      <mj-column>
+        <mj-image
+          src="https://mxz-assets.s3.eu-central-1.amazonaws.com/webapp/lilien.svg"
+          alt="{{app_name}}"
+          width="48px"
+          align="left"
+          padding="0"
+        />
+      </mj-column>
+    </mj-section>
+
+    <!-- Greeting + hook -->
+    <mj-section background-color="#FFFFFF" padding="0 40px 16px 40px">
+      <mj-column>
+        <mj-text font-size="22px" font-weight="700" line-height="1.2" color="#2D2D46" padding="0 0 16px 0">
+          Hallo {{user_name}},
+        </mj-text>
+        <mj-text font-size="16px" line-height="1.55" color="#43445B" padding="0">
+          In der Community wird gerade diskutiert. Hier ist, was du verpasst:
+        </mj-text>
+      </mj-column>
+    </mj-section>
+
+    <!-- CARD 1 -->
+    <mj-section background-color="#FFFFFF" padding="8px 40px 0 40px" css-class="card-1-wrapper">
+      <mj-column background-color="#F6F6F8" border-radius="12px" padding="0">
+        <!-- IMAGE (conditionally hidden via Postmark when empty) -->
+        <mj-image
+          src="{{card_1_image}}"
+          alt="{{card_1_headline}}"
+          border-radius="12px 12px 0 0"
+          padding="0"
+          href="{{card_1_deeplink}}"
+          css-class="card-1-image"
+        />
+        <mj-text font-size="12px" line-height="1.3" padding="14px 20px 0 20px" css-class="card-source">
+          {{card_1_source}}
+        </mj-text>
+        <mj-text font-size="17px" font-weight="600" line-height="1.3" color="#2D2D46" padding="4px 20px 4px 20px">
+          <a href="{{card_1_deeplink}}" class="card-headline" style="color: #2D2D46; text-decoration: none;">
+            {{card_1_headline}}
+          </a>
+        </mj-text>
+        <mj-text font-size="14px" line-height="1.45" color="#5A5A6E" padding="0 20px 16px 20px">
+          {{card_1_teaser}}
+        </mj-text>
+      </mj-column>
+    </mj-section>
+
+    <!-- CARD 2 -->
+    <mj-section background-color="#FFFFFF" padding="12px 40px 0 40px" css-class="card-2-wrapper">
+      <mj-column background-color="#F6F6F8" border-radius="12px" padding="0">
+        <mj-image
+          src="{{card_2_image}}"
+          alt="{{card_2_headline}}"
+          border-radius="12px 12px 0 0"
+          padding="0"
+          href="{{card_2_deeplink}}"
+          css-class="card-2-image"
+        />
+        <mj-text font-size="12px" line-height="1.3" padding="14px 20px 0 20px" css-class="card-source">
+          {{card_2_source}}
+        </mj-text>
+        <mj-text font-size="17px" font-weight="600" line-height="1.3" color="#2D2D46" padding="4px 20px 4px 20px">
+          <a href="{{card_2_deeplink}}" class="card-headline" style="color: #2D2D46; text-decoration: none;">
+            {{card_2_headline}}
+          </a>
+        </mj-text>
+        <mj-text font-size="14px" line-height="1.45" color="#5A5A6E" padding="0 20px 16px 20px">
+          {{card_2_teaser}}
+        </mj-text>
+      </mj-column>
+    </mj-section>
+
+    <!-- CARD 3 -->
+    <mj-section background-color="#FFFFFF" padding="12px 40px 0 40px" css-class="card-3-wrapper">
+      <mj-column background-color="#F6F6F8" border-radius="12px" padding="0">
+        <mj-image
+          src="{{card_3_image}}"
+          alt="{{card_3_headline}}"
+          border-radius="12px 12px 0 0"
+          padding="0"
+          href="{{card_3_deeplink}}"
+          css-class="card-3-image"
+        />
+        <mj-text font-size="12px" line-height="1.3" padding="14px 20px 0 20px" css-class="card-source">
+          {{card_3_source}}
+        </mj-text>
+        <mj-text font-size="17px" font-weight="600" line-height="1.3" color="#2D2D46" padding="4px 20px 4px 20px">
+          <a href="{{card_3_deeplink}}" class="card-headline" style="color: #2D2D46; text-decoration: none;">
+            {{card_3_headline}}
+          </a>
+        </mj-text>
+        <mj-text font-size="14px" line-height="1.45" color="#5A5A6E" padding="0 20px 16px 20px">
+          {{card_3_teaser}}
+        </mj-text>
+      </mj-column>
+    </mj-section>
+
+    <!-- COMMUNITY COMMENTS SECTION -->
+    <mj-section background-color="#FFFFFF" padding="28px 40px 0 40px">
+      <mj-column>
+        <mj-text font-size="11px" line-height="1.3" padding="0 0 12px 0" css-class="section-label">
+          Was die Community sagt
+        </mj-text>
+        <mj-divider border-color="#E8E8EC" border-width="1px" padding="0 0 4px 0" />
+      </mj-column>
+    </mj-section>
+
+    <!-- Comment 1 -->
+    <mj-section background-color="#FFFFFF" padding="8px 40px 0 40px">
+      <mj-column>
+        <mj-text font-size="14px" line-height="1.5" color="#43445B" padding="0 0 4px 0" css-class="comment-text">
+          &ldquo;{{comment_1_text}}&rdquo;
+        </mj-text>
+        <mj-text font-size="12px" line-height="1.3" color="#8B8B9B" padding="0 0 12px 0">
+          {{comment_1_likes}} Reaktionen
+        </mj-text>
+        <mj-divider border-color="#F0F0F2" border-width="1px" padding="0" />
+      </mj-column>
+    </mj-section>
+
+    <!-- Comment 2 -->
+    <mj-section background-color="#FFFFFF" padding="8px 40px 0 40px">
+      <mj-column>
+        <mj-text font-size="14px" line-height="1.5" color="#43445B" padding="0 0 4px 0" css-class="comment-text">
+          &ldquo;{{comment_2_text}}&rdquo;
+        </mj-text>
+        <mj-text font-size="12px" line-height="1.3" color="#8B8B9B" padding="0 0 4px 0">
+          {{comment_2_likes}} Reaktionen
+        </mj-text>
+      </mj-column>
+    </mj-section>
+
+    <!-- CTA button -->
+    <mj-section background-color="#FFFFFF" padding="24px 40px 12px 40px">
+      <mj-column>
+        <mj-button
+          background-color="#004B8D"
+          color="#FFFFFF"
+          font-size="15px"
+          font-weight="600"
+          border-radius="8px"
+          inner-padding="14px 32px"
+          href="{{cta_deeplink}}"
+          align="left"
+        >
+          Jetzt in der App ansehen
+        </mj-button>
+      </mj-column>
+    </mj-section>
+
+    <!-- Closing -->
+    <mj-section background-color="#FFFFFF" padding="4px 40px 36px 40px">
+      <mj-column>
+        <mj-text font-size="15px" line-height="1.55" color="#43445B" padding="0">
+          Bis bald in der Community.
+        </mj-text>
+      </mj-column>
+    </mj-section>
+
+    <!-- Footer -->
+    <mj-section padding="24px 40px 16px 40px">
+      <mj-column>
+        <mj-text font-size="13px" line-height="1.5" color="#8B8B9B" align="left" padding="0">
+          Du bekommst diese E-Mail, weil du dich bei {{app_name}} registriert hast.
+        </mj-text>
+      </mj-column>
+    </mj-section>
+    <mj-section padding="0 40px 32px 40px">
+      <mj-column>
+        <mj-text font-size="13px" line-height="1.5" color="#8B8B9B" align="left" padding="0">
+          <a href="{{unsubscribe_url}}" class="footer-link" style="color: #8B8B9B; text-decoration: underline;">Abmelden</a>
+        </mj-text>
+      </mj-column>
+    </mj-section>
+
+  </mj-body>
+</mjml>
